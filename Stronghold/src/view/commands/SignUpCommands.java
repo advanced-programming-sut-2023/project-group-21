@@ -12,7 +12,7 @@ public enum SignUpCommands {
     BACK("\\s*back\\s*"),
     PICK_QUESTION(
             "\\s*pick\\+question\\s+-q\\s+(?<questionNumber>\\d+)\\s+-a\\s+(?<answer>\\S+)\\s+-c\\s+(?<confirm>\\S+)\\s*");
-    public String regex;
+    private String regex;
     SignUpCommands(String regex){
         this.regex=regex;
     }
