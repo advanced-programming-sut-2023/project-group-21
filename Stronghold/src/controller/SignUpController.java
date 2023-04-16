@@ -15,8 +15,11 @@ public class SignUpController {
         return SignUpMessages.SUCCESS;
     }
 
-    public void createUser(String username, String password, String email, String nickname, String slogan,int number,String answer){
+    public User createUser(String username, String password, String email, String nickname, String slogan,int number,String answer){
         User user = new User(username,password,nickname,email,slogan);
+        String info = packUser(username,password,email,slogan,nickname,number,answer);
+        addToFile(info);
+        return user;
     }
     private boolean checkExistenceOfUserOrEmail(String info,boolean flag){// if flag username else email
         FileInputStream fileInputStream;
@@ -60,6 +63,9 @@ public class SignUpController {
             temp += "##^^^";
         else
             temp += ("##"+nickname);
+        temp += ("##"+questionNumber);
+        temp += ("##"+answer);
+        temp += ("##"+0);
         return temp;
     }
     public SignUpMessages pickQuestion(int number,String answer,String confirm){

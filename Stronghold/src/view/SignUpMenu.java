@@ -1,6 +1,7 @@
 package view;
 
 import controller.SignUpController;
+import model.User;
 import view.commands.CheckValidion;
 import view.commands.SignUpCommands;
 import view.message.SignUpMessages;
@@ -31,7 +32,7 @@ public class SignUpMenu {
         String confirm = matcher.group("confirm");
         String email = matcher.group("email");
         String slogan = matcher.group("slogan");
-        String nickname = matcher.group("nicknam");
+        String nickname = matcher.group("nickname");
         String answer = "";
         int questionNumber = 0;
         if(email == null)
@@ -58,6 +59,10 @@ public class SignUpMenu {
             if (questionNumber <= 3 && questionNumber > 0) {
                 System.out.println("what is your answer?");
                 answer = scanner.nextLine();
+                User user = new User(username,password,nickname,email,slogan);
+                PlayerMenu playerMenu = new PlayerMenu(user);
+                System.out.println("you are in player menu");
+                playerMenu.run(scanner);
             }else
                 System.out.println("out of range");
         }

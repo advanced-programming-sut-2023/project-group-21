@@ -2,8 +2,13 @@ package view;
 
 import java.util.Scanner;
 import java.util.regex.Matcher;
+import model.User;
 
 public class PlayerMenu {
+    private User user;
+    PlayerMenu(User user){
+        this.user = user;
+    }
     public void run(Scanner scanner){
 
     }
