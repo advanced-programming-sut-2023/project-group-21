@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public enum SignUpCommands {
     REGISTER_WITH_PASSWORD(
-            "\\s*create\\s+user\\s+-u\\s+(?<username>\\S+)\\s+-p\\s+(?<password>\\S+)\\s+(?<confirm>\\S+)\\s+-e\\s+(?<email>\\S+)(\\s+-s\\s+(?<slogan>.*))?(\\s+-n\\s+(?<nickname>\\S+))?\\s*$"),
+            "\\s*create\\s+user\\s+-u\\s+(?<username>\\S+)\\s+-p\\s+(?<password>\\S+)\\s+(?<confirm>\\S+)(\\s+-e\\s+(?<email>\\S+))?(\\s+-s\\s+(?<slogan>.*))?(\\s+-n\\s+(?<nickname>\\S+))?\\s*$"),
     REGISTER_WITH_RANDOM_PASSWORD(
             "\\s*user\\s+create\\s+-u\\s+(?<username>\\S+)\\s+-p\\s+(?<password>\\S+)\\s+random\\s+email\\s+(?<email>\\S+)(\\s+-s(?<slogan>.*))?\\s*$"),
     HELP("\\s*help\\s*"),

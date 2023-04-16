@@ -1,19 +1,28 @@
 package model;
 
 public class User {
-    String userName, passWord, nickName, email, slogan;
-    int passwordRecoveryQuestionIndex, highScore;
+    private String username, password, nickname, email, slogan;
+    int highScore;
 
-    public String getUserName() {
-        return userName;
+    public User(String username,String password,String nickName,String email,String slogan){
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.nickname = nickName;
+        this.slogan = slogan;
+        this.highScore = 0;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getUsername() {
+        return username;
     }
 
-    public String getNickName() {
-        return nickName;
+    public String getPassword() {
+        return password;
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 
     public String getEmail() {
@@ -22,10 +31,6 @@ public class User {
 
     public String getSlogan() {
         return slogan;
-    }
-
-    public int getPasswordRecoveryQuestionIndex() {
-        return passwordRecoveryQuestionIndex;
     }
 
     public int getHighScore() {

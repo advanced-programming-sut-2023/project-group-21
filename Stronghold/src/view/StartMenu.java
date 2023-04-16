@@ -1,21 +1,35 @@
 package view;
 
+import view.commands.StartMenuCommand;
+
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
 public class StartMenu {
     public void run(Scanner scanner){
-        String input=scanner.nextLine().trim();
+        String input ;
+        Matcher matcher;
+        while (true){
+            input = scanner.nextLine().trim();
+            if(input.equals("exit"))
+                break;
+            else if((matcher = StartMenuCommand.getMatcher(input,StartMenuCommand.GO_TO_SIGNUP_MENU))!=null)
+                checkWhichMenu(matcher,scanner,false);
+            else if((matcher = StartMenuCommand.getMatcher(input,StartMenuCommand.GO_TO_SIGN_IN)) != null)
+                checkWhichMenu(matcher,scanner,true);
+            else
+                System.out.println("invalid format");
+        }
 
     }
 
-    public void checkWhichMenu(Matcher matcher,Scanner scanner){
-        if(true){
-            System.out.println("repair");
+    public void checkWhichMenu(Matcher matcher,Scanner scanner,boolean isLogin){
+        if(!isLogin){
+            System.out.println("you are in sign up menu");
             SignUpMenu signUpMenu=new SignUpMenu();
             signUpMenu.run(scanner);
-        }else if(true){
-            System.out.println("repair");
+        }else{
+            System.out.println("you are in login menu");
             LoginMenu loginMenu=new LoginMenu();
             loginMenu.run(scanner);
         }
