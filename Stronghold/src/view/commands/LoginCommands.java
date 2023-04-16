@@ -10,7 +10,7 @@ public enum LoginCommands {
     HELP("\\s*help\\s*"),
     FORGET_PASSWORD("\\s*forget\\s+password\\s*"),
     FORGET_USERNAME("\\s*forget\\s+username");
-    public String regex;
+    private String regex;
     LoginCommands(String regex) {
         this.regex = regex;
     }

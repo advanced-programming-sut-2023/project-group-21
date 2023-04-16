@@ -8,7 +8,7 @@ public enum TradeCommand {
     SHOW_LIST("\\s*trade\\s+list\\s*"),
     ACCEPT_TRADE("accept\\s+trade\\s+-i\\s+(?<id>\\d+)\\s+-m\\s+(?<comment>.+)"),
     TRADE_HISTORY("show\\s+history\\s+");
-    public String regex;
+    private String regex;
 
     TradeCommand(String regex) {
         this.regex = regex;
