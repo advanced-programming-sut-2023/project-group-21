@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum StartMenuCommand {
-    GO_TO_SIGNUP_MENU("\\s*sign_up\\s*"),
-    GO_TO_SIGN_IN("\\s*sign_in\\s+");
+    GO_TO_SIGNUP_MENU("\\s*sign-up\\s*"),
+    GO_TO_SIGN_IN("\\s*sign-in\\s+");
     private String regex;
     StartMenuCommand(String regex){
         this.regex=regex;

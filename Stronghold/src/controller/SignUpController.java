@@ -6,7 +6,7 @@ import view.message.SignUpMessages;
 import java.io.*;
 
 public class SignUpController {
-    private final String address = "users.txt";
+    private final String address = "/home/morteza/Desktop/program_ap/project/Stronghold3/Stronghold/src/controller/users.txt";//please change before use
     public SignUpMessages createUserLastCheck(String username, String password, String email, String nickname, String slogan){
         if(checkExistenceOfUserOrEmail(username,true))
             return SignUpMessages.USERNAME_REPEAT;
@@ -30,18 +30,20 @@ public class SignUpController {
             fileInputStream = new  FileInputStream(address);
             inputStreamReader = new InputStreamReader(fileInputStream);
             bufferedReader = new BufferedReader(inputStreamReader);
-            fileInputStream.close();
             line = bufferedReader.readLine();
             while (line != null && flag){
                 String[] userInfo = line.split("##");
                 if(userInfo[0].equals(info))
                     return true;
+                line = bufferedReader.readLine();
             }
             while (line != null && !flag){
                 String[] userInfo = line.split("##");
-                if(userInfo[0].equals(info))
+                if(userInfo[2].equals(info))
                     return true;
+                line = bufferedReader.readLine();
             }
+            fileInputStream.close();
         }
         catch (FileNotFoundException e){
             return false;
@@ -82,10 +84,11 @@ public class SignUpController {
     private void addToFile(String userInfo){
         try {
             FileWriter fileWriter = new FileWriter(address, true);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            PrintWriter printWriter = new PrintWriter(bufferedWriter);
             printWriter.println(userInfo);
+            bufferedWriter.close();
             printWriter.close();
-            fileWriter.close();
         }catch (IOException e){
             return;
         }

@@ -37,6 +37,8 @@ public class SignUpMenu {
         int questionNumber = 0;
         if(email == null)
             System.out.println("please enter your email");
+        else if(!confirm.equals(password))
+            System.out.println("password and confirm are not the same");
         else if(!CheckValidion.check(username,CheckValidion.CHECK_USERNAME))
             System.out.println("please enter valid username");
         else if(!CheckValidion.check(password,CheckValidion.CHECK_PASSWORD))
@@ -62,6 +64,7 @@ public class SignUpMenu {
                 User user = new User(username,password,nickname,email,slogan);
                 PlayerMenu playerMenu = new PlayerMenu(user);
                 System.out.println("you are in player menu");
+                signUpController.createUser(username,password,email,nickname,slogan,questionNumber,answer);
                 playerMenu.run(scanner);
             }else
                 System.out.println("out of range");
