@@ -61,6 +61,8 @@ public class SignUpMenu {
             if (questionNumber <= 3 && questionNumber > 0) {
                 System.out.println("what is your answer?");
                 answer = scanner.nextLine();
+                System.out.println("please confirm your answer");
+                String confirmQuestion = scanner.nextLine();
                 User user = new User(username,password,nickname,email,slogan);
                 PlayerMenu playerMenu = new PlayerMenu(user);
                 System.out.println("you are in player menu");

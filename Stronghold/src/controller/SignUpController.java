@@ -21,7 +21,7 @@ public class SignUpController {
         addToFile(info);
         return user;
     }
-    private boolean checkExistenceOfUserOrEmail(String info,boolean flag){// if flag username else email
+    protected boolean checkExistenceOfUserOrEmail(String info,boolean flag){// if flag username else email
         FileInputStream fileInputStream;
         InputStreamReader inputStreamReader;
         BufferedReader bufferedReader;
