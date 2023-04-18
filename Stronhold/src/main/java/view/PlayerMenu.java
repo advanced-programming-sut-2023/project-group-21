@@ -3,23 +3,37 @@ package view;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
-public class PlayerMenu {
-    public void run(Scanner scanner){
+import model.User;
 
+public class PlayerMenu {
+    private User user;
+
+    PlayerMenu(User user) {
+        this.user = user;
     }
 
-    public void checkMenu(Matcher matcher,Scanner scanner){
-        if(true){
+    public void run(Scanner scanner) {
+        String line = "";
+        Matcher matcher;
+        while (true) {
+            line = scanner.nextLine();
+            if (line.equals("logout"))
+                break;
+        }
+    }
+
+    public void checkMenu(Matcher matcher, Scanner scanner) {
+        if (true) {
             System.out.println("repair");
-            ProfileMenu profileMenu=new ProfileMenu();
+            ProfileMenu profileMenu = new ProfileMenu();
             profileMenu.run();
-        }else if(true){
+        } else if (true) {
             System.out.println("repair");
-            MapMenu mapMenu=new MapMenu();
+            MapMenu mapMenu = new MapMenu();
             mapMenu.run(scanner);
-        }else if(true){
+        } else if (true) {
             System.out.println("repair");
-            GameMenu gameMenu=new GameMenu();
+            GameMenu gameMenu = new GameMenu();
             gameMenu.run(scanner);
         }
     }
