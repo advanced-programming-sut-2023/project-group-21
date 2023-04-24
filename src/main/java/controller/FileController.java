@@ -9,6 +9,10 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class FileController {
     private static final String jsonAddress = "/home/morteza/Desktop/program_ap/projectMaven3/AP/src/main/java/controller/users.json";
@@ -27,6 +31,19 @@ public class FileController {
             System.out.println(p.getMessage());
         }
 
+    }
+
+    public static String encode(String input){
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            String encoded = Base64.getEncoder().encodeToString(hash);
+            return encoded;
+        }
+        catch (NoSuchAlgorithmException e){
+
+        }
+        return "";
     }
 
     public static int getSecurityQuestion(String username){

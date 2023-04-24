@@ -10,12 +10,13 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         FileController.start();
         User user = FileController.getStayedUser();
-        if(user != null){
+        if (user != null) {
             PlayerMenu playerMenu = new PlayerMenu(user);
             playerMenu.run(scanner);
         }
         StartMenu startMenu = new StartMenu();
         startMenu.run(scanner);
+
         FileController.finish();
     }
 }

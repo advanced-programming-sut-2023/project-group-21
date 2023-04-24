@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum PlayerMenuCommand {
-    GO_TO_MENU("\\s*go\\s+to\\s+(?<menuName>\\S+)\\s+menu\\s*");
+    GO_TO_MENU("\\s*go\\s+to\\s+(?<menuName>\\S+)\\s+menu\\s*"),
+    START_GAME_WITH("\\s*start\\s+game\\s+with\\s+[(\\S+)]*\\s*");
 
 
 
