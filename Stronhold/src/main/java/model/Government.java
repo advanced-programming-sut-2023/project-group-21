@@ -1,6 +1,9 @@
 package model;
 
 import model.building.Building;
+import model.building.Gate;
+import model.generalenums.GroundTexture;
+import model.generalenums.Resource;
 import model.human.Person;
 import model.machine.Machine;
 
@@ -9,7 +12,7 @@ import java.util.HashMap;
 
 public class Government {
     private User lord;
-    private int popularity, foodRate, taxRate, fearRate;
+    private int popularity, foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
     private ArrayList<Building> buildings;
     private ArrayList<Person> people;
     private ArrayList<Machine> machines;
@@ -51,5 +54,31 @@ public class Government {
         return resources;
     }
 
-    public void addResource(Resource resource, int amount){}
+    public void addBuilding(Building building){
+        buildings.add(building);
+        building.getCell().setBuilding(building);
+    }
+
+    public void setFoodRate(int foodRate) {
+        popularityRate += (foodRate - this.foodRate) * 4;
+        this.foodRate = foodRate;
+    }
+
+    public void setTaxRate(int taxRate) {
+        popularityRate += Game.TaxDetails.getPopularity(taxRate) - Game.TaxDetails.getPopularity(this.taxRate);
+        this.taxRate = taxRate;
+    }
+
+    public void setFearRate(int fearRate) {
+        popularityRate += fearRate - this.fearRate;
+        this.fearRate = fearRate;
+    }
+
+    public void setBuildings(ArrayList<Building> buildings) {
+        this.buildings = buildings;
+    }
+
+    public void setReligionRate(boolean check) {
+        religionRate += check ? 2 : -2;
+    }
 }

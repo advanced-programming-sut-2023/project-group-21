@@ -2,20 +2,15 @@ package model.building;
 
 import model.Cell;
 import model.Government;
-import model.Resource;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.TowerDetails;
-import model.human.Mercenary;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class Tower extends Building {
     TowerDetails towerDetails;
     private boolean isClimbable;
 
-    public Tower(Government government, BuildingsDetails buildingsDetails, int hitPoint, Cell cell, HashMap<Resource, Integer> cost, TowerDetails towerDetails) {
-        super(government, buildingsDetails, hitPoint, cell, cost);
+    public Tower(Government government, Cell cell, TowerDetails towerDetails) {
+        super(government, towerDetails.getBuildingsDetails(), cell);
         this.towerDetails = towerDetails;
         isClimbable = false;
     }
@@ -38,9 +33,5 @@ public class Tower extends Building {
 
     public boolean isClimbable() {
         return isClimbable;
-    }
-
-    public List<Mercenary> getSoldiers() {
-        return towerDetails.getSoldiers();
     }
 }

@@ -2,16 +2,21 @@ package model.building;
 
 import model.Cell;
 import model.Government;
-import model.Resource;
+import model.generalenums.Resource;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.ProductMakerDetails;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ProductMaker extends Building {
     ProductMakerDetails productMakerDetails;
+    Resource currentProduction;
+
+    public ProductMaker(Government government, Cell cell, ProductMakerDetails productMakerDetails) {
+        super(government, productMakerDetails.getBuildingsDetails(), cell);
+        this.productMakerDetails = productMakerDetails;
+        currentProduction = productMakerDetails.getProducts().get(0);
+    }
 
     public BuildingsDetails getBuildingsDetails() {
         return productMakerDetails.getBuildingsDetails();
@@ -19,11 +24,6 @@ public class ProductMaker extends Building {
 
     public List<Resource> getProducts() {
         return productMakerDetails.getProducts();
-    }
-
-    public ProductMaker(Government government, BuildingsDetails buildingsDetails, int hitPoint, Cell cell, HashMap<Resource, Integer> cost, ProductMakerDetails productMakerDetails) {
-        super(government, buildingsDetails, hitPoint, cell, cost);
-        this.productMakerDetails = productMakerDetails;
     }
 
     public int getRate() {

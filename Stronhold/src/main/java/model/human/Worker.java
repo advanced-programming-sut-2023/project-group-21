@@ -1,16 +1,17 @@
 package model.human;
 
-import model.Resource;
-import model.building.Building;
+import model.Cell;
 import model.human.Enums.WorkerDetails;
-
-import java.util.List;
 
 public class Worker extends Person {
     WorkerDetails workerDetails;
+    Cell position;
+    Cell destination;
 
-    public Worker(WorkerDetails workerDetails) {
+    public Worker(WorkerDetails workerDetails, Cell position, Cell destination) {
         this.workerDetails = workerDetails;
+        this.position = position;
+        this.destination = destination;
     }
 
     public String getName() {
@@ -37,11 +38,15 @@ public class Worker extends Person {
         return workerDetails.getRange();
     }
 
-    public List<Resource> getWeapon() {
-        return workerDetails.getWeapon();
+    public Cell getPosition() {
+        return position;
     }
 
-    public List<Resource> getArmor() {
-        return workerDetails.getArmor();
+    public Cell getDestination() {
+        return destination;
+    }
+
+    public void setDestination(Cell destination) {
+        this.destination = destination;
     }
 }

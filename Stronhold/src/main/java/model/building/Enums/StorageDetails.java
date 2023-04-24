@@ -1,27 +1,28 @@
 package model.building.Enums;
 
-import model.Resource;
-
-import java.util.Arrays;
-import java.util.List;
-
 public enum StorageDetails {
-    STORAGE_DETAILS(BuildingsDetails.BUILDINGS_DETAILS, Arrays.asList(Resource.RESOURCE), 0);
+    ARMOURY(BuildingsDetails.ARMOURY, 50),
+    GRANARY(BuildingsDetails.GRANARY, 60),
+    STOCKPILE(BuildingsDetails.STOCKPILE, 100);
     BuildingsDetails buildingsDetails;
-    List<Resource> availableResources;
     int capacity;
 
-    StorageDetails(BuildingsDetails buildingsDetails, List<Resource> availableResources, int capacity) {};
+    StorageDetails(BuildingsDetails buildingsDetails, int capacity) {
+        this.buildingsDetails = buildingsDetails;
+        this.capacity = capacity;
+    }
 
     public BuildingsDetails getBuildingsDetails() {
         return buildingsDetails;
     }
 
-    public List<Resource> getAvailableResources() {
-        return availableResources;
-    }
-
     public int getCapacity() {
         return capacity;
+    }
+
+    public static StorageDetails getStorageDetailsByBuildingDetails(BuildingsDetails buildingsDetails) {
+        for (StorageDetails storageDetails: StorageDetails.values())
+            if (storageDetails.buildingsDetails.equals(buildingsDetails)) return storageDetails;
+        return null;
     }
 }

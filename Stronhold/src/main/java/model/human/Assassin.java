@@ -1,13 +1,12 @@
 package model.human;
 
-import model.human.Enums.MercenaryDetails;
 import model.human.Enums.WorkerDetails;
 
-public class Assassin extends Mercenary {
+public class Assassin extends Worker {
     private boolean isHidden = false;
 
-    public Assassin(WorkerDetails workerDetails, MercenaryDetails mercenaryDetails) {
-        super(workerDetails, mercenaryDetails);
+    public Assassin(WorkerDetails workerDetails) {
+        super(workerDetails);
     }
 
     public void expose(boolean hidden) {

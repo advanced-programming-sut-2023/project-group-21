@@ -1,12 +1,12 @@
 package controller;
 
 import model.building.TroopTrainer;
-import model.human.Mercenary;
+import model.human.European;
 import view.TroopTrainMenu;
 
 public class TroopTrainController {
     TroopTrainer currentTroopTrainer;
-    public TroopTrainMenu train(Mercenary mercenary){
+    public TroopTrainMenu train(European mercenary){
         return null;
     }
 }

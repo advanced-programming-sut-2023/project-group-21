@@ -1,18 +1,23 @@
 package model.building.Enums;
 
-import model.human.Enums.MercenaryDetails;
-import model.human.Enums.WorkerDetails;
-import model.human.Mercenary;
-
-import java.util.Arrays;
-import java.util.List;
+import model.building.Tower;
 
 public enum TowerDetails {
-    TOWER_DETAILS(BuildingsDetails.BUILDINGS_DETAILS, 0, 0, Arrays.asList(new Mercenary(WorkerDetails.WORKER_DETAILS, MercenaryDetails.MERCENARY_DETAILS)));
+    LOOKOUT_TOWER(BuildingsDetails.LOOKOUT_TOWER, 8, 1, false),
+    PERIMETER_TOWER(BuildingsDetails.PERIMETER_TOWER, 6, 3, false),
+    TURRET(BuildingsDetails.TURRET, 6, 3, false),
+    SQUARE_TOWER(BuildingsDetails.SQUARE_TOWER, 7, 3, true),
+    ROUND_TOWER(BuildingsDetails.ROUND_TOWER,  7, 3, true);
     BuildingsDetails buildingsDetails;
     int fireRange, defenseRange;
-    List<Mercenary> soldiers;
-    TowerDetails(BuildingsDetails buildingsDetails, int fireRange, int defenseRange, List<Mercenary> soldiers){}
+    boolean canStandMachines;
+
+    TowerDetails(BuildingsDetails buildingsDetails, int fireRange, int defenseRange, boolean canStandMachines) {
+        this.buildingsDetails = buildingsDetails;
+        this.fireRange = fireRange;
+        this.defenseRange = defenseRange;
+        this.canStandMachines = canStandMachines;
+    }
 
     public BuildingsDetails getBuildingsDetails() {
         return buildingsDetails;
@@ -26,7 +31,9 @@ public enum TowerDetails {
         return defenseRange;
     }
 
-    public List<Mercenary> getSoldiers() {
-        return soldiers;
+    public static TowerDetails getTowerDetailsByBuildingDetails(BuildingsDetails buildingsDetails) {
+        for (TowerDetails towerDetails: TowerDetails.values())
+            if (towerDetails.buildingsDetails.equals(buildingsDetails)) return towerDetails;
+        return null;
     }
 }

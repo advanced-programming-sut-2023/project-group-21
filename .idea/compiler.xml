@@ -6,10 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="Stronhold" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="FuckCE" target="19" />
+      <module name="Stronhold" target="19" />
     </bytecodeTargetLevel>
   </component>
 </project>

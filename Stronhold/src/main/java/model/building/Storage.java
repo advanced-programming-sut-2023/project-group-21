@@ -2,18 +2,20 @@ package model.building;
 
 import model.Cell;
 import model.Government;
-import model.Resource;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.StorageDetails;
+import model.generalenums.Resource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 public class Storage extends Building {
-    StorageDetails storageDetails;
+    private StorageDetails storageDetails;
+    private Map<Resource, Integer> availableResources = new HashMap<>();
 
-    public Storage(Government government, BuildingsDetails buildingsDetails, int hitPoint, Cell cell, HashMap<Resource, Integer> cost, StorageDetails storageDetails) {
-        super(government, buildingsDetails, hitPoint, cell, cost);
+    public Storage(Government government, Cell cell, StorageDetails storageDetails) {
+        super(government, storageDetails.getBuildingsDetails(), cell);
         this.storageDetails = storageDetails;
     }
 
@@ -21,11 +23,11 @@ public class Storage extends Building {
         return storageDetails.getBuildingsDetails();
     }
 
-    public List<Resource> getAvailableResources() {
-        return storageDetails.getAvailableResources();
-    }
-
     public int getCapacity() {
         return storageDetails.getCapacity();
+    }
+
+    public Map<Resource, Integer> getAvailableResources() {
+        return availableResources;
     }
 }

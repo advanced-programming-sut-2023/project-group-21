@@ -5,5 +5,6 @@ public enum SignUpMessages {
     EMAIL_REPEAT,
     SUCCESS,
     INVALID_NUMBER,
-    BAD_REAPAET
+    BAD_REAPAET,
+    OUT_OF_RANGE
 }

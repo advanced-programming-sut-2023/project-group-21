@@ -4,6 +4,8 @@ import model.Game;
 import model.User;
 import view.message.SignUpMessages;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -12,6 +14,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.regex.Matcher;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
@@ -139,6 +143,55 @@ public class SignUpController {
         } catch (IOException e) {
             return;
         }
+    }
+
+    public String generateCaptcha() {
+        int width = 100;
+        int height = 20;
+        ArrayList<Integer> random;
+        StringBuilder captcha = new StringBuilder();
+        String[] fonts = {Font.DIALOG_INPUT, Font.DIALOG, Font.SANS_SERIF, Font.SERIF};
+        Random randomize = new Random();
+
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = bufferedImage.getGraphics();
+        graphics.setFont(new Font(fonts[Math.abs(randomize.nextInt() % 4)], Font.BOLD, 10));
+        Graphics2D graphics2D = (Graphics2D) graphics;
+        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics2D.drawString(generateCaptchaString(), 10, 20);
+
+        for (int y = 0; y < height; y++) {
+            StringBuilder sb = new StringBuilder();
+            random = randomNoise();
+            for (int x = 0; x < width; x++) {
+                if (bufferedImage.getRGB(x, y) != -16777216) sb.append("%");
+                else sb.append(" ");
+            }
+            if (sb.toString().trim().isEmpty()) continue;
+            for (int rand: random) sb.replace(rand, rand + 1, "#");
+            captcha.append(sb).append("\n");
+        }
+        return captcha.toString();
+    }
+
+    private String generateCaptchaString() {
+        int n = 9;
+        Random rand = new Random(26);
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String captcha = "";
+        while (n-->0){
+            int index = (int)(Math.random()*26);
+            captcha += characters.charAt(index);
+            if (n != 0) captcha += " ";
+        }
+        return captcha;
+    }
+
+    private ArrayList<Integer> randomNoise() {
+        Random random = new Random();
+        ArrayList<Integer> sth = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) sth.add(Math.abs(random.nextInt() % 100));
+        return sth;
     }
 
 }
