@@ -1,14 +1,15 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import model.generalenums.GroundTexture;
+
+import java.util.*;
 
 public class Game {
     private static ArrayList<User> users = new ArrayList<>();
     public static final Map<Integer, Double> foodConsumption = Map.of(-2, (double) 0, -1, 0.5, 0, (double) 1, 1, 1.5, 2, (double) 2);
     public static final ArrayList<String> SLOGANS = new ArrayList<>(Arrays.asList(""));
+    public static final List<GroundTexture> UNPASSABLE = Arrays.asList(GroundTexture.ROCK, GroundTexture.RIVER,
+            GroundTexture.SMALL_LAKE, GroundTexture.BIG_LAKE, GroundTexture.SEA);
     public static enum TaxDetails {
         A(-3, -1, 7),
         B(-2, -0.8, 5),

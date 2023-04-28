@@ -13,11 +13,21 @@ public enum EuropeanSoldiersDetails {
     MACEMAN(WorkerDetails.MACEMAN, Arrays.asList(Resource.MACE, Resource.LEATHER_ARMOR)),
     SWORDSMAN(WorkerDetails.SWORDSMAN, Arrays.asList(Resource.SWORD, Resource.METAL_ARMOR)),
     KNIGHT(WorkerDetails.KNIGHT, Arrays.asList(Resource.SWORD, Resource.METAL_ARMOR, Resource.HORSE));
-    WorkerDetails workerDetails;
-    List<Resource> equipments;
+    private WorkerDetails workerDetails;
+    private List<Resource> equipments;
 
     EuropeanSoldiersDetails(WorkerDetails workerDetails, List<Resource> equipments) {
         this.workerDetails = workerDetails;
         this.equipments = equipments;
+    }
+
+    public static EuropeanSoldiersDetails getDetailsByWorkerDetails(WorkerDetails workerDetails) {
+        for (EuropeanSoldiersDetails soldiersDetails: EuropeanSoldiersDetails.values())
+            if (soldiersDetails.workerDetails.equals(workerDetails)) return soldiersDetails;
+        return null;
+    }
+
+    public List<Resource> getEquipments() {
+        return equipments;
     }
 }

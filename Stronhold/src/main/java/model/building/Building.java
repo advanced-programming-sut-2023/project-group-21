@@ -12,6 +12,7 @@ public class Building {
     private BuildingsDetails buildingsDetails;
     private int hitPoint;
     private Cell cell;
+    private boolean isWrecked = false;
     public Building(Government government, BuildingsDetails buildingsDetails, Cell cell) {
         this.government = government;
         this.buildingsDetails = buildingsDetails;
@@ -45,5 +46,9 @@ public class Building {
 
     public String getName() {
         return getBuildingsDetails().name();
+    }
+
+    public boolean isWrecked() {
+        return isWrecked;
     }
 }

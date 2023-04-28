@@ -1,5 +1,6 @@
 package model.human;
 
+import model.Cell;
 import model.building.Building;
 import model.human.Enums.WorkerDetails;
 import model.machine.Machine;
@@ -7,8 +8,9 @@ import model.machine.Machine;
 public class Engineer extends Worker {
     Building building;
     Machine machine;
-    public Engineer(WorkerDetails workerDetails) {
-        super(workerDetails);
+
+    public Engineer(WorkerDetails workerDetails, Cell position, Cell destination) {
+        super(workerDetails, position, destination);
     }
 
     public Building getBuilding() {

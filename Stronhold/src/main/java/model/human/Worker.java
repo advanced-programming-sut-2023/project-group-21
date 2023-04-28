@@ -4,6 +4,7 @@ import model.Cell;
 import model.human.Enums.WorkerDetails;
 
 public class Worker extends Person {
+    private String state;
     WorkerDetails workerDetails;
     Cell position;
     Cell destination;
@@ -12,6 +13,7 @@ public class Worker extends Person {
         this.workerDetails = workerDetails;
         this.position = position;
         this.destination = destination;
+        state = "standing";
     }
 
     public String getName() {
@@ -49,4 +51,10 @@ public class Worker extends Person {
     public void setDestination(Cell destination) {
         this.destination = destination;
     }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+
 }

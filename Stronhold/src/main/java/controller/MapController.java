@@ -36,6 +36,7 @@ public class MapController {
         yCoordinates = y;
         StringBuilder output = new StringBuilder();
         boolean hasPerson = false;
+        if (x < 1 || x > 200 || y < 1 || y > 200) return null;
         int yMax = min(y + 2, size) - 1, yMin = max(y - 2, 0) - 1, xMax = min(x + 2, size) - 1, xMin = max(x - 2, 0) - 1;
         for (int j = yMin; j <= yMax; j++) {
             for (int i = xMin; i <= xMax; i++) {

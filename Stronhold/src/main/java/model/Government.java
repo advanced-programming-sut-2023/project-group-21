@@ -81,4 +81,10 @@ public class Government {
     public void setReligionRate(boolean check) {
         religionRate += check ? 2 : -2;
     }
+
+    public Building getBuildingByName(String name) {
+        for (Building building: buildings)
+            if (building.getName().equals(name)) return building;
+        return null;
+    }
 }

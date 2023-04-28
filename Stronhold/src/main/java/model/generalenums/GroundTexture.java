@@ -41,8 +41,8 @@ public enum GroundTexture {
             this.code = code;
         }
     }
-    String name;
-    ColorCode colorCode;
+    private String name;
+    private ColorCode colorCode;
 
     GroundTexture(String name, ColorCode colorCode) {
         this.name = name;

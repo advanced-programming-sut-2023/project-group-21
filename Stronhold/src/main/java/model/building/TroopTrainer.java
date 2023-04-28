@@ -4,6 +4,7 @@ import model.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.TroopTrainerDetails;
+import model.human.Enums.EuropeanSoldiersDetails;
 import model.human.Enums.WorkerDetails;
 import model.human.Worker;
 
