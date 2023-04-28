@@ -1,40 +1,75 @@
 package view;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
+import controller.FileController;
+import controller.MapController;
+import model.Government;
 import model.User;
+import view.commands.PlayerMenuCommand;
+import view.message.MapMessages;
 
 public class PlayerMenu {
-    private User user;
+    private final User user;
 
-    PlayerMenu(User user) {
+    public PlayerMenu(User user) {
         this.user = user;
     }
 
     public void run(Scanner scanner) {
-        String line = "";
+        String line ;
         Matcher matcher;
         while (true) {
             line = scanner.nextLine();
             if (line.equals("logout"))
                 break;
+            else if((matcher = PlayerMenuCommand.getMatcher(line,PlayerMenuCommand.GO_TO_MENU))!=null)
+                checkMenu(matcher,scanner);
         }
     }
 
+
     public void checkMenu(Matcher matcher, Scanner scanner) {
-        if (true) {
-            System.out.println("repair");
-            ProfileMenu profileMenu = new ProfileMenu();
-            profileMenu.run();
-        } else if (true) {
-            System.out.println("repair");
-            MapMenu mapMenu = new MapMenu();
-            mapMenu.run(scanner);
-        } else if (true) {
-            System.out.println("repair");
-            GameMenu gameMenu = new GameMenu();
-            gameMenu.run(scanner);
+        String menuName = matcher.group("menuName");
+        switch (menuName) {
+            case "profile" -> {
+                System.out.println("you are in profile menu");
+                ProfileMenu profileMenu = new ProfileMenu(user);
+                profileMenu.run(scanner);
+            }
+            case "map" -> {
+                System.out.println("you are in map menu");
+                MapMenu mapMenu = new MapMenu(user);
+                mapMenu.run(scanner);
+            }
+            case "game" -> {
+                System.out.println("first enter number of player and then enter their username");
+                int numberOfPlayer;
+                try {
+                    numberOfPlayer = Integer.parseInt(scanner.nextLine());
+                    ArrayList<Government> governments = new ArrayList<>();
+                    Government government = new Government(user);
+                    governments.add(government);
+                    for (int i1=1;i1<numberOfPlayer;i1++){
+                        String username1 = scanner.nextLine();
+                        User tempUser = FileController.getUserByUsername(username1);
+                        Government tempGovernment;
+                        if (tempUser == null){
+                            System.out.println("no user found,please try again!");
+                            return;
+                        }
+                        tempGovernment = new Government(tempUser);
+                        governments.add(tempGovernment);
+                        GameMenu gameMenu = new GameMenu(user,governments);
+                        gameMenu.run(scanner);
+                    }
+                }catch (NumberFormatException e){
+                    System.out.println("please enter a number");
+                }
+            }
+
         }
     }
 

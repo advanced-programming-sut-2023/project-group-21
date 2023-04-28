@@ -1,22 +1,22 @@
 package model.generalenums;
 
 public enum GroundTexture {
-    SOIL("soil", ColorCode.WHITE),
-    GRAVEL("gravel", ColorCode.RED),
-    STONE("stone", ColorCode.INTENSE_BLACK),
-    ROCK("rock", ColorCode.INTENSE_WHITE),
-    IRON("iron", ColorCode.INTENSE_RED),
-    GRASS("grass", ColorCode.INTENSE_GREEN),
-    MEADOW("meadow", ColorCode.YELLOW),
-    DENSE_MEADOW("dense meadow", ColorCode.INTENSE_YELLOW),
-    PETROL("petrol", ColorCode.BLACK),
-    PLAIN("plain", ColorCode.INTENSE_WHITE),
-    SHALLOW_WATER("shallow water", ColorCode.CYAN),
-    RIVER("river", ColorCode.BLUE),
-    SMALL_LAKE("small lake", ColorCode.PURPLE),
-    BIG_LAKE("big lake", ColorCode.INTENSE_PURPLE),
-    BEACH("beach", ColorCode.GREEN),
-    SEA("sea", ColorCode.INTENSE_BLUE);
+    SOIL("soil", ColorCode.WHITE,"i"),
+    GRAVEL("gravel", ColorCode.RED,"j"),
+    STONE("stone", ColorCode.INTENSE_BLACK,"k"),
+    ROCK("rock", ColorCode.INTENSE_WHITE,"l"),
+    IRON("iron", ColorCode.INTENSE_RED,"m"),
+    GRASS("grass", ColorCode.INTENSE_GREEN,"n"),
+    MEADOW("meadow", ColorCode.YELLOW,"o"),
+    DENSE_MEADOW("dense meadow", ColorCode.INTENSE_YELLOW,"p"),
+    PETROL("petrol", ColorCode.BLACK,"q"),
+    PLAIN("plain", ColorCode.INTENSE_WHITE,"r"),
+    SHALLOW_WATER("shallow water", ColorCode.CYAN,"s"),
+    RIVER("river", ColorCode.BLUE,"t"),
+    SMALL_LAKE("small lake", ColorCode.PURPLE,"u"),
+    BIG_LAKE("big lake", ColorCode.INTENSE_PURPLE,"x"),
+    BEACH("beach", ColorCode.GREEN,"y"),
+    SEA("sea", ColorCode.INTENSE_BLUE,"z");
 
     public enum ColorCode {
         WHITE("\033[47m"),
@@ -41,17 +41,26 @@ public enum GroundTexture {
             this.code = code;
         }
     }
-    private String name;
-    private ColorCode colorCode;
+    String name;
+    ColorCode colorCode;
+    String saveCode;
 
-    GroundTexture(String name, ColorCode colorCode) {
+    GroundTexture(String name, ColorCode colorCode,String saveCode) {
         this.name = name;
         this.colorCode = colorCode;
+        this.saveCode = saveCode;
     }
 
     public static GroundTexture getTextureByName(String name) {
         for (GroundTexture groundTexture: GroundTexture.values()) {
             if (groundTexture.name.equals(name)) return groundTexture;
+        }
+        return null;
+    }
+
+    public static GroundTexture getTextureBySaveCode(String saveCode) {
+        for (GroundTexture groundTexture: GroundTexture.values()) {
+            if (groundTexture.saveCode.equals(saveCode)) return groundTexture;
         }
         return null;
     }
@@ -62,5 +71,9 @@ public enum GroundTexture {
 
     public String getColor() {
         return colorCode.code;
+    }
+
+    public String getSaveCode(){
+        return this.saveCode;
     }
 }

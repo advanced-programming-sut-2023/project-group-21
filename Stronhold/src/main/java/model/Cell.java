@@ -93,4 +93,13 @@ public class Cell {
     public int getyCoordinates() {
         return yCoordinates;
     }
+    public String makeSaveCode(){
+        String temp = "";
+        if(extra == null)
+            temp += "!";
+        else
+            temp += extra.getSaveCode();
+        temp += groundTexture.getSaveCode();
+        return temp;
+    }
 }

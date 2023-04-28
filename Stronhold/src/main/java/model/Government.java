@@ -18,6 +18,10 @@ public class Government {
     private ArrayList<Machine> machines;
     private HashMap<Resource, Integer> resources;
 
+    public Government(User lord) {
+        this.lord = lord;
+    }
+
     public User getLord() {
         return lord;
     }

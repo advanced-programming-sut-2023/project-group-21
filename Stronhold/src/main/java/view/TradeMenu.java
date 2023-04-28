@@ -11,6 +11,7 @@ public class TradeMenu {
 
     }
 
+
     private void showTradeList(){
 
     }

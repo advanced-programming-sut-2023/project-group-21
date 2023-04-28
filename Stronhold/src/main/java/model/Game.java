@@ -8,6 +8,8 @@ public class Game {
     private static ArrayList<User> users = new ArrayList<>();
     public static final Map<Integer, Double> foodConsumption = Map.of(-2, (double) 0, -1, 0.5, 0, (double) 1, 1, 1.5, 2, (double) 2);
     public static final ArrayList<String> SLOGANS = new ArrayList<>(Arrays.asList(""));
+    public static final String[] SECURITY_QUESTION = { "what is your favorite food ?", "what is your father s name ?",
+            "what is your oldest sibling's first name?" };
     public static final List<GroundTexture> UNPASSABLE = Arrays.asList(GroundTexture.ROCK, GroundTexture.RIVER,
             GroundTexture.SMALL_LAKE, GroundTexture.BIG_LAKE, GroundTexture.SEA);
     public static enum TaxDetails {

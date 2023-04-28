@@ -1,18 +1,20 @@
 package model.generalenums;
 
 public enum Extras {
-    SHRUB("shrub"),
-    CHERRY_TREE("cherry tree"),
-    OLIVE_TREE("olive tree"),
-    COCONUT_TREE("coconut tree"),
-    PALM_TREE("palm tree"),
-    NORTH_ROCK("n"),
-    SOUTH_ROCK("s"),
-    WEST_ROCK("w"),
-    EAST_ROCK("e");
+    SHRUB("shrub","a"),
+    CHERRY_TREE("cherry tree","b"),
+    OLIVE_TREE("olive tree","c"),
+    COCONUT_TREE("coconut tree","d"),
+    PALM_TREE("palm tree","d"),
+    NORTH_ROCK("n","e"),
+    SOUTH_ROCK("s","f"),
+    WEST_ROCK("w","g"),
+    EAST_ROCK("e","h");
     String name;
-    Extras(String name) {
+    String saveCode;
+    Extras(String name,String saveCode) {
         this.name = name;
+        this.saveCode = saveCode;
     }
 
     public static Extras getExtrasByName(String name) {
@@ -22,7 +24,18 @@ public enum Extras {
         return null;
     }
 
+    public static Extras getExtrasByCode(String saveCode) {
+        for (Extras extras: Extras.values()) {
+            if (extras.saveCode.equals(saveCode)) return extras;
+        }
+        return null;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public String getSaveCode() {
+        return saveCode;
     }
 }

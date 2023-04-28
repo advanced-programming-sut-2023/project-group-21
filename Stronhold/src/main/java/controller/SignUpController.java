@@ -2,106 +2,71 @@ package controller;
 
 import model.Game;
 import model.User;
+import view.commands.CheckValidion;
 import view.message.SignUpMessages;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.regex.Matcher;
+
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 
-public class SignUpController {
-    private final String address = "";
-    private String username, password, email, nickname, slogan;
 
-    public SignUpMessages checkUserCreation(Matcher matcher) {
-        return null;
+public class SignUpController {
+    private String  slogan;
+    private final int sleepRate = 5000;
+    private int sleepTime = 5000;
+
+
+    public void resetSleepTime(){
+        sleepTime = sleepRate;
     }
 
-    private String packUser(String username, String password, String email, String slogan, String nickname,
-            int questionNumber, String answer) {// temp code
-        String temp = "";
-        temp += (username + "##" + password + "##" + email);
-        if (slogan == null)
-            temp += "##^^^";
-        else
-            temp += ("##" + slogan);
-        if (nickname == null)
-            temp += "##^^^";
-        else
-            temp += ("##" + nickname);
-        temp += ("##" + questionNumber);
-        temp += ("##" + answer);
-        temp += ("##" + 0);
-        return temp;
+    public void increaseSleepRate(){
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        sleepTime += sleepRate;
+    }
+
+    public void sleepNormal(){
+        try {
+            Thread.sleep(sleepRate);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public SignUpMessages createUserLastCheck(String username, String password, String email, String nickname,
             String slogan) {
-        if (checkExistenceOfUserOrEmail(username, true))
+        if (FileController.checkExistenceOfUserOrEmail(username, true)) {
+            OtherController.sleepNormal();
             return SignUpMessages.USERNAME_REPEAT;
-        if (checkExistenceOfUserOrEmail(email, false))
+        }
+        if (FileController.checkExistenceOfUserOrEmail(email, false)) {
+            OtherController.sleepNormal();
             return SignUpMessages.EMAIL_REPEAT;
+        }
+        OtherController.resetSleepTime();
         return SignUpMessages.SUCCESS;
     }
 
     public User createUser(String username, String password, String email, String nickname, String slogan, int number,
             String answer) {
+        password = FileController.encode(password);
+        answer = FileController.encode(answer);
         User user = new User(username, password, nickname, email, slogan);
-        String info = packUser(username, password, email, slogan, nickname, number, answer);
-        addToFile(info);
+        FileController.addUserToFile(username,password,email,nickname,slogan,number,answer);
         return user;
     }
 
-    protected boolean checkExistenceOfUserOrEmail(String info, boolean flag) {// if flag username else email
-        FileInputStream fileInputStream;
-        InputStreamReader inputStreamReader;
-        BufferedReader bufferedReader;
-        String line;
-        try {
-            fileInputStream = new FileInputStream(address);
-            inputStreamReader = new InputStreamReader(fileInputStream);
-            bufferedReader = new BufferedReader(inputStreamReader);
-            line = bufferedReader.readLine();
-            while (line != null && flag) {
-                String[] userInfo = line.split("##");
-                if (userInfo[0].equals(info))
-                    return true;
-                line = bufferedReader.readLine();
-            }
-            while (line != null && !flag) {
-                String[] userInfo = line.split("##");
-                if (userInfo[2].equals(info))
-                    return true;
-                line = bufferedReader.readLine();
-            }
-            fileInputStream.close();
-            bufferedReader.close();
-        } catch (FileNotFoundException e) {
-            return false;
-        } catch (IOException e) {
-            return false;
-        }
-        return false;
-    }
 
     public SignUpMessages pickQuestion(int number, String answer, String confirm) {
         if (number > 3 || number < 1)
             return SignUpMessages.OUT_OF_RANGE;
         if (!answer.equals(confirm))
-            return SignUpMessages.BAD_REAPAET;
-        Game.addUser(new User(username, password, email, nickname, slogan));
+            return SignUpMessages.BAD_REPEAT;
         return SignUpMessages.SUCCESS;
     }
 
@@ -112,6 +77,20 @@ public class SignUpController {
     public String giveRandomSlogan() {
         slogan = Game.SLOGANS.get((int) (Math.random() % 10));
         return slogan;
+    }
+
+    public SignUpMessages checkValidationFormat(String email,String username,String password,String confirm){
+        if (email == null)
+            return SignUpMessages.NO_EMAIL;
+        else if (!confirm.equals(password))
+            return SignUpMessages.BAD_REPEAT;
+        else if (!CheckValidion.check(username, CheckValidion.CHECK_USERNAME))
+            return SignUpMessages.VALID_USERNAME;
+        else if (!CheckValidion.check(password, CheckValidion.CHECK_PASSWORD))
+            return SignUpMessages.WEAK_PASSWORD;
+        else if (!CheckValidion.check(email, CheckValidion.CHECK_EMAIL))
+            return SignUpMessages.VALID_EMAIL;
+        return SignUpMessages.PRINT_NOTHING;
     }
 
     private String generateSecurePassword() {
@@ -132,66 +111,5 @@ public class SignUpController {
         return passGen.generatePassword(13, SR, LCR, UCR, DR);
     }
 
-    private void addToFile(String userInfo) {
-        try {
-            FileWriter fileWriter = new FileWriter(address, true);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            PrintWriter printWriter = new PrintWriter(bufferedWriter);
-            printWriter.println(userInfo);
-            bufferedWriter.close();
-            printWriter.close();
-        } catch (IOException e) {
-            return;
-        }
-    }
-
-    public String generateCaptcha() {
-        int width = 100;
-        int height = 20;
-        ArrayList<Integer> random;
-        StringBuilder captcha = new StringBuilder();
-        String[] fonts = {Font.DIALOG_INPUT, Font.DIALOG, Font.SANS_SERIF, Font.SERIF};
-        Random randomize = new Random();
-
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = bufferedImage.getGraphics();
-        graphics.setFont(new Font(fonts[Math.abs(randomize.nextInt() % 4)], Font.BOLD, 10));
-        Graphics2D graphics2D = (Graphics2D) graphics;
-        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        graphics2D.drawString(generateCaptchaString(), 10, 20);
-
-        for (int y = 0; y < height; y++) {
-            StringBuilder sb = new StringBuilder();
-            random = randomNoise();
-            for (int x = 0; x < width; x++) {
-                if (bufferedImage.getRGB(x, y) != -16777216) sb.append("%");
-                else sb.append(" ");
-            }
-            if (sb.toString().trim().isEmpty()) continue;
-            for (int rand: random) sb.replace(rand, rand + 1, "#");
-            captcha.append(sb).append("\n");
-        }
-        return captcha.toString();
-    }
-
-    private String generateCaptchaString() {
-        int n = 9;
-        Random rand = new Random(26);
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String captcha = "";
-        while (n-->0){
-            int index = (int)(Math.random()*26);
-            captcha += characters.charAt(index);
-            if (n != 0) captcha += " ";
-        }
-        return captcha;
-    }
-
-    private ArrayList<Integer> randomNoise() {
-        Random random = new Random();
-        ArrayList<Integer> sth = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) sth.add(Math.abs(random.nextInt() % 100));
-        return sth;
-    }
 
 }

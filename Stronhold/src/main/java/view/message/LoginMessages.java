@@ -4,5 +4,6 @@ public enum LoginMessages {
     NO_USER_EXISTS,
     INCORRECT_PASSWORD,
     PLEASE_WAIT,
-    SUCCESS
+    SUCCESS,
+    INCORRECT_ANSWER
 }

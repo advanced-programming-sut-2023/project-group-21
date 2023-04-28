@@ -27,6 +27,12 @@ public class GameController {
         return null;
     }
 
+    public GameController(ArrayList<Government> governments,Cell[][] map){
+        this.governments = governments;
+        this.map = map;
+        this.currentGovernment = governments.get(0);
+    }
+
     public String showFoodList(){
         StringBuilder list = new StringBuilder();
         Storage storage = null;
@@ -69,6 +75,7 @@ public class GameController {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
             if (!textureMatches(buildingsDetails, x, y)) return null;
+        return null;
 
     }
 
@@ -215,6 +222,10 @@ public class GameController {
         updateBuilding();
         updateTroops();
         updateStorage();
+    }
+
+    public void setGovernment(Government government){
+        this.currentGovernment = government;
     }
 
     private void updateStorage(){
