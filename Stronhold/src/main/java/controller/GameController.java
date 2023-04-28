@@ -22,6 +22,7 @@ public class GameController {
     private Building selectedBuilding;
     private Worker selectedWorker;
     private Government currentGovernment;
+    private ArrayList<Command> commands = new ArrayList<>();
     public GameMessage showFactor(){
         return null;
     }
@@ -60,7 +61,18 @@ public class GameController {
         return null;
     }
 
-    public GameMessage DropBuilding(int x,int y,String type){
+    public GameMessage checkDropBuilding(int x, int y, String type) {
+        BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(type);
+        if (x > 200 || x < 1 || y > 200 || y < 1) return null;
+        if (buildingsDetails == null) return null;
+        if (map[x-1][y-1].getBuilding() != null) return null;
+        BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
+        if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
+            if (!textureMatches(buildingsDetails, x, y)) return null;
+
+    }
+
+    private GameMessage dropBuilding(int x,int y,String type){
         BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(type);
         if (x > 200 || x < 1 || y > 200 || y < 1) return null;
         if (buildingsDetails == null) return null;
