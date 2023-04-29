@@ -6,7 +6,8 @@ public enum ShopMessage {
     NOT_ENOUGH("your inventory is not sufficient"),
     NOT_ENOUGH_MONEY("you don't have enough money to buy"),
     NO_CAPACITY("you don't have capacity to store them!"),
-    INVALID_NUMBER("invalid number!");
+    INVALID_NUMBER("invalid number!"),
+    SUCCESS("success!");
     private final String message;
     ShopMessage(String message){
         this.message = message;

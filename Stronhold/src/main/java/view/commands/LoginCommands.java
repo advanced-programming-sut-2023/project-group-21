@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum LoginCommands {
-    LOGIN("\\s*login\\s+-u\\s+(?<username>(\\S+|\"[^\"]+\"))\\s+-p\\s+(?<password>(\\S+|\"[^\"]\"))(\\s+(?<last>\\.*)--stay-logged-in)?\\s*"),
+    LOGIN("\\s*login\\s+(?:(\\s*-u\\s+(?<username>(\\S+|\"[^\"]+\"))\\s*)|(\\s*-p\\s+(?<password>(\\S+|\"[^\"]\"))\\s*)){2}(\\s+(?<last>\\.*)--stay-logged-in)?\\s*"),
     BACK("\\s*back\\s*"),
     HELP("\\s*help\\s*"),
     FORGET_PASSWORD("\\s*forget\\s+password\\s+-u\\s+(?<username>(\\S+|\"[^\"]\"))\\s*"),

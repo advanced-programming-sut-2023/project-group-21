@@ -1,5 +1,6 @@
 package view;
 
+import controller.OtherController;
 import controller.ShopController;
 import model.Government;
 import view.commands.ShopMenuCommand;
@@ -26,23 +27,28 @@ public class ShopMenu {
                 buyCheck(matcher);
             else if((matcher = ShopMenuCommand.getMatcher(line,ShopMenuCommand.SELL))!=null)
                 sellCheck(matcher);
-            else if((matcher = ShopMenuCommand.getMatcher(line,ShopMenuCommand.SHOW_ITEM))!=null)
+            else if((ShopMenuCommand.getMatcher(line,ShopMenuCommand.SHOW_ITEM))!=null)
                 showPrice();
+            else
+                System.out.println("invalid command");
         }
     }
+
     private void showPrice(){
         System.out.print(shopController.showDetails());
     }
     private void buyCheck(Matcher matcher){
-        String name = matcher.group("name");
+        String name = OtherController.myTrim(matcher.group("name"));
         String intString = matcher.group("amount");
         int amount = Integer.parseInt(intString);
         ShopMessage message = shopController.buy(name,amount);
+        System.out.println(message);
     }
     private void sellCheck(Matcher matcher){
-        String name = matcher.group("name");
+        String name = OtherController.myTrim(matcher.group("name"));
         String intString = matcher.group("amount");
         int amount = Integer.parseInt(intString);
         ShopMessage message = shopController.sell(name,amount);
+        System.out.println(message);
     }
 }

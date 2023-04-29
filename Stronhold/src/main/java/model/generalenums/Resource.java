@@ -48,7 +48,7 @@ public enum Resource {
     public int getCostBuy() {
         return costBuy;
     }
-    public static Resource getExtrasByName(String name) {
+    public static Resource getResourceByName(String name) {
         for (Resource resource: Resource.values()) {
             if (resource.name.equals(name)) return resource;
         }
