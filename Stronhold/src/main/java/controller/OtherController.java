@@ -100,7 +100,7 @@ public class OtherController {
         System.out.flush();
     }
 
-    public String myTrim(String input) {
+    public static String myTrim(String input) {
         if (input == null)
             return null;
         if (input.length() == 0)
