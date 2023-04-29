@@ -1,15 +1,20 @@
 package model.human;
 
 import model.Cell;
+import model.Government;
 import model.human.Enums.WorkerDetails;
 
 public class Worker extends Person {
     private String state;
-    WorkerDetails workerDetails;
-    Cell position;
-    Cell destination;
+    private WorkerDetails workerDetails;
+    private Cell position;
+    private Cell destination;
+    private boolean isPatrolOn = false;
+    private int patrolX1, patrolY1, patrolX2, patrolY2;
+    private Worker enemy;
 
-    public Worker(WorkerDetails workerDetails, Cell position, Cell destination) {
+    public Worker(WorkerDetails workerDetails, Government government, Cell position, Cell destination) {
+        super(government);
         this.workerDetails = workerDetails;
         this.position = position;
         this.destination = destination;
@@ -56,5 +61,14 @@ public class Worker extends Person {
         this.state = state;
     }
 
+    public void setPatrolMovement(int x1, int y1, int x2, int y2) {
+        patrolX1 = x1;
+        patrolX2 = x2;
+        patrolY1 = y1;
+        patrolY2 = y2;
+    }
 
+    public void setEnemy(Worker enemy) {
+        this.enemy = enemy;
+    }
 }

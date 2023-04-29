@@ -3,7 +3,8 @@ package model.building.Enums;
 public enum StorageDetails {
     ARMOURY(BuildingsDetails.ARMOURY, 50),
     GRANARY(BuildingsDetails.GRANARY, 60),
-    STOCKPILE(BuildingsDetails.STOCKPILE, 100);
+    STOCKPILE(BuildingsDetails.STOCKPILE, 100),
+    STABLE(BuildingsDetails.STABLE, 4);
     BuildingsDetails buildingsDetails;
     int capacity;
 

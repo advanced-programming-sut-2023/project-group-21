@@ -1,6 +1,7 @@
 package controller;
 
 import model.Cell;
+import model.Game;
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.building.Gate;
@@ -18,7 +19,6 @@ import java.util.regex.Pattern;
 import static java.lang.Math.*;
 
 public class MapController {
-    private final String directions = "nwesr";
     private int size, xCoordinates, yCoordinates;
     private Cell[][] map;
 
@@ -77,7 +77,7 @@ public class MapController {
                 else if (building != null && (building instanceof Tower || building.getBuildingsDetails().equals(BuildingsDetails.WALL) ||
                         building instanceof Gate)) output.append("W");
                 else if (building != null) output.append("B");
-                else if (map[i][j].getExtra() != null && !directions.contains(map[i][j].getExtra().getName())) output.append("T");
+                else if (map[i][j].getExtra() != null && !Game.directions.contains(map[i][j].getExtra().getName())) output.append("T");
                 else output.append(" ");
             }
             output.append("\033[0m").append("\n");
@@ -119,7 +119,7 @@ public class MapController {
 
     public MapMessages dropRock(int x,int y, String direction){
         if (direction.length() > 1) return MapMessages.INVALID_FORMAT;
-        if (!directions.contains(direction)) return MapMessages.INVALID_DIRECTION;
+        if (!Game.directions.contains(direction)) return MapMessages.INVALID_DIRECTION;
         Extras stone = Extras.getExtrasByName(direction);
         if (stone == null) return MapMessages.NO_STONE;
         map[x-1][y-1].setExtras(stone);

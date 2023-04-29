@@ -5,6 +5,7 @@ import model.generalenums.Resource;
 import java.util.Map;
 
 public enum BuildingsDetails {
+    CASTLE("castle", null, 100, null),
     SMALL_STONE_GATEHOUSE("small stone gatehouse", BuildingType.GATE, 35, null),
     BIG_STONE_GATEHOUSE("big stone gatehouse", BuildingType.GATE, 45, Map.of(Resource.STONE, 20)),
     DRAWBRIDGE("drawbridge", BuildingType.GATE, 35, Map.of(Resource.WOOD, 10)),
@@ -47,7 +48,8 @@ public enum BuildingsDetails {
     BAKERY("bakery", BuildingType.PRODUCT_MAKER, 20, Map.of(Resource.WOOD, 10)),
     BREWERY("brewery", BuildingType.PRODUCT_MAKER, 20, Map.of(Resource.WOOD, 10)),
     GRANARY("granary", BuildingType.STORAGE, 25, Map.of(Resource.WOOD, 5)),
-    WALL("wall", null, 20, null);
+    WALL("wall", null, 20, null),
+    DITCH("ditch", null, -1000, null);
     public enum BuildingType {
         PRODUCT_MAKER, GATE, STORAGE, TOWER, TROOP_TRAINER, QUARRY, SIEGE_TENT, STABLE, TRAP, WEAPON_PRODUCTION, OIL_SMELTER, CAGED_WAR_DOGS, RESIDENCY
     }

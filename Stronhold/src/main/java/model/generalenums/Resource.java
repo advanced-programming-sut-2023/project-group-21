@@ -25,7 +25,7 @@ public enum Resource {
     SWORD("sword", StorageDetails.ARMOURY),
     LEATHER_ARMOR("leather armor", StorageDetails.ARMOURY),
     METAL_ARMOR("metal armor", StorageDetails.ARMOURY),
-    HORSE("horse", null);
+    HORSE("horse", StorageDetails.STABLE);
     String name;
     StorageDetails resourceKeeper;
 
