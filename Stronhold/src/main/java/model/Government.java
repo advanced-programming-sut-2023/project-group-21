@@ -2,7 +2,9 @@ package model;
 
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
+import model.building.Enums.StorageDetails;
 import model.building.Gate;
+import model.building.Storage;
 import model.generalenums.GroundTexture;
 import model.generalenums.Resource;
 import model.human.Enums.WorkerDetails;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Government {
-    private User lord;
+    private final User lord;
     private int popularity, foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
     private ArrayList<Building> buildings;
     private ArrayList<Person> people;
@@ -112,5 +114,24 @@ public class Government {
 
     public void reduceResources(Resource resource, int count) {
         resources.replace(resource, resources.get(resource) - count);
+    }
+
+    public int calculateLeftStorageCapacity(Resource resource){
+        int sum = 0;
+        if(resource == null || resource == Resource.GOLD)
+            return -1;
+        StorageDetails details = resource.getResourceKeeper();
+        if(details == null)
+            return -2;
+        for(int i1=0;i1<buildings.size();i1++){
+            if(buildings.get(i1) instanceof Storage ){
+                sum += ((Storage) buildings.get(i1)).getCapacity()-((Storage)buildings.get(i1)).getOccupation(resource.getResourceKeeper());
+            }
+        }
+        return sum;//it should be repaired !
+    }
+
+    public void addResources(Resource resource,int amount){
+
     }
 }

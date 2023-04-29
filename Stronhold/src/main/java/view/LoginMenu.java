@@ -28,46 +28,53 @@ public class LoginMenu {
             else if ((matcher = LoginCommands.getMatcher(line, LoginCommands.FORGET_PASSWORD)) != null)
                 checkForgotPassword(matcher, scanner);
             else if ((matcher = LoginCommands.getMatcher(line, LoginCommands.FORGET_USERNAME)) != null)
-                System.out.println("repair");
+                System.out.println("repair!");
             else
                 System.out.println("Invalid format");
         }
     }
 
     public void checkLogin(Matcher matcher, Scanner scanner) {
-        String username = matcher.group("username");
-        String password = matcher.group("password");
-        LoginMessages loginMessages = loginMenuController.CheckLogin(username, password);
-        if (loginMessages == LoginMessages.NO_USER_EXISTS)
-            System.out.println("No user with this this id exists!");
-        else if (loginMessages == LoginMessages.INCORRECT_PASSWORD)
-            System.out.println("Incorrect password");
-        else {
-            System.out.println(OtherController.generateCaptcha());
-            String solve = scanner.nextLine();
-            if (OtherController.checkCaptcha(solve)) {
-                OtherController.clearScreen();
-                OtherController.resetSleepTime();
-                System.out.println("successful login you are in main menu");
-                User user = loginMenuController.Login(username);
-                PlayerMenu playerMenu = new PlayerMenu(user);
-                playerMenu.run(scanner);
-                return;
-            }
-            OtherController.increaseSleepRate();
-            OtherController.clearScreen();
+        String username = OtherController.myTrim(matcher.group("username"));
+        String password = OtherController.myTrim(matcher.group("password"));
+        OtherController.sleepShort();
+        System.out.println(OtherController.generateCaptcha());
+        String solve = scanner.nextLine();
+        OtherController.sleepShort();
+        if (!OtherController.checkCaptcha(solve.trim())) {
             System.out.println("wrong captcha!");
+            OtherController.increaseSleepRate();
+            return;
+        }
+        LoginMessages loginMessages = loginMenuController.CheckLogin(username, password);
+        if (loginMessages == LoginMessages.NO_USER_EXISTS) {
+            System.out.println("No user with this this id exists!");
+            OtherController.increaseSleepRate();
+        }
+        else if (loginMessages == LoginMessages.INCORRECT_PASSWORD) {
+            System.out.println("Incorrect password");
+            OtherController.increaseSleepRate();
+        }
+        else {
+            OtherController.clearScreen();
+            OtherController.resetSleepTime();
+            System.out.println("successful login you are in main menu");
+            User user = loginMenuController.Login(username);
+            PlayerMenu playerMenu = new PlayerMenu(user);
+            playerMenu.run(scanner);
         }
     }
 
+
+
     public void checkForgotPassword(Matcher matcher, Scanner scanner) {
-        String username = matcher.group("username");
+        String username = OtherController.myTrim(matcher.group("username"));
         OtherController.sleepNormal();
         System.out.println("please enter the captcha!");
         System.out.println(OtherController.generateCaptcha());
         String input = scanner.nextLine();
-        OtherController.sleepShort();
-        if(!OtherController.checkCaptcha(input)){
+        OtherController.sleepNormal();
+        if (!OtherController.checkCaptcha(input)) {
             OtherController.clearScreen();
             System.out.println("Wrong captcha!");
             OtherController.increaseSleepRate();
@@ -80,26 +87,26 @@ public class LoginMenu {
         }
         System.out.println(loginMenuController.getSecurityQuestion(username));
         String answer = scanner.nextLine();
-        if(loginMenuController.changePassword(username,answer)==LoginMessages.INCORRECT_ANSWER) {
+        if (loginMenuController.changePassword(username, answer) == LoginMessages.INCORRECT_ANSWER) {
             System.out.println("incorrect answer");
             return;
         }
         System.out.println("now enter your password and confirm it");
         String line = scanner.nextLine();
-        if((matcher = LoginCommands.getMatcher(line,LoginCommands.NEW_PASSWORD))!=null){
+        if ((matcher = LoginCommands.getMatcher(line, LoginCommands.NEW_PASSWORD)) != null) {
             String password = matcher.group("password");
             String confirm = matcher.group("confirm");
-            if(password.equals(confirm)){
-                if(CheckValidion.check(password,CheckValidion.CHECK_PASSWORD)) {
+            if (password.equals(confirm)) {
+                if (CheckValidion.check(password, CheckValidion.CHECK_PASSWORD)) {
                     System.out.println("password changed successfully!");
-                    if(matcher.group("last")!=null)
+                    if (matcher.group("last") != null)
                         FileController.changeStayed(username);
                     FileController.modifyInfo("password", username, password);
-                }else
-                    System.out.println("weak password");
-            }else
+                } else
+                    System.out.println("weak password!");
+            } else
                 System.out.println("password and confirm are not the same!");
-        }else
+        } else
             System.out.println("invalid format for new password");
     }
 }

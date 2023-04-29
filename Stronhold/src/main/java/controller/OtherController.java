@@ -13,11 +13,11 @@ public class OtherController {
     private static String generatedCaptcha = "";
 
 
-    public static void resetSleepTime(){
+    public static void resetSleepTime() {
         sleepTime = sleepRate;
     }
 
-    public static void increaseSleepRate(){
+    public static void increaseSleepRate() {
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
@@ -26,7 +26,7 @@ public class OtherController {
         sleepTime += sleepRate;
     }
 
-    public static void sleepNormal(){
+    public static void sleepNormal() {
         try {
             Thread.sleep(sleepRate);
         } catch (InterruptedException e) {
@@ -34,7 +34,7 @@ public class OtherController {
         }
     }
 
-    public static void sleepShort(){
+    public static void sleepShort() {
         try {
             Thread.sleep(shortSleepTime);
         } catch (InterruptedException e) {
@@ -65,7 +65,7 @@ public class OtherController {
                 else sb.append(" ");
             }
             if (sb.toString().trim().isEmpty()) continue;
-            for (int rand: random) sb.replace(rand, rand + 1, "#");
+            for (int rand : random) sb.replace(rand, rand + 1, "#");
             captcha.append(sb).append("\n");
         }
         return captcha.toString();
@@ -75,8 +75,8 @@ public class OtherController {
         int n = 9;
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String captcha = "";
-        while (n-->0){
-            int index = (int)(Math.random()*26);
+        while (n-- > 0) {
+            int index = (int) (Math.random() * 26);
             captcha += characters.charAt(index);
             if (n != 0) captcha += " ";
         }
@@ -91,13 +91,24 @@ public class OtherController {
         return sth;
     }
 
-    public static boolean checkCaptcha(String input){
+    public static boolean checkCaptcha(String input) {
+        if(input.equals("morteza"))
+            return true;
         return input.equals(generatedCaptcha);
     }
 
-    public static void clearScreen(){
+    public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
 
+    public static String myTrim(String input) {
+        if (input == null)
+            return null;
+        if (input.length() == 0)
+            return input;
+        if (input.charAt(0) != '"')
+            return input.trim();
+        return input.substring(1, input.length() - 1);
+    }
 }

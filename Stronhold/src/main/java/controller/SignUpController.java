@@ -13,30 +13,6 @@ import org.passay.PasswordGenerator;
 
 public class SignUpController {
     private String  slogan;
-    private final int sleepRate = 5000;
-    private int sleepTime = 5000;
-
-
-    public void resetSleepTime(){
-        sleepTime = sleepRate;
-    }
-
-    public void increaseSleepRate(){
-        try {
-            Thread.sleep(sleepTime);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
-        sleepTime += sleepRate;
-    }
-
-    public void sleepNormal(){
-        try {
-            Thread.sleep(sleepRate);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
-    }
 
     public SignUpMessages createUserLastCheck(String username, String password, String email, String nickname,
             String slogan) {
