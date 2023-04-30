@@ -14,6 +14,7 @@ import model.machine.Machine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Government {
     private final User lord;
@@ -117,21 +118,38 @@ public class Government {
     }
 
     public int calculateLeftStorageCapacity(Resource resource){
-        int sum = 0;
+        int sum = 0,sum2=0;
         if(resource == null || resource == Resource.GOLD)
             return -1;
         StorageDetails details = resource.getResourceKeeper();
         if(details == null)
             return -2;
         for(int i1=0;i1<buildings.size();i1++){
-            if(buildings.get(i1) instanceof Storage ){
+            if(buildings.get(i1) instanceof Storage && ((Storage)buildings.get(i1)).getStorageDetails()==details){
                 sum += ((Storage) buildings.get(i1)).getCapacity()-((Storage)buildings.get(i1)).getOccupation(resource.getResourceKeeper());
             }
         }
-        return sum;//it should be repaired !
+        for (Map.Entry<Resource, Integer> entry : resources.entrySet()){
+            Resource resource1=entry.getKey();
+            Integer amount = entry.getValue();
+            if(resource1.getResourceKeeper() == details)
+                sum2 += amount;
+        }
+        return sum-sum2;//it has repaired !
     }
 
-    public void addResources(Resource resource,int amount){
-
+    public void addToResource(Resource resource,int amount){
+        if(resources.containsKey(resource))
+            resources.replace(resource,resources.get(resource)+amount);
+        else
+            resources.put(resource,amount);
     }
+
+    public void doActionInTurnFirst(){
+        //feed people
+
+        //get tax
+        
+    }
+
 }
