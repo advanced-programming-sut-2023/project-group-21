@@ -1,12 +1,15 @@
 package model;
 
 import model.building.Building;
+import model.building.Enums.BuildingsDetails;
 import model.building.Enums.StorageDetails;
 import model.building.Gate;
 import model.building.Storage;
 import model.generalenums.GroundTexture;
 import model.generalenums.Resource;
+import model.human.Enums.WorkerDetails;
 import model.human.Person;
+import model.human.Worker;
 import model.machine.Machine;
 
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ public class Government {
     private ArrayList<Person> people;
     private ArrayList<Machine> machines;
     private HashMap<Resource, Integer> resources;
+    private Building castle;
 
     public Government(User lord) {
         this.lord = lord;
@@ -65,6 +69,16 @@ public class Government {
         building.getCell().setBuilding(building);
     }
 
+    public void addTrainedPeople(WorkerDetails workerDetails) {
+        for (int i = 0; i < people.size(); i++) {
+            if (! (people.get(i) instanceof Worker)) {
+                people.remove(i);
+                break;
+            }
+        }
+        people.add(new Worker(workerDetails, this, castle.getCell(), castle.getCell()));
+    }
+
     public void setFoodRate(int foodRate) {
         popularityRate += (foodRate - this.foodRate) * 4;
         this.foodRate = foodRate;
@@ -92,6 +106,14 @@ public class Government {
         for (Building building: buildings)
             if (building.getName().equals(name)) return building;
         return null;
+    }
+
+    public Building getCastle() {
+        return castle;
+    }
+
+    public void reduceResources(Resource resource, int count) {
+        resources.replace(resource, resources.get(resource) - count);
     }
 
     public int calculateLeftStorageCapacity(Resource resource){

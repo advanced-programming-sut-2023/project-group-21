@@ -1,6 +1,7 @@
 package model.generalenums;
 
 import model.building.Enums.StorageDetails;
+import model.building.Storage;
 
 public enum Resource {
     MEAT("meat", StorageDetails.GRANARY,5),
@@ -30,7 +31,7 @@ public enum Resource {
     private final int costSell;
     private final StorageDetails resourceKeeper;
 
-    Resource(String name, StorageDetails resourceKeeper,int cost) {
+    Resource(String name, StorageDetails resourceKeeper) {
         this.name = name;
         this.resourceKeeper = resourceKeeper;
         this.costBuy = cost;

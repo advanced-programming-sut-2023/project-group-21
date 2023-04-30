@@ -12,7 +12,6 @@ public class Building {
     private BuildingsDetails buildingsDetails;
     private int hitPoint;
     private Cell cell;
-    private boolean isWrecked = false;
     public Building(Government government, BuildingsDetails buildingsDetails, Cell cell) {
         this.government = government;
         this.buildingsDetails = buildingsDetails;
@@ -36,7 +35,7 @@ public class Building {
         return buildingsDetails;
     }
 
-    public int getHitPoints() {
+    public int getMaxHitPoint() {
         return buildingsDetails.getMaxHitPoints();
     }
 
@@ -46,9 +45,5 @@ public class Building {
 
     public String getName() {
         return getBuildingsDetails().name();
-    }
-
-    public boolean isWrecked() {
-        return isWrecked;
     }
 }
