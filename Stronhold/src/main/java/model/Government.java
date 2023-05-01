@@ -148,22 +148,23 @@ public class Government {
 
     public void removeResource(Resource resource,int amount){
         if(resources.containsKey(resource)){
-            resources.put(resource,resources.get(resource)-amount);
+            int newAmount=resources.get(resource)-amount;
+            resources.put(resource,newAmount);
+            if(newAmount==0)
+                resources.remove(resource);
         }
     }
 
     public void sellSuccessfully(Trade trade){
-//check the logic of gold and cost
-        //        int receivedMoney=trade.getAmount()*trade.getResource().getCostSell();
-        int newGoldAmount=resources.get(Resource.GOLD)+trade.getAmount();
+        int newGoldAmount=resources.get(Resource.GOLD)-trade.getAmount()*trade.getCost();
         resources.put(Resource.GOLD,newGoldAmount);
     }
 
     public void buySuccessfully(Trade trade){
         if(resources.containsKey(trade.getResource())){
-            resources.put(trade.getResource(),resources.get(trade.getResource())-trade.getAmount());
+            resources.put(trade.getResource(),resources.get(trade.getResource())+trade.getAmount());
         }
-        int newGoldAmount=resources.get(Resource.GOLD)+trade.getAmount();
+        int newGoldAmount=resources.get(Resource.GOLD)-trade.getAmount()*trade.getCost();
         resources.put(Resource.GOLD,newGoldAmount);
     }
 

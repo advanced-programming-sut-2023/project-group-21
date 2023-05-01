@@ -16,7 +16,7 @@ public enum Resource {
     IRON("iron", StorageDetails.STOCKPILE,4),
     WOOD("wood", StorageDetails.STOCKPILE,6),
     PITCH("pitch", StorageDetails.STOCKPILE,8),
-    GOLD("gold", null,8),
+    GOLD("gold", null,1),
     BOW("bow", StorageDetails.ARMOURY,9),
     CROSSBOW("crossbow", StorageDetails.ARMOURY,12),
     SPEAR("spear", StorageDetails.ARMOURY,6),
@@ -51,7 +51,7 @@ public enum Resource {
     }
     public static Resource getResourceByName(String name) {
         for (Resource resource: Resource.values()) {
-            if (resource.name.equals(name)) return resource;
+            if (resource.getName().equals(name)) return resource;
         }
         return null;
     }

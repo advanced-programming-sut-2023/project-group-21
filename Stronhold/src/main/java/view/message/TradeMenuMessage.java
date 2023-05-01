@@ -10,7 +10,8 @@ public enum TradeMenuMessage {
     NOT_EXISTENCE_IN_SELLER("you don't have this resource"),
     SUCCESS("Done successfully"),
     INVALID_ID("The id is not valid"),
-    CAN_NOT_AFFORD("You do not have enough money");
+    CAN_NOT_AFFORD("You do not have enough money"),
+    CAPACITY("You don't have enough capacity");
 
 
 

@@ -10,7 +10,7 @@ public class TradeController {
     public TradeMenuMessage trade(String resourceName, int amount, int price, String message,Government government) {
         Government currentGovernment=government;
         Resource resource=Resource.getResourceByName(resourceName);
-        if(resource==null)
+        if((resource==null)||resource==Resource.GOLD)
             return TradeMenuMessage.INVALID_RESOURCE_TYPE;
         if(price<0)
             return TradeMenuMessage.INVALID_PRICE;
@@ -25,8 +25,6 @@ public class TradeController {
         currentGovernment.addTrade(createdTrade);
         Game.addTrade(createdTrade);
         return TradeMenuMessage.SUCCESS;
-        //added to both game and the government
-        //but if finished let it be in the government arraylist but delete it from the game
     }
 
     public static TradeMenuMessage accept(int id, String message, Government government) {
@@ -36,8 +34,10 @@ public class TradeController {
         Trade trade=Game.getTradeById(id);
         Government buyer=government;
         Government seller=Game.getTradeById(id).getSeller();
-        if(seller.getGold()<=trade.getCost()* trade.getAmount())
+        if(seller.getGold()<trade.getCost()* trade.getAmount())
             return TradeMenuMessage.CAN_NOT_AFFORD;
+        if(seller.calculateLeftStorageCapacity(trade.getResource())< trade.getAmount())
+            return TradeMenuMessage.CAPACITY;
         buyer.buySuccessfully(Game.getTradeById(id));
         seller.sellSuccessfully(Game.getTradeById(id));
         Game.getTradeById(id).isDone();
