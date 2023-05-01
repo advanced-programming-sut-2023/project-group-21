@@ -24,6 +24,7 @@ public class Government {
     private HashMap<Resource, Integer> resources;
     private Building castle;
 
+    private ArrayList<Trade> trades;
     public Government(User lord) {
         this.lord = lord;
     }
@@ -128,10 +129,49 @@ public class Government {
                 sum += ((Storage) buildings.get(i1)).getCapacity()-((Storage)buildings.get(i1)).getOccupation(resource.getResourceKeeper());
             }
         }
-        return sum;//it should be repaired !
+        return sum;//It should be repaired !
     }
 
     public void addResources(Resource resource,int amount){
 
+    }
+
+    public void addTrade(Trade createdTrade) {
+        trades.add(createdTrade);
+    }
+
+    public int getResourceAmount(Resource resource) {
+        if(resources.containsKey(resource))
+            return resources.get(resource);
+        return -1;
+    }
+
+    public void removeResource(Resource resource,int amount){
+        if(resources.containsKey(resource)){
+            resources.put(resource,resources.get(resource)-amount);
+        }
+    }
+
+    public void sellSuccessfully(Trade trade){
+//check the logic of gold and cost
+        //        int receivedMoney=trade.getAmount()*trade.getResource().getCostSell();
+        int newGoldAmount=resources.get(Resource.GOLD)+trade.getAmount();
+        resources.put(Resource.GOLD,newGoldAmount);
+    }
+
+    public void buySuccessfully(Trade trade){
+        if(resources.containsKey(trade.getResource())){
+            resources.put(trade.getResource(),resources.get(trade.getResource())-trade.getAmount());
+        }
+        int newGoldAmount=resources.get(Resource.GOLD)+trade.getAmount();
+        resources.put(Resource.GOLD,newGoldAmount);
+    }
+
+    public int getGold() {
+        return resources.get(Resource.GOLD);
+    }
+
+    public ArrayList<Trade> getTrades() {
+        return trades;
     }
 }
