@@ -86,7 +86,7 @@ public class GameMenu {
     }
     private void goToTradeMenu(Scanner scanner){
         TradeMenu tradeMenu = new TradeMenu();
-        tradeMenu.run(scanner);
+        tradeMenu.run(scanner,gameController.getCurrentGovernment());
     }
     private void goToShop(Matcher matcher,Scanner scanner){
        ShopMenu shopMenu = new ShopMenu(government);

@@ -311,5 +311,7 @@ public class GameController {
 
     }
 
-
+    public Government getCurrentGovernment() {
+        return currentGovernment;
+    }
 }

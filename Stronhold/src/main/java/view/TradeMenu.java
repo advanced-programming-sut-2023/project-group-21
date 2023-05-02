@@ -59,7 +59,6 @@ public class TradeMenu {
         for (Trade trade : government.getTrades()) {
             show = show + trade.getId() + " " + trade.getResource().getName() + trade + " " + trade.getAmount() + " " + trade.getCost() + " " + trade.getComment() + "\n";
         }
-
         System.out.print(show);
     }
 
