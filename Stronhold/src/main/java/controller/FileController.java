@@ -204,4 +204,30 @@ public class FileController {
         return f.exists() && !f.isDirectory();
     }
 
+    public static int getRank(String username){
+        int score = -1;
+        for(int i1=0;i1<allUsers.size();i1++){
+            if(((JSONObject)allUsers.get(i1)).get("username").equals(username))
+                score = (Integer) (((JSONObject)allUsers.get(i1)).get("score"));
+        }
+        if(score == -1)
+            return -1;
+        int rank = 1;
+        for(int i2 = 0;i2<allUsers.size();i2++){
+            if(score<(Integer)(((JSONObject)allUsers.get(i2)).get("score")))
+                rank++;
+        }
+        return rank;
+    }
+
+    public static String suggestUsername(String username){
+        if(!checkExistenceOfUserOrEmail(username,true))
+            return username;
+        for(int i1=0;i1<100;i1++) {
+            if (!checkExistenceOfUserOrEmail(username + String.valueOf(i1),true))
+                return username + String.valueOf(i1);
+        }
+        return suggestUsername(username + "a");
+    }
+
 }
