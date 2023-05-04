@@ -31,7 +31,7 @@ public enum Resource {
     private final int costSell;
     private final StorageDetails resourceKeeper;
 
-    Resource(String name, StorageDetails resourceKeeper) {
+    Resource(String name, StorageDetails resourceKeeper,int cost) {
         this.name = name;
         this.resourceKeeper = resourceKeeper;
         this.costBuy = cost;
