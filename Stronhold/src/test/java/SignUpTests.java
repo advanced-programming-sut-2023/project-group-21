@@ -27,5 +27,17 @@ public class SignUpTests {
         Assertions.assertEquals(SignUpMessages.WEAK_PASSWORD,message);
     }
 
+    @Test
+    public void usernameFault(){
+        SignUpController controller=new SignUpController();
+        SignUpMessages message=controller.checkValidationFormat("ssea434w@gmail.com","mor#","moshan!AP21","moshan!AP21");
+        Assertions.assertEquals(SignUpMessages.VALID_USERNAME,message);
+    }
 
+    @Test
+    public void emailFault(){
+        SignUpController controller=new SignUpController();
+        SignUpMessages message=controller.checkValidationFormat("ssea434wgmail.com","SALAMman12Hastam","moshan!AP21","moshan!AP21");
+        Assertions.assertEquals(SignUpMessages.VALID_EMAIL,message);
+    }
 }

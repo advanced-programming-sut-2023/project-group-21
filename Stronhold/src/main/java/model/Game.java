@@ -8,8 +8,20 @@ public class Game {
     private static ArrayList<User> users = new ArrayList<>();
     public static final String directions = "nwesr";
     public static final Map<Integer, Double> foodConsumption = Map.of(-2, (double) 0, -1, 0.5, 0, (double) 1, 1, 1.5, 2, (double) 2);
-    public static final ArrayList<String> SLOGANS = new ArrayList<>(Arrays.asList(""));
+    public static final List<String> SLOGANS=Arrays.asList("Peace Through Strength",
+            "Better to die than to be a coward",
+            "Whatever It Takes",
+            "Deeds, Not Words",
+            "Be All You Can Be",
+            "Always Ready",
+            "Fortune favours the brave",
+            "Loyalty, duty, honor",
+            "An Army of One",
+            "The harder the conflict, the more glorious the triumph",
+            "The only easy day was yesterday"
+            );
     private static ArrayList<Trade> trades;
+
     public static final String[] SECURITY_QUESTION = { "what is your favorite food ?", "what is your father s name ?",
             "what is your oldest sibling's first name?" };
     public static final List<GroundTexture> UNPASSABLE = Arrays.asList(GroundTexture.ROCK, GroundTexture.RIVER,
