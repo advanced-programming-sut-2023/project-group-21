@@ -4,6 +4,8 @@ import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.human.Enums.WorkerDetails;
 import model.human.Worker;
+import model.machine.Machine;
+import model.machine.MachineDetails;
 
 public class Command {
     WorkerDetails workerDetails;
@@ -11,6 +13,7 @@ public class Command {
     BuildingsDetails buildingsDetails;
     Building building;
     String name, direction;
+    MachineDetails machineDetail;
     int x, y, soldierCount;
 
     public Command(String name, BuildingsDetails buildingsDetails, int x, int y) {
@@ -48,6 +51,13 @@ public class Command {
         this.worker = worker;
         this.name = name;
         this.direction = direction;
+        this.x = x;
+        this.y = y;
+    }
+
+    public Command(String name, MachineDetails machineDetail, int x, int y) {
+        this.name = name;
+        this.machineDetail = machineDetail;
         this.x = x;
         this.y = y;
     }

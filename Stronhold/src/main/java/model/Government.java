@@ -20,13 +20,14 @@ import static java.lang.Math.min;
 
 public class Government {
     private final User lord;
-    private int popularity, foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
+    private int foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
     private ArrayList<Building> buildings;
     private ArrayList<Person> people;
     private ArrayList<Machine> machines;
     private HashMap<Resource, Integer> resources;
     private Building castle;
 
+    private ArrayList<Trade> trades;
     public Government(User lord) {
         this.lord = lord;
     }
@@ -36,7 +37,7 @@ public class Government {
     }
 
     public int getPopularity() {
-        return popularity;
+        return people.size();
     }
 
     public int getFoodRate() {
@@ -158,6 +159,46 @@ public class Government {
         return number;
     }
 
+    }
+
+    public void addTrade(Trade createdTrade) {
+        trades.add(createdTrade);
+    }
+
+    public int getResourceAmount(Resource resource) {
+        if(resources.containsKey(resource))
+            return resources.get(resource);
+        return -1;
+    }
+
+    public void removeResource(Resource resource,int amount){
+        if(resources.containsKey(resource)){
+            int newAmount=resources.get(resource)-amount;
+            resources.put(resource,newAmount);
+            if(newAmount==0)
+                resources.remove(resource);
+        }
+    }
+
+    public void sellSuccessfully(Trade trade){
+        int newGoldAmount=resources.get(Resource.GOLD)-trade.getAmount()*trade.getCost();
+        resources.put(Resource.GOLD,newGoldAmount);
+    }
+
+    public void buySuccessfully(Trade trade){
+        if(resources.containsKey(trade.getResource())){
+            resources.put(trade.getResource(),resources.get(trade.getResource())+trade.getAmount());
+        }
+        int newGoldAmount=resources.get(Resource.GOLD)-trade.getAmount()*trade.getCost();
+        resources.put(Resource.GOLD,newGoldAmount);
+    }
+
+    public int getGold() {
+        return resources.get(Resource.GOLD);
+    }
+
+    public ArrayList<Trade> getTrades() {
+        return trades;
     public void doActionInTurnFirst() {
         //get tax and feed
         int change = 0;
@@ -182,5 +223,4 @@ public class Government {
         int tax = (int) (Game.TaxDetails.getTax(taxRate)*people.size());
         resources.put(Resource.GOLD,resources.get(Resource.GOLD)+tax);
     }
-
 }
