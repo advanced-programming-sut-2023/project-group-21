@@ -84,11 +84,6 @@ public class ProfileMenu {
             System.out.println("success!");
     }
 
-
-    public void checkRemoveSlogan() {
-
-    }
-
     public void checkDisplay(Matcher matcher) {
         String part = matcher.group("part");
         System.out.println(profileController.display(part));
