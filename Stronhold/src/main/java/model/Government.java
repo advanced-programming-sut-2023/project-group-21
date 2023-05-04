@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 public class Government {
     private final User lord;
-    private int popularity, foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
+    private int foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
     private ArrayList<Building> buildings;
     private ArrayList<Person> people;
     private ArrayList<Machine> machines;
@@ -34,7 +34,7 @@ public class Government {
     }
 
     public int getPopularity() {
-        return popularity;
+        return people.size();
     }
 
     public int getFoodRate() {

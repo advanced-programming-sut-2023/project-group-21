@@ -12,6 +12,7 @@ import model.human.Enums.EuropeanSoldiersDetails;
 import model.human.Enums.WorkerDetails;
 import model.human.Person;
 import model.human.Worker;
+import model.machine.MachineDetails;
 import view.message.GameMessage;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class GameController {
     }
 
     public GameMessage SetFoodRate(int newRate){
-        if (newRate > 5 || newRate < -5) return null;
+        if (newRate > 2 || newRate < -2) return null;
         currentGovernment.setFoodRate(newRate);
         return null;
     }
@@ -71,7 +72,7 @@ public class GameController {
     public GameMessage checkDropBuilding(int x, int y, String type) {
         BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(type);
         if (x > 200 || x < 1 || y > 200 || y < 1) return null;
-        if (buildingsDetails == null) return null;
+        if (buildingsDetails == null || buildingsDetails.equals(BuildingsDetails.SIEGE_TENT)) return null;
         if (map[x-1][y-1].getBuilding() != null) return null;
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
@@ -94,15 +95,27 @@ public class GameController {
             case STORAGE:
                 currentGovernment.addBuilding(new Storage(currentGovernment, map[x-1][y-1],
                         StorageDetails.getStorageDetailsByBuildingDetails(buildingsDetails)));
+                break;
             case RESIDENCY:
                 currentGovernment.addBuilding(new Residency(currentGovernment, map[x-1][y-1],
                         ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails)));
+                break;
             case GATE:
                 currentGovernment.addBuilding(new Gate(currentGovernment, map[x-1][y-1],
                         ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), true, false));
+                break;
             case WEAPON_PRODUCTION:
                 currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x-1][y-1],
                         ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails)));
+                break;
+            case STABLE:
+                currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x-1][y-1]));
+                break;
+            case TRAP:
+                currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x-1][y-1]));
+                break;
+            case QUARRY:
+                currentGovernment.addBuilding(new Quarry(currentGovernment, map[x-1][y-1]));
             default:
                 currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x-1][y-1]));
         }
@@ -281,11 +294,31 @@ public class GameController {
         }
         return true;
     }
-    public GameMessage buildSiegeEquipment(String name){
+    public GameMessage checkBuildSiegeEquipment(String name){
+        ArrayList<Engineer> engineers = new ArrayList<>();
+        if (!(selectedWorker instanceof Engineer)) return null;
+        MachineDetails machineDetail = MachineDetails.getMachineDetailsByName(name);
+        if (machineDetail == null) return null;
+        if (numberOfEngineers() < machineDetail.getEngineersNeeded()) return null;
+        currentGovernment.addBuilding(new Building(currentGovernment, BuildingsDetails.SIEGE_TENT, selectedWorker.getPosition()));
+        for (int i = 0; i < currentGovernment.getPopularity(); i++)
+            if (currentGovernment.getPeople().get(i) instanceof Engineer &&
+            !(currentGovernment.getPeople().get(i).equals(selectedWorker))) engineers.add((Engineer) currentGovernment.getPeople().get(i));
+        for (Engineer engineer : engineers) engineer.setDestination(selectedWorker.getPosition());
+        commands.add(new Command("build equipment", machineDetail, selectedWorker.getPosition().getxCoordinates(),
+                selectedWorker.getPosition().getyCoordinates()));
         return null;
     }
 
+    private int numberOfEngineers() {
+        int engineers = 0;
+        for (Person person: currentGovernment.getPeople())
+            if (person instanceof Engineer) engineers++;
+        return engineers;
+    }
+
     public GameMessage disbandUnit(){
+        selectedWorker.setDestination(currentGovernment.getBuildingByName("castle").getCell());
         return null;
     }
 
