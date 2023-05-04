@@ -45,10 +45,16 @@ public class MapMenu {
                 saveMap();
             else if((matcher = MapCommand.getMatcher(line,MapCommand.MAKE_NEW_MAP))!=null)
                 makeMap(matcher);
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("INVALID COMMAND");
         }
 
+    }
+
+    private void help() {
+        System.out.println("You can show,move,clear and change the map.You can also save the built map or create a new one");
     }
 
     private void makeMap(Matcher matcher) {

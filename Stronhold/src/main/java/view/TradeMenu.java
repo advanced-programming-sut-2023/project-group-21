@@ -26,9 +26,15 @@ public class TradeMenu {
                 showTradeHistory(government);
             else if((matcher=TradeCommand.getMatcher(line,TradeCommand.ACCEPT_TRADE)) != null)
                 checkAccept(matcher,government);
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("Invalid input");
         }
+    }
+
+    private void help() {
+        System.out.println("You are in the trade menu.You can sell, buy and check the history of trades");
     }
 
     private void checkTrade(Matcher matcher,Government government){

@@ -26,18 +26,22 @@ public class ProfileMenu {
             line = scanner.nextLine();
             if ((matcher = ProfileCommands.getMatcher(line, ProfileCommands.BACK)) != null)
                 break;
-            else if ((matcher = ProfileCommands.getMatcher(line, ProfileCommands.HELP)) != null)
-                System.out.println("it needs repair");
             else if ((matcher = ProfileCommands.getMatcher(line, ProfileCommands.CHANGE_PASSWORD)) != null)
                 checkChangePassword(matcher);
             else if ((matcher = ProfileCommands.getMatcher(line, ProfileCommands.CHANGE_SOMETHING)) != null)
                 checkChangeSomething(matcher);
             else if ((matcher = ProfileCommands.getMatcher(line, ProfileCommands.DISPLAY_PROFILE)) != null)
                 checkDisplay(matcher);
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("invalid command!");
 
         }
+    }
+
+    private void help() {
+        System.out.println("You are in the profile menu\nYou can change your profile's fields or see your profile details");
     }
 
 

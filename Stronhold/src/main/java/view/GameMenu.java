@@ -72,10 +72,16 @@ public class GameMenu {
                 nextTurn();
             else if(GameMenuCommand.getMatcher(line,GameMenuCommand.GO_TO_TRADE)!=null)
                 goToTradeMenu(scanner);
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("invalid format!");
 
         }
+    }
+
+    private void help() {
+        System.out.println("You are in the game menu\nYou can do anything needed here!!!");
     }
 
     private boolean checkWin(){

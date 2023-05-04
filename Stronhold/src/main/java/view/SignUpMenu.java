@@ -27,9 +27,15 @@ public class SignUpMenu {
                 checkCreateUser(matcher, scanner);
             else if ((matcher = SignUpCommands.getMatcher(line, SignUpCommands.REGISTER_WITH_RANDOM_PASSWORD)) != null)
                 checkCreateUserPassword(matcher, scanner);
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("invalid command!");
         }
+    }
+
+    private void help() {
+        System.out.println("You are in the signup menu\nYou can register with random or selected password");
     }
 
 
