@@ -48,6 +48,8 @@ public class ProfileController {
 
     public String display(String whatToDisplay){
         switch (whatToDisplay) {
+            case "rank":
+                return String.valueOf(FileController.getRank(user.getUserName()));
             case "username":
                 return user.getUserName();
             case "email":
@@ -58,8 +60,8 @@ public class ProfileController {
                 return "sorry due to security reason it is impossible ";
             case "slogan":
                 return user.getSlogan();
-
         }
+
         String str = "";
         str += "username: "+user.getUserName()+"\n"+"email: "+user.getEmail()+"\n";
         if(user.getNickName() != null)

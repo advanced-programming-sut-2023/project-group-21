@@ -75,6 +75,30 @@ public class Game {
         }
     }
 
+    public static enum FoodRate {
+        A(-2,0,-8),
+        B(-1,0.5,-4),
+        C(0,1,0),
+        D(1,1.5,4),
+        E(2,2,8);
+        int number,popularityRate;
+        double foodRate;
+        FoodRate(int number, double foodRate, int popularityRate){
+            this.number = number;
+            this.popularityRate = popularityRate;
+            this.foodRate = foodRate;
+        }
+
+        public static double getFoodRate(int number) {
+            for (FoodRate foodRate1: FoodRate.values()) if (foodRate1.number == number) return foodRate1.foodRate;
+            return 0;
+        }
+        public static int getPopularity(int number) {
+            for (FoodRate foodRate1: FoodRate.values()) if (foodRate1.number == number) return foodRate1.popularityRate;
+            return 0;
+        }
+    }
+
     public static ArrayList<User> getUsers() {
         return users;
     }

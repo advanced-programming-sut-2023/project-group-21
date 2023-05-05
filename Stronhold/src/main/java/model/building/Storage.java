@@ -22,6 +22,10 @@ public class Storage extends Building {
         return storageDetails.getBuildingsDetails();
     }
 
+    public StorageDetails getStorageDetails(){
+        return storageDetails;
+    }
+
     public int getCapacity() {
         return storageDetails.getCapacity();
     }
