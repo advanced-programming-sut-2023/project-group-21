@@ -179,4 +179,8 @@ public class MapController {
             return;
         initializeMap(savedMap);
     }
+
+    public Cell[][] getMap(){
+        return map;
+    }
 }

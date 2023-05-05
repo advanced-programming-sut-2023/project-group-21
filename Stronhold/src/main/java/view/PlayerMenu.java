@@ -6,13 +6,16 @@ import java.util.regex.Matcher;
 
 import controller.FileController;
 import controller.MapController;
+import model.Cell;
 import model.Government;
 import model.User;
 import view.commands.PlayerMenuCommand;
-import view.message.MapMessages;
+
 
 public class PlayerMenu {
     private final User user;
+    private Cell[][] myMap;
+    private MapMenu mapMenu;
 
     public PlayerMenu(User user) {
         this.user = user;
@@ -47,10 +50,18 @@ public class PlayerMenu {
             }
             case "map" -> {
                 System.out.println("you are in map menu");
-                MapMenu mapMenu = new MapMenu(user);
+                mapMenu = new MapMenu(user);
                 mapMenu.run(scanner);
+                myMap = mapMenu.getMyMap();
             }
             case "game" -> {
+                if(myMap==null && FileController.checkExistenceOfMap(user.getUserName())){
+                    System.out.println("you should first make the map!");
+                    return;
+                }
+                if(mapMenu==null){
+                    mapMenu = new MapMenu(user);
+                }
                 System.out.println("first enter number of player and then enter their username");
                 int numberOfPlayer;
                 try {
@@ -69,6 +80,7 @@ public class PlayerMenu {
                         tempGovernment = new Government(tempUser);
                         governments.add(tempGovernment);
                         GameMenu gameMenu = new GameMenu(user,governments);
+                        gameMenu.setMapMenu(mapMenu);
                         gameMenu.run(scanner);
                     }
                 }catch (NumberFormatException e){

@@ -33,7 +33,7 @@ public class GameController {
     private Worker selectedWorker;
     private Government currentGovernment;
     private ArrayList<Command> commands = new ArrayList<>();
-    private ArrayList<Cell> looked;
+    private MapController mapController;
 
     public GameMessage showFactor() {
         return GameMessage.FACTORS;
@@ -61,6 +61,10 @@ public class GameController {
         if (newRate > 5 || newRate < -5) return GameMessage.INVALID_FOOD_RATE;
         currentGovernment.setFoodRate(newRate);
         return GameMessage.SUCCESS;
+    }
+
+    public void setMapController(MapController mapController) {
+        this.mapController = mapController;
     }
 
     public GameMessage setTax(int tax) {//repair
@@ -413,7 +417,6 @@ public class GameController {
 
     private void find2Path(int x1, int y1, int x2, int y2, int distancesOfStart) {
         int totalDistance = abs(x1 - x2) + abs(y1 - y2) + distancesOfStart;
-        // System.out.println(x1 + "!!!!!" + y1 + " " + totalDistance);
         int endDistance = abs(x1 - x2) + abs(y1 - y2);
         if (x1 >= map.length || x1 < 0 || x2 >= map.length || x2 < 0 || y1 >= map.length || y1 < 0 || y2 >= map.length
                 || y2 < 0)
@@ -468,6 +471,7 @@ public class GameController {
 
             }
         }
+        decodePath(x,y);
     }
 
     private void decodePath(int x2, int y2) {

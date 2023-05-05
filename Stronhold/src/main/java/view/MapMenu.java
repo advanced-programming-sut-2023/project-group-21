@@ -1,6 +1,7 @@
 package view;
 
 import controller.MapController;
+import model.Cell;
 import model.User;
 import view.commands.MapCommand;
 import view.message.MapMessages;
@@ -12,6 +13,7 @@ public class MapMenu {
 
     private final User user;
     private final MapController mapController;
+
     public MapMenu(User user){
         this.user = user;
         mapController = new MapController();
@@ -106,8 +108,10 @@ public class MapMenu {
     }
 
     private void checkMove(Matcher matcher){
-        String dir1 = matcher.group("dir1");
-        String dir2 = matcher.group("dir2");
+        String left = matcher.group("left");
+        String mapShow = mapController.moveMap(left);
+        clearScreen();
+        System.out.println(mapShow);
     }
 
     private void clearScreen(){
@@ -119,4 +123,11 @@ public class MapMenu {
         mapController.saveMap(user.getUserName());
     }
 
+    public Cell[][] getMyMap() {
+        return mapController.getMap();
+    }
+
+    public MapController getMapController(){
+        return mapController;
+    }
 }

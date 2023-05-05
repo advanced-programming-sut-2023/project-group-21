@@ -1,5 +1,6 @@
 package view;
 
+import controller.FileController;
 import controller.OtherController;
 import controller.SignUpController;
 import model.Game;
@@ -105,7 +106,7 @@ public class SignUpMenu {
             System.out.println("please enter another email , this email is already used");
         else if (signUpController.createUserLastCheck(username, password, email, nickname,
                 slogan) == SignUpMessages.USERNAME_REPEAT)
-            System.out.println("this username is already taken");
+            System.out.println("this username is already taken but this username is available "+ FileController.suggestUsername(username));
         else
             doAction(scanner, matcher, username, password, email, nickname, slogan);
     }
