@@ -17,4 +17,8 @@ public class Person {
     public Government getGovernment() {
         return government;
     }
+
+    public void delete() {
+        government.deletePerson(this);
+    }
 }

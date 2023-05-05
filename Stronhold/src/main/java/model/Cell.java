@@ -184,4 +184,9 @@ public class Cell {
         }
         return true;
     }
+
+    public void deletePerson(Person person){
+        people.remove(person);
+    }
+
 }

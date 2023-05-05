@@ -71,4 +71,14 @@ public class Worker extends Person {
     public void setEnemy(Worker enemy) {
         this.enemy = enemy;
     }
+
+    public String getState() {
+        return state;
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        position.deletePerson(this);
+    }
 }

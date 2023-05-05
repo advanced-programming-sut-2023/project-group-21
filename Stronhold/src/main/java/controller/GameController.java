@@ -347,11 +347,6 @@ public class GameController {
         return null;
     }
 
-    public void nextTurn() {
-        updateBuilding();
-        updateTroops();
-        updateStorage();
-    }
 
     public void setGovernment(Government government) {
         this.currentGovernment = government;
@@ -498,6 +493,42 @@ public class GameController {
                     break;
             }
             path.add(map[x2][y2]);
+        }
+    }
+
+    public void nextTurn() {
+        updateBuilding();
+        updateTroops();
+        updateStorage();
+
+        currentGovernment.doActionInTurnFirst();
+        clearDeadSoldiers();
+    }
+
+    //moving
+    public Person attackInRange(Worker soldier){
+        int x=soldier.getPosition().getxCoordinates();
+        int y=soldier.getPosition().getyCoordinates();
+        soldier.getState();
+        //get range
+        for(int b=0;b<=soldier.getRange();b++) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    for (Worker person : map[i - 1][j - 1].getPeople()) {
+                        if (!person.getGovernment().equals(soldier.getGovernment()))
+                            return person;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void clearDeadSoldiers(){
+        for (Person person : currentGovernment.getPeople()) {
+            if (person.getHitPoint() <= 0) {
+                person.delete();
+            }
         }
     }
 

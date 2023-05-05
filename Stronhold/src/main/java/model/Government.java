@@ -26,7 +26,6 @@ public class Government {
     private ArrayList<Machine> machines;
     private HashMap<Resource, Integer> resources;
     private Building castle;
-
     private ArrayList<Trade> trades;
 
     public Government(User lord) {
@@ -225,4 +224,9 @@ public class Government {
             int tax = (int) (Game.TaxDetails.getTax(taxRate) * people.size());
             resources.put(Resource.GOLD, resources.get(Resource.GOLD) + tax);
         }
+
+    public void deletePerson(Person person){
+        people.remove(person);
+    }
+
     }
