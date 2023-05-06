@@ -46,4 +46,8 @@ public class Building {
     public String getName() {
         return getBuildingsDetails().name();
     }
+
+    public void repairHitpoint(){
+        hitPoint=getHitPoint();
+    }
 }

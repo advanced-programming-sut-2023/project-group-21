@@ -352,18 +352,6 @@ public class GameController {
         this.currentGovernment = government;
     }
 
-    private void updateStorage() {
-
-    }
-
-    private void updateTroops() {
-
-    }
-
-    private void updateBuilding() {
-
-    }
-
     public Government getCurrentGovernment() {
         return currentGovernment;
     }
@@ -506,30 +494,82 @@ public class GameController {
     }
 
     //moving
-    public Person attackInRange(Worker soldier){
+
+    public void attackInRange(Worker soldier){
         int x=soldier.getPosition().getxCoordinates();
         int y=soldier.getPosition().getyCoordinates();
-        soldier.getState();
-        //get range
-        for(int b=0;b<=soldier.getRange();b++) {
+        int range=0;
+        if(soldier.getState().equals("standing"))
+            range=soldier.getRange();
+        else if (soldier.getState().equals("defensive"))
+            range= soldier.getRange()+1;
+        else if(soldier.getState().equals("attacking"))
+            range=soldier.getRange()+ soldier.getSpeed();
+        for(int b=0;b<=range;b++) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     for (Worker person : map[i - 1][j - 1].getPeople()) {
                         if (!person.getGovernment().equals(soldier.getGovernment()))
-                            return person;
+                            soldier.setEnemy(person);
                     }
                 }
             }
         }
-        return null;
     }
-
     public void clearDeadSoldiers(){
-        for (Person person : currentGovernment.getPeople()) {
-            if (person.getHitPoint() <= 0) {
-                person.delete();
+        for (Government government : governments) {
+            for (Person person : government.getPeople()) {
+                if (person.getHitPoint() <= 0) {
+                    person.delete();
+                }
             }
         }
     }
 
+    public void doTheMove(Worker person,ArrayList<Cell> way){
+            //the array is from last to first
+        int length= way.size();
+        for(int i=1;i<=person.getSpeed();i++) {
+            //way.get(length-i).rempveThePerson;
+            //check if goes well..{the changes in the cell and the hitpoint of the person
+            //way.get(length- 1- i).addThePerson;}
+        }
+    }
+
+    private void updateStorage() {
+
+    }
+
+    private void updateTroops() {
+
+    }
+
+    private void updateBuilding() {
+        for (Command command : commands) {
+            switch (command.name){
+                case "repair":
+                    command.building.repairHitpoint();
+                    break;
+                case "drop building":
+                    for (Map.Entry<Resource, Integer> entry : command.buildingsDetails.getRequiredResource().entrySet()) {
+                        currentGovernment.reduceResources(entry.getKey() ,entry.getValue());
+                    //what if not enough
+                    }
+                    Building building=new Building(currentGovernment,command.buildingsDetails,map[command.x][command.y]);
+                    map[command.x][command.y].setBuilding(building);
+                    break;
+                case "drop unit":
+                    int x=command.worker.getPosition().getxCoordinates();
+                    int y=command.worker.getPosition().getyCoordinates();
+                    //map[x][y].addPeople
+                    //consequences???
+                    break;
+//                case "the rest":??
+            }
+        }
+    }
+
+    //to do: finish the commands processing with all considerations
+    //update troop but what written
+    //update and consider all the government factors
 }
