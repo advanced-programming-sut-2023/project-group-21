@@ -9,7 +9,7 @@ import model.machine.Machine;
 public class Engineer extends Worker {
     private Building workplace;
     private Machine machine;
-    private boolean hasOil;
+    private boolean hasOil,hasMachine;
 
     public Engineer(WorkerDetails workerDetails, Government government, Cell position, Cell destination) {
         super(workerDetails, government, position, destination);
@@ -37,5 +37,13 @@ public class Engineer extends Worker {
 
     public boolean hasOil() {
         return hasOil;
+    }
+
+    public void giveHimMachine(boolean trueOrFalse){
+        hasMachine = trueOrFalse;
+    }
+
+    public boolean hasMachine() {
+        return hasMachine;
     }
 }

@@ -2,10 +2,12 @@ package controller;
 
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
+import model.human.Engineer;
 import model.human.Enums.WorkerDetails;
 import model.human.Worker;
-import model.machine.Machine;
 import model.machine.MachineDetails;
+
+import java.util.ArrayList;
 
 public class Command {
     WorkerDetails workerDetails;
@@ -14,6 +16,7 @@ public class Command {
     Building building;
     String name, direction;
     MachineDetails machineDetail;
+    ArrayList<Engineer> engineers=new ArrayList<>();
     int x, y, soldierCount;
 
     public Command(String name, BuildingsDetails buildingsDetails, int x, int y) {
@@ -55,10 +58,12 @@ public class Command {
         this.y = y;
     }
 
-    public Command(String name, MachineDetails machineDetail, int x, int y) {
+    public Command(String name, MachineDetails machineDetail, int x, int y, ArrayList<Engineer> engineers) {
         this.name = name;
         this.machineDetail = machineDetail;
         this.x = x;
         this.y = y;
+        //is the syntax of copying the arraylist OK??
+        this.engineers=engineers;
     }
 }
