@@ -26,6 +26,10 @@ public class ProductMaker extends Building {
         return productMakerDetails.getProducts();
     }
 
+    public Resource getConsumingProduct() {
+        return productMakerDetails.getConsumption();
+    }
+
     public int getRate() {
         return productMakerDetails.getRate();
     }

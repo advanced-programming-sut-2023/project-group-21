@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.min;
 
 public class GameController {
     private ArrayList<Cell> path = new ArrayList<>();
@@ -180,8 +181,8 @@ public class GameController {
         return GameMessage.SUCCESS;
     }
 
-    private void makeTroop(WorkerDetails workerDetails, int count) {
-        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(workerDetails);
+    private void makeTroop(WorkerDetails workerDetails, int count, int x, int y) {
+        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(workerDetails, map[x - 1][y - 1]);
     }
 
     public int getNumberOfPeasants() {
@@ -259,7 +260,13 @@ public class GameController {
         if (!(name.equals("archer") || name.equals("crossbowman") || name.equals("archer bow")))
             return GameMessage.NO_SUITABLE;
         if (getDistance(x, y) > selectedWorker.getRange()) return GameMessage.OUT_OF_RANGE;
-        commands.add(new Command("attack", selectedWorker, x, y));
+        Worker enemy = null;
+        for (Person person : map[x - 1][y - 1].getPeople()) {
+            if (person instanceof Worker && !person.getGovernment().equals(selectedWorker.getGovernment()))
+                enemy = (Worker) person;
+        }
+        if (enemy == null) return GameMessage.NO_ENEMY_TO_FIGHT;
+        selectedWorker.setEnemy(enemy);
         return GameMessage.SUCCESS;
     }
 
@@ -500,6 +507,7 @@ public class GameController {
     public void nextTurn() {
         doCommands();
         updateTroops();
+        updateStorage();
         currentGovernment.doActionInTurnFirst();
         clearDeadSoldiers();
     }
@@ -552,7 +560,19 @@ public class GameController {
     }
 
     private void updateStorage() {
-
+        for (Government government: governments) {
+            for (Building building: government.getBuildings()) {
+                if (building instanceof ProductMaker) {
+                    if (((ProductMaker) building).getConsumingProduct() != null) {
+                        if (currentGovernment.getResources().containsKey(((ProductMaker) building).getConsumingProduct()))
+                            currentGovernment.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
+                    }
+                    for (Resource resource: ((ProductMaker) building).getProducts())
+                        currentGovernment.addToResource(resource,
+                                Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                }
+            }
+        }
     }
 
     private void updateTroops() {
@@ -607,24 +627,15 @@ public class GameController {
     }
     private void doCommands() {
         for (Command command : commands) {
-            switch (command.name){
+            switch (command.getName()){
                 case "repair":
-                    command.building.repairHitpoint();
+                    command.getBuilding().repairHitpoint();
                     break;
                 case "drop building":
-                    Building building=new Building(currentGovernment,command.buildingsDetails,map[command.x][command.y]);
-                    map[command.x][command.y].setBuilding(building);
-                    //call it
+                    dropBuilding(command.getX(), command.getY(), command.getBuildingsDetails());
                     break;
                 case "drop unit":
-                    int x=command.worker.getPosition().getxCoordinates();
-                    int y=command.worker.getPosition().getyCoordinates();
-                    //map[x][y].addPeople
-                    //add to the government
-                    //consequences???
-                    break;
-                case "attack":
-                    command.worker.setDestination(map[command.x][command.y]);
+                    makeTroop(command.getWorkerDetails(), command.getSoldierCount(), command.getX(), command.getY());
                     break;
                 case "pour oil":
                     pourOil(command);
@@ -632,40 +643,51 @@ public class GameController {
                 case "build equipment":
                     //repair: build a machine with passing the machine details to the constructor
                     Machine machine=new Machine();
-                    for (Engineer engineer : command.engineers) {
+                    for (Engineer engineer : command.getEngineers())
                         engineer.setMachine(machine);
-                    }
                     machine.getCell().addMachine(machine);
 //                case "the rest":??
             }
         }
     }
 
-    public void pourOil(Command command)
-    {
-        String direction=command.direction;
-        int x=selectedWorker.getPosition().getxCoordinates();
-        int y=selectedWorker.getPosition().getyCoordinates();
+    public void pourOil(Command command) {
+        String direction=command.getDirection();
+        int x= command.getWorker().getPosition().getxCoordinates();
+        int y= command.getWorker().getPosition().getyCoordinates();
         //check the logic of direction
         switch (direction){
             case "n":
-                y++;
+                for (int i = y - 1; i >= y - 3; i--) {
+                    for (Worker person : map[x][i].getPeople()) {
+                        person.getDamaged(5);
+                    }
+                    if (i == 0) break;
+                }
                 break;
             case "s":
-                y--;
+                for (int i = y + 1; i <= y + 3; i++) {
+                    for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
+                    if (i == 200) break;
+                }
                 break;
             case "e":
-                x++;
+                for (int i = x + 1; i <= x + 3; i++) {
+                    for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
+                    if (i == 0) break;
+                }
                 break;
             case "w":
-                x--;
+                for (int i = x - 1; i >= x - 3; i--) {
+                    for (Worker person : map[x][i].getPeople()) {
+                        person.getDamaged(5);
+                    }
+                    if (i == 0) break;
+                }
                 break;
         }
-        for (Worker person : map[x][y].getPeople()) {
-            person.getDamaged(5);
-        }
-        //give the nearest  oil smelter
-        //send him there
+        ((Engineer) command.getWorker()).setHasOil(false);
+        command.getWorker().setDestination(currentGovernment.getBuildingByName("oil smelter").getCell());
     }
 
 

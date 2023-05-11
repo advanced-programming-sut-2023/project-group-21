@@ -48,6 +48,6 @@ public class Building {
     }
 
     public void repairHitpoint(){
-        hitPoint=getHitPoint();
+        hitPoint=buildingsDetails.getMaxHitPoints();
     }
 }

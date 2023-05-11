@@ -10,14 +10,58 @@ import model.machine.MachineDetails;
 import java.util.ArrayList;
 
 public class Command {
-    WorkerDetails workerDetails;
-    Worker worker;
-    BuildingsDetails buildingsDetails;
-    Building building;
-    String name, direction;
-    MachineDetails machineDetail;
-    ArrayList<Engineer> engineers=new ArrayList<>();
-    int x, y, soldierCount;
+    private WorkerDetails workerDetails;
+    private Worker worker;
+    private BuildingsDetails buildingsDetails;
+    private Building building;
+    private String name, direction;
+    private MachineDetails machineDetail;
+    private ArrayList<Engineer> engineers=new ArrayList<>();
+    private int x, y, soldierCount;
+
+    public WorkerDetails getWorkerDetails() {
+        return workerDetails;
+    }
+
+    public Worker getWorker() {
+        return worker;
+    }
+
+    public BuildingsDetails getBuildingsDetails() {
+        return buildingsDetails;
+    }
+
+    public Building getBuilding() {
+        return building;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public MachineDetails getMachineDetail() {
+        return machineDetail;
+    }
+
+    public ArrayList<Engineer> getEngineers() {
+        return engineers;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getSoldierCount() {
+        return soldierCount;
+    }
 
     public Command(String name, BuildingsDetails buildingsDetails, int x, int y) {
         this.name = name;
