@@ -12,15 +12,18 @@ import model.human.Enums.EuropeanSoldiersDetails;
 import model.human.Enums.WorkerDetails;
 import model.human.Person;
 import model.human.Worker;
+import model.machine.Machine;
 import model.machine.MachineDetails;
 import view.message.GameMessage;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.min;
 
 public class GameController {
     private ArrayList<Cell> path = new ArrayList<>();
@@ -178,8 +181,8 @@ public class GameController {
         return GameMessage.SUCCESS;
     }
 
-    private void makeTroop(WorkerDetails workerDetails, int count) {
-        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(workerDetails);
+    private void makeTroop(WorkerDetails workerDetails, int count, int x, int y) {
+        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(workerDetails, map[x - 1][y - 1]);
     }
 
     public int getNumberOfPeasants() {
@@ -257,7 +260,13 @@ public class GameController {
         if (!(name.equals("archer") || name.equals("crossbowman") || name.equals("archer bow")))
             return GameMessage.NO_SUITABLE;
         if (getDistance(x, y) > selectedWorker.getRange()) return GameMessage.OUT_OF_RANGE;
-        commands.add(new Command("attack", selectedWorker, x, y));
+        Worker enemy = null;
+        for (Person person : map[x - 1][y - 1].getPeople()) {
+            if (person instanceof Worker && !person.getGovernment().equals(selectedWorker.getGovernment()))
+                enemy = (Worker) person;
+        }
+        if (enemy == null) return GameMessage.NO_ENEMY_TO_FIGHT;
+        selectedWorker.setEnemy(enemy);
         return GameMessage.SUCCESS;
     }
 
@@ -325,13 +334,24 @@ public class GameController {
         if (machineDetail == null) return null;
         if (numberOfEngineers() < machineDetail.getEngineersNeeded()) return null;
         currentGovernment.addBuilding(new Building(currentGovernment, BuildingsDetails.SIEGE_TENT, selectedWorker.getPosition()));
-        for (int i = 0; i < currentGovernment.getPopularity(); i++)
-            if (currentGovernment.getPeople().get(i) instanceof Engineer &&
-                    !(currentGovernment.getPeople().get(i).equals(selectedWorker)))
-                engineers.add((Engineer) currentGovernment.getPeople().get(i));
-        for (Engineer engineer : engineers) engineer.setDestination(selectedWorker.getPosition());
+        for (Worker person : selectedWorker.getPosition().getPeople()) {
+            if(person instanceof Engineer&& !((Engineer) person).hasMachine())
+                engineers.add((Engineer) person);
+            if(engineers.size()>=machineDetail.getEngineersNeeded())
+                break;
+        }
+        if(engineers.size()<machineDetail.getEngineersNeeded())
+            return null;
+        for (Engineer engineer : engineers) {
+            engineer.giveHimMachine(true);
+        }
+//        for (int i = 0; i < currentGovernment.getPopularity(); i++)
+//            if (currentGovernment.getPeople().get(i) instanceof Engineer &&
+//                    !(currentGovernment.getPeople().get(i).equals(selectedWorker)))
+//                engineers.add((Engineer) currentGovernment.getPeople().get(i));
+//        for (Engineer engineer : engineers) engineer.setDestination(selectedWorker.getPosition());
         commands.add(new Command("build equipment", machineDetail, selectedWorker.getPosition().getxCoordinates(),
-                selectedWorker.getPosition().getyCoordinates()));
+                selectedWorker.getPosition().getyCoordinates(),engineers));
         return null;
     }
 
@@ -347,26 +367,9 @@ public class GameController {
         return null;
     }
 
-    public void nextTurn() {
-        updateBuilding();
-        updateTroops();
-        updateStorage();
-    }
 
     public void setGovernment(Government government) {
         this.currentGovernment = government;
-    }
-
-    private void updateStorage() {
-
-    }
-
-    private void updateTroops() {
-
-    }
-
-    private void updateBuilding() {
-
     }
 
     public Government getCurrentGovernment() {
@@ -501,4 +504,197 @@ public class GameController {
         }
     }
 
+    public void nextTurn() {
+        doCommands();
+        updateTroops();
+        updateStorage();
+        currentGovernment.doActionInTurnFirst();
+        clearDeadSoldiers();
+    }
+
+    //moving
+
+    public void attackInRange(Worker soldier){
+        int x=soldier.getPosition().getxCoordinates();
+        int y=soldier.getPosition().getyCoordinates();
+        int range=0;
+        if(soldier.getState().equals("standing"))
+            range=soldier.getRange();
+        else if (soldier.getState().equals("defensive"))
+            range= soldier.getRange()+1;
+        else if(soldier.getState().equals("attacking"))
+            range=soldier.getRange()+ soldier.getSpeed();
+        for(int b=0;b<=range;b++) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    for (Worker person : map[i - 1][j - 1].getPeople()) {
+                        if (!person.getGovernment().equals(soldier.getGovernment())&&person.getEnemy()!=null)
+                            soldier.setEnemy(person);
+                    }
+                }
+            }
+        }
+    }
+    public void clearDeadSoldiers(){
+        for (Government government : governments) {
+            for (Person person : government.getPeople()) {
+                if (person.getHitPoint() <= 0) {
+                    person.delete();
+                }
+            }
+        }
+    }
+
+    public void doTheMove(Worker person,ArrayList<Cell> way){
+            //the array is from last to first
+        int length= way.size();
+        for(int i=1;i<=person.getSpeed();i++) {
+            way.get(length-i).deletePerson(person);
+            if(way.get(length- 1- i).doesHaveHole()||way.get(length- 1- i).doesHaveOil())
+                person.getDamaged(10);
+            if(person.getHitPoint()>0)
+                way.get(length- 1- i).addPerson(person);
+            way.remove(length-i);
+            //check if goes well..{the changes in the cell and the hitpoint of the person
+        }
+    }
+
+    private void updateStorage() {
+        for (Government government: governments) {
+            for (Building building: government.getBuildings()) {
+                if (building instanceof ProductMaker) {
+                    if (((ProductMaker) building).getConsumingProduct() != null) {
+                        if (currentGovernment.getResources().containsKey(((ProductMaker) building).getConsumingProduct()))
+                            currentGovernment.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
+                    }
+                    for (Resource resource: ((ProductMaker) building).getProducts())
+                        currentGovernment.addToResource(resource,
+                                Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                }
+            }
+        }
+    }
+
+    private void updateTroops() {
+        //moving
+        for (Government government : governments) {
+            for (Person person : government.getPeople()) {
+                //doTheMove(person,Morteza);
+            }
+        }
+        for (Person person : currentGovernment.getPeople()) {
+            damage(person);
+        }
+        clearDeadSoldiers();
+    }
+
+    private void damage(Person person) {
+        int hitDamage=((Worker)person).getDamage();
+        if(isEnemyInRange(person)==true) {
+            int defenseRate=((Worker)person).getEnemy().getDefense();
+            if(hitDamage>defenseRate)
+                ((Worker) person).getEnemy().getDamaged(hitDamage-defenseRate);
+        }
+        else if(((Worker)findRandomEnemy(person))!=null){
+            int defenseRate=((Worker)findRandomEnemy(person)).getDefense();
+            ((Worker)findRandomEnemy(person)).getDamaged(hitDamage-defenseRate);
+        }
+    }
+
+    private Person findRandomEnemy(Person person){
+        int range=((Worker)person).getRange();
+        for(int b=0;b<=range;b++) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    for (Worker worker : map[i - 1][j - 1].getPeople()) {
+                        if (!person.getGovernment().equals(worker.getGovernment()))
+                            return worker;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    private boolean isEnemyInRange(Person person){
+        int x1=((Worker)person).getEnemy().getPosition().getxCoordinates();
+        int y1=((Worker)person).getEnemy().getPosition().getyCoordinates();
+        int x2=((Worker) person).getPosition().getxCoordinates();
+        int y2=((Worker) person).getPosition().getyCoordinates();
+        int distance=calculateDistance(x1,y1,x2,y2);
+        if(distance<=((Worker)person).getRange())
+            return true;
+        return false;
+    }
+    private void doCommands() {
+        for (Command command : commands) {
+            switch (command.getName()){
+                case "repair":
+                    command.getBuilding().repairHitpoint();
+                    break;
+                case "drop building":
+                    dropBuilding(command.getX(), command.getY(), command.getBuildingsDetails());
+                    break;
+                case "drop unit":
+                    makeTroop(command.getWorkerDetails(), command.getSoldierCount(), command.getX(), command.getY());
+                    break;
+                case "pour oil":
+                    pourOil(command);
+                    break;
+                case "build equipment":
+                    //repair: build a machine with passing the machine details to the constructor
+                    Machine machine=new Machine();
+                    for (Engineer engineer : command.getEngineers())
+                        engineer.setMachine(machine);
+                    machine.getCell().addMachine(machine);
+//                case "the rest":??
+            }
+        }
+    }
+
+    public void pourOil(Command command) {
+        String direction=command.getDirection();
+        int x= command.getWorker().getPosition().getxCoordinates();
+        int y= command.getWorker().getPosition().getyCoordinates();
+        //check the logic of direction
+        switch (direction){
+            case "n":
+                for (int i = y - 1; i >= y - 3; i--) {
+                    for (Worker person : map[x][i].getPeople()) {
+                        person.getDamaged(5);
+                    }
+                    if (i == 0) break;
+                }
+                break;
+            case "s":
+                for (int i = y + 1; i <= y + 3; i++) {
+                    for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
+                    if (i == 200) break;
+                }
+                break;
+            case "e":
+                for (int i = x + 1; i <= x + 3; i++) {
+                    for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
+                    if (i == 0) break;
+                }
+                break;
+            case "w":
+                for (int i = x - 1; i >= x - 3; i--) {
+                    for (Worker person : map[x][i].getPeople()) {
+                        person.getDamaged(5);
+                    }
+                    if (i == 0) break;
+                }
+                break;
+        }
+        ((Engineer) command.getWorker()).setHasOil(false);
+        command.getWorker().setDestination(currentGovernment.getBuildingByName("oil smelter").getCell());
+    }
+
+
+    //to do: finish the commands processing with all considerations
+    //update troop but what written
+    //update and consider all the government factors
+    //what check archer attack does and what consequences it have while next turn
+    //pour oil
+    //dig tunnel
 }

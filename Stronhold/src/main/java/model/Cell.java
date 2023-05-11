@@ -19,14 +19,13 @@ public class Cell {
     private Extras extra;
     private ArrayList<Worker> people;
     private int xCoordinates, yCoordinates;
-    private boolean hadCross = false;
+    private boolean hadCross = false,hasOil=false,hasHole=false;
     private  char direction;
 
     public Cell(int xCoordinates, int yCoordinates) {
         this.xCoordinates = xCoordinates;
         this.yCoordinates = yCoordinates;
     }
-
     public void setDistanceOfStart(int distanceOfStart){
         this.distanceOfStart = distanceOfStart;
     }
@@ -183,5 +182,25 @@ public class Cell {
             return false;
         }
         return true;
+    }
+
+    public void deletePerson(Person person){
+        people.remove(person);
+    }
+
+    public void addPerson(Person person){
+        people.add((Worker) person);
+    }
+
+    public void addMachine(Machine machine) {
+        this.machine=machine;
+    }
+
+    public boolean doesHaveOil() {
+        return hasOil;
+    }
+
+    public boolean doesHaveHole() {
+        return hasHole;
     }
 }

@@ -14,7 +14,6 @@ public class GameMenu {
     private Government government;
     private final GameController gameController;
     private final ArrayList<Government> governments;
-    private MapMenu mapMenu;
     public GameMenu(User user,ArrayList<Government> governments){
         this.governments = governments;
         this.user =user;
@@ -77,11 +76,6 @@ public class GameMenu {
                 System.out.println("invalid format!");
 
         }
-    }
-
-    public void setMapMenu(MapMenu mapMenu) {
-        this.mapMenu = mapMenu;
-        gameController.setMapController(mapMenu.getMapController());
     }
 
     private boolean checkWin(){

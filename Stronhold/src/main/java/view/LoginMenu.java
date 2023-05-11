@@ -29,9 +29,15 @@ public class LoginMenu {
                 checkForgotPassword(matcher, scanner);
             else if ((matcher = LoginCommands.getMatcher(line, LoginCommands.FORGET_USERNAME)) != null)
                 System.out.println("repair!");
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("Invalid format");
         }
+    }
+
+    private void help() {
+
     }
 
     public void checkLogin(Matcher matcher, Scanner scanner) {

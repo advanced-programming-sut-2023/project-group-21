@@ -26,7 +26,6 @@ public class Government {
     private ArrayList<Machine> machines;
     private HashMap<Resource, Integer> resources;
     private Building castle;
-
     private ArrayList<Trade> trades;
 
     public Government(User lord) {
@@ -74,14 +73,14 @@ public class Government {
         building.getCell().setBuilding(building);
     }
 
-    public void addTrainedPeople(WorkerDetails workerDetails) {
+    public void addTrainedPeople(WorkerDetails workerDetails, Cell cell) {
         for (int i = 0; i < people.size(); i++) {
             if (!(people.get(i) instanceof Worker)) {
                 people.remove(i);
                 break;
             }
         }
-        people.add(new Worker(workerDetails, this, castle.getCell(), castle.getCell()));
+        people.add(new Worker(workerDetails, this, cell, cell));
     }
 
     public void setFoodRate(int foodRate) {
@@ -119,27 +118,7 @@ public class Government {
 
     public void reduceResources(Resource resource, int count) {
         resources.replace(resource, resources.get(resource) - count);
-    }
-
-    public int calculateLeftStorageCapacity(Resource resource) {
-        int sum = 0, sum2 = 0;
-        if (resource == null || resource == Resource.GOLD)
-            return -1;
-        StorageDetails details = resource.getResourceKeeper();
-        if (details == null)
-            return -2;
-        for (int i1 = 0; i1 < buildings.size(); i1++) {
-            if (buildings.get(i1) instanceof Storage && ((Storage) buildings.get(i1)).getStorageDetails() == details) {
-                sum += ((Storage) buildings.get(i1)).getCapacity() - ((Storage) buildings.get(i1)).getOccupation(resource.getResourceKeeper());
-            }
-        }
-        for (Map.Entry<Resource, Integer> entry : resources.entrySet()) {
-            Resource resource1 = entry.getKey();
-            Integer amount = entry.getValue();
-            if (resource1.getResourceKeeper() == details)
-                sum2 += amount;
-        }
-        return sum - sum2;//it has repaired !
+        if (resources.get(resource) == 0) resources.remove(resource);
     }
 
     public void addToResource(Resource resource, int amount) {
@@ -181,6 +160,18 @@ public class Government {
         }
     }
 
+    public int leftStorage(Resource resource) {
+        StorageDetails storageDetails = resource.getResourceKeeper();
+        int capacity = 0;
+        for (Building building: buildings)
+            if (building instanceof Storage && ((Storage) building).getStorageDetails().equals(storageDetails))
+                capacity += storageDetails.getCapacity();
+        int full = 0;
+        for (Map.Entry<Resource, Integer> entry: resources.entrySet())
+            if (entry.getKey().getResourceKeeper().equals(storageDetails)) full += entry.getValue();
+        return capacity - full;
+    }
+
     public void sellSuccessfully(Trade trade) {
         int newGoldAmount = resources.get(Resource.GOLD) - trade.getAmount() * trade.getCost();
         resources.put(Resource.GOLD, newGoldAmount);
@@ -201,28 +192,33 @@ public class Government {
     public ArrayList<Trade> getTrades() {
         return trades;
     }
-        public void doActionInTurnFirst () {
-            //get tax and feed
-            int change = 0;
-            if (people.size() * taxRate < 0 && ((resources.get(Resource.GOLD) + people.size() * taxRate) < 0))
-                taxRate = 0;
-            resources.replace(Resource.GOLD, resources.get(Resource.GOLD) + (resources.get(Resource.GOLD) + people.size() * taxRate));
-            if (getLeftFood() < Game.FoodRate.getFoodRate(foodRate) * people.size())
-                foodRate = -2;
-            int foodNumber = (int) Game.FoodRate.getFoodRate(foodRate);
-            for (Map.Entry<Resource, Integer> entry : resources.entrySet()) {
-                Resource resource = entry.getKey();
-                Integer amount = entry.getValue();
-                if (resource.getResourceKeeper() == StorageDetails.ARMOURY) {
-                    change = min(amount, foodNumber);
-                    amount -= change;
-                    foodNumber -= change;
-                    resources.replace(resource, amount);
-                    if (amount == 0)
-                        resources.remove(resource);
-                }
+    public void doActionInTurnFirst () {
+        //get tax and feed
+        int change = 0;
+        if (people.size() * taxRate < 0 && ((resources.get(Resource.GOLD) + people.size() * taxRate) < 0))
+            taxRate = 0;
+        resources.replace(Resource.GOLD, resources.get(Resource.GOLD) + (resources.get(Resource.GOLD) + people.size() * taxRate));
+        if (getLeftFood() < Game.FoodRate.getFoodRate(foodRate) * people.size())
+            foodRate = -2;
+        int foodNumber = (int) Game.FoodRate.getFoodRate(foodRate);
+        for (Map.Entry<Resource, Integer> entry : resources.entrySet()) {
+            Resource resource = entry.getKey();
+            Integer amount = entry.getValue();
+            if (resource.getResourceKeeper() == StorageDetails.ARMOURY) {
+                change = min(amount, foodNumber);
+                amount -= change;
+                foodNumber -= change;
+                resources.replace(resource, amount);
+                if (amount == 0)
+                    resources.remove(resource);
             }
-            int tax = (int) (Game.TaxDetails.getTax(taxRate) * people.size());
-            resources.put(Resource.GOLD, resources.get(Resource.GOLD) + tax);
         }
+        int tax = (int) (Game.TaxDetails.getTax(taxRate) * people.size());
+        resources.put(Resource.GOLD, resources.get(Resource.GOLD) + tax);
     }
+
+    public void deletePerson(Person person){
+        people.remove(person);
+    }
+
+}

@@ -30,7 +30,13 @@ public class PlayerMenu {
                 break;
             else if((matcher = PlayerMenuCommand.getMatcher(line,PlayerMenuCommand.GO_TO_MENU))!=null)
                 checkMenu(matcher,scanner);
+            else if(line.equals("help"))
+                help();
         }
+    }
+
+    private void help() {
+        System.out.println("You can go to profile, map or game menu. Also you can logout by inputting so");
     }
 
 

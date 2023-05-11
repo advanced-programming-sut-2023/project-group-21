@@ -5,7 +5,7 @@ import model.generalenums.Resource;
 import java.util.Map;
 
 public enum BuildingsDetails {
-    CASTLE("castle", null, 100, null),
+    HOLD("castle", null, 100, null),
     SMALL_STONE_GATEHOUSE("small stone gatehouse", BuildingType.GATE, 35, null),
     BIG_STONE_GATEHOUSE("big stone gatehouse", BuildingType.GATE, 45, Map.of(Resource.STONE, 20)),
     DRAWBRIDGE("drawbridge", BuildingType.GATE, 35, Map.of(Resource.WOOD, 10)),

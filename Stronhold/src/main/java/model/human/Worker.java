@@ -66,9 +66,32 @@ public class Worker extends Person {
         patrolX2 = x2;
         patrolY1 = y1;
         patrolY2 = y2;
+        isPatrolOn = true;
+    }
+
+    public void setPatrolOn(boolean patrolOn) {
+        isPatrolOn = patrolOn;
     }
 
     public void setEnemy(Worker enemy) {
         this.enemy = enemy;
+    }
+
+    public Worker getEnemy() {
+        return enemy;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        position.deletePerson(this);
+    }
+
+    public void getDamaged(int amount){
+        hitPoint-=amount;
     }
 }

@@ -36,7 +36,7 @@ public class TradeController {
         Government seller=Game.getTradeById(id).getSeller();
         if(seller.getGold()<trade.getCost()* trade.getAmount())
             return TradeMenuMessage.CAN_NOT_AFFORD;
-        if(seller.calculateLeftStorageCapacity(trade.getResource())< trade.getAmount())
+        if(seller.leftStorage(trade.getResource())< trade.getAmount())
             return TradeMenuMessage.CAPACITY;
         buyer.buySuccessfully(Game.getTradeById(id));
         seller.sellSuccessfully(Game.getTradeById(id));

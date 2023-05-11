@@ -17,9 +17,15 @@ public class StartMenu {
                 checkWhichMenu(matcher,scanner,false);
             else if((matcher = StartMenuCommand.getMatcher(input,StartMenuCommand.GO_TO_SIGN_IN)) != null)
                 checkWhichMenu(matcher,scanner,true);
+            else if(input.equals("help"))
+                help();
             else
                 System.out.println("invalid format");
         }
+    }
+
+    private void help() {
+        System.out.println("You are in the start menu:\n You can enter signup menu or login menu");
     }
 
     public void checkWhichMenu(Matcher matcher,Scanner scanner,boolean isLogin){

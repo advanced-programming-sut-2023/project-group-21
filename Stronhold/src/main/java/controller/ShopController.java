@@ -22,7 +22,7 @@ public class ShopController {
             return ShopMessage.NOT_A_RESOURCE;
         if(amount<=0)
             return ShopMessage.INVALID_NUMBER;
-        if(amount>=currentGovernment.calculateLeftStorageCapacity(resource))
+        if(amount>=currentGovernment.leftStorage(resource))
             return ShopMessage.NO_CAPACITY;
         if((amount*resource.getCostBuy())>resources.get(Resource.GOLD))
             return ShopMessage.NOT_ENOUGH_MONEY;

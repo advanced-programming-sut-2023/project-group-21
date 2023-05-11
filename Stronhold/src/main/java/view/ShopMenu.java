@@ -29,9 +29,15 @@ public class ShopMenu {
                 sellCheck(matcher);
             else if((ShopMenuCommand.getMatcher(line,ShopMenuCommand.SHOW_ITEM))!=null)
                 showPrice();
+            else if(line.equals("help"))
+                help();
             else
                 System.out.println("invalid command");
         }
+    }
+
+    private void help() {
+        System.out.println("You are in the shop menu\n You can buy,sell or see the items");
     }
 
     private void showPrice(){
