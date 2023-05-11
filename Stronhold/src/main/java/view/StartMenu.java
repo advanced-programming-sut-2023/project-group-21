@@ -20,7 +20,6 @@ public class StartMenu {
             else
                 System.out.println("invalid format");
         }
-
     }
 
     public void checkWhichMenu(Matcher matcher,Scanner scanner,boolean isLogin){
@@ -28,10 +27,12 @@ public class StartMenu {
             System.out.println("you are in sign up menu");
             SignUpMenu signUpMenu=new SignUpMenu();
             signUpMenu.run(scanner);
+            System.out.println("you are in start menu!");
         }else{
             System.out.println("you are in login menu");
             LoginMenu loginMenu=new LoginMenu();
             loginMenu.run(scanner);
+            System.out.println("you are in start menu!");
         }
     }
 }

@@ -25,10 +25,11 @@ public enum GameMenuCommand {
     DIG_TUNNEL("\\s*dig\\s+tunnel\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
     DISBAND_UNIT("\\s*disband\\s+unit\\s*"),
     NEXT_TURN("\\s*next\\s+turn\\s*"),
+    SELECT_MACHINE("move\\s+machine\\s+-x"),//repair!
     GO_TO_TRADE("\\s*go\\s+to\\s+trade\\s*");
-    private String regex;
+    private final String regex;
     GameMenuCommand(String regex){
-        regex = regex;
+        this.regex = regex;
     }
     public static Matcher getMatcher(String input, GameMenuCommand mainRegex) {
         Matcher matcher = Pattern.compile(mainRegex.regex).matcher(input);
