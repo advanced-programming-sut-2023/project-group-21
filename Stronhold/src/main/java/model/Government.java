@@ -25,7 +25,7 @@ public class Government {
     private ArrayList<Person> people;
     private ArrayList<Machine> machines;
     private HashMap<Resource, Integer> resources;
-    private Building castle;
+    private Building hold;
     private ArrayList<Trade> trades;
 
     public Government(User lord) {
@@ -64,6 +64,10 @@ public class Government {
         return machines;
     }
 
+    public void addMachine(Machine machine) {
+        machines.add(machine);
+    }
+
     public HashMap<Resource, Integer> getResources() {
         return resources;
     }
@@ -75,7 +79,7 @@ public class Government {
 
     public void addTrainedPeople(WorkerDetails workerDetails, Cell cell) {
         for (int i = 0; i < people.size(); i++) {
-            if (!(people.get(i) instanceof Worker)) {
+            if (!(people.get(i) instanceof Worker) && people.get(i).getWorkPlace() == null) {
                 people.remove(i);
                 break;
             }
@@ -112,8 +116,8 @@ public class Government {
         return null;
     }
 
-    public Building getCastle() {
-        return castle;
+    public Building getHold() {
+        return hold;
     }
 
     public void reduceResources(Resource resource, int count) {

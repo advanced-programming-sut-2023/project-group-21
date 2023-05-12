@@ -4,13 +4,16 @@ import model.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.TowerDetails;
+import model.human.Person;
+
+import java.util.ArrayList;
 
 public class Tower extends Building {
     TowerDetails towerDetails;
     private boolean isClimbable;
 
-    public Tower(Government government, Cell cell, TowerDetails towerDetails) {
-        super(government, towerDetails.getBuildingsDetails(), cell);
+    public Tower(Government government, Cell cell, TowerDetails towerDetails, ArrayList<Person> workers) {
+        super(government, towerDetails.getBuildingsDetails(), cell, workers);
         this.towerDetails = towerDetails;
         isClimbable = false;
     }
