@@ -26,7 +26,7 @@ public class Government {
     private ArrayList<Person> people = new ArrayList<>();
     private ArrayList<Machine> machines = new ArrayList<>();
     private HashMap<Resource, Integer> resources = new HashMap<>();
-    private Building castle;
+    private Building hold;
     private ArrayList<Trade> trades;
 
     public Government(User lord,Cell cell) {
@@ -38,7 +38,7 @@ public class Government {
         resources.put(Resource.APPLE,30);
         resources.put(Resource.BREAD,60);
         resources.put(Resource.WOOD,15);
-        castle = new Building(this,BuildingsDetails.HOLD,cell);
+        hold = new Building(this,BuildingsDetails.HOLD,cell, null);
         this.lord = lord;
         for(int i1=0;i1<10;i1++){
             people.add(new Person(this));
@@ -250,7 +250,7 @@ public class Government {
     public boolean checkDefeat(){
         if(people.size()==0 || ((Worker)(people.get(0))).getHitPoint()<=0)
             return true;
-        return castle.getHitPoint() <= 0;
+        return hold.getHitPoint() <= 0;
     }
 
     public int calculateLeftPopulationCapacity(){

@@ -28,7 +28,6 @@ public class GameController {
     private Building selectedBuilding;
     private Worker selectedWorker;
     private Government currentGovernment;
-    private ArrayList<Command> commands = new ArrayList<>();
     private MapController mapController;
     private Map<Engineer, String> pouringOils = new HashMap<>();
     public GameMessage showFactor() {
@@ -308,7 +307,7 @@ public class GameController {
         if (direction.length() > 1) return GameMessage.INVALID_DIRECTION;
         if (!Game.directions.contains(direction)) return GameMessage.INVALID_DIRECTION;
         if (!checkTunnel(x, y, direction)) return GameMessage.FAILURE2;
-        commands.add(new Command("dig tunnel", selectedWorker, x, y, direction));
+
         return GameMessage.SUCCESS;
     }
 
@@ -621,12 +620,9 @@ public class GameController {
     }
 
     private void updateStorage() {
-        for (Government government: governments) {
-            for (Building building: government.getBuildings()) {
-                if (building instanceof ProductMaker productMaker) {
         for (Government government : governments) {
             for (Building building : government.getBuildings()) {
-                if (building instanceof ProductMaker) {
+                if (building instanceof ProductMaker productMaker) {
                     if (((ProductMaker) building).getConsumingProduct() != null) {
                         if (currentGovernment.getResources().containsKey(productMaker.getConsumingProduct()) &&
                             productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()) {
@@ -664,15 +660,6 @@ public class GameController {
         clearDeadSoldiers();
     }
 
-    private void damage(Person person) {
-        int hitDamage = ((Worker) person).getDamage();
-        if (isEnemyInRange(person) == true) {
-            int defenseRate = ((Worker) person).getEnemy().getDefense();
-            if (hitDamage > defenseRate)
-                ((Worker) person).getEnemy().getDamaged(hitDamage - defenseRate);
-        } else if (((Worker) findRandomEnemy(person)) != null) {
-            int defenseRate = ((Worker) findRandomEnemy(person)).getDefense();
-            ((Worker) findRandomEnemy(person)).getDamaged(hitDamage - defenseRate);
     private void damage(Worker worker) {
         Worker enemy;
         int range = worker.isOnTower() ? worker.getRange()*2 : worker.getRange();
@@ -695,15 +682,6 @@ public class GameController {
         }
     }
 
-    private Person findRandomEnemy(Person person) {
-        int range = ((Worker) person).getRange();
-        for (int b = 0; b <= range; b++) {
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    for (Worker worker : map[i - 1][j - 1].getPeople()) {
-                        if (!person.getGovernment().equals(worker.getGovernment()))
-                            return worker;
-                    }
     private Worker findRandomEnemy(Worker worker) {
         int distance = 10000;
         Worker selected = null;
@@ -722,15 +700,6 @@ public class GameController {
         return selected;
     }
 
-    private boolean isEnemyInRange(Person person) {
-        int x1 = ((Worker) person).getEnemy().getPosition().getxCoordinates();
-        int y1 = ((Worker) person).getEnemy().getPosition().getyCoordinates();
-        int x2 = ((Worker) person).getPosition().getxCoordinates();
-        int y2 = ((Worker) person).getPosition().getyCoordinates();
-        int distance = calculateDistance(x1, y1, x2, y2);
-        if (distance <= ((Worker) person).getRange())
-            return true;
-        return false;
     private boolean isEnemyInRange(Person person) {
         int x1=((Worker)person).getEnemy().getPosition().getxCoordinates();
         int y1=((Worker)person).getEnemy().getPosition().getyCoordinates();

@@ -222,8 +222,8 @@ public class Cell {
         return hasHole;
     }
 
-    public void deleteMachine(){
-        this.machine = null;
+    public void deleteMachine(Machine machine){
+        machines.remove(machine);
     }
 
 }

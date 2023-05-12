@@ -19,10 +19,8 @@ public class Gate extends Residency {
 
     public void setGate(boolean state) {
         isOpen = state;
+    }
     public boolean checkState(){
         return isOpen;
-    }
-    public void openGate() {
-        isOpen = true;
     }
 }
