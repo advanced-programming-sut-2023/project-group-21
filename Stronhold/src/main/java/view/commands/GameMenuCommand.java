@@ -14,7 +14,7 @@ public enum GameMenuCommand {
     GO_TO_SHOP("\\s*go\\s+to\\s+shop\\s*"),
     SELECT_BUILDING("\\s*select\\s+building\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
     SHOW_FOOD_RATE("\\s*show\\s+food\\s+rate\\s*"),
-    CREATE_UNIT("\\s*create\\s+unit\\s+-t\\s+(?<type>\\S+)\\s+-c\\s+(?<count>\\d+)\\s*"),
+    CREATE_UNIT("\\s*create\\s+unit\\s+-t\\s+(?<type>\\S+)\\s+-c\\s+(?<count>\\d+)\\s+-x (?<x>\\d+) -y (?<y>\\d+)\\s*"),
     REPAIR("\\s*repair\\s*"),
     SELECT_UNIT("\\s*select\\s+unit\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
     MOVE_UNIT("\\s*move\\s+unit\\s+to\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
@@ -29,7 +29,8 @@ public enum GameMenuCommand {
     GO_TO_TRADE("\\s*go\\s+to\\s+trade\\s*"),
     PATROL("\\s*patrol\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\x2)\\s+(?<y2>\\d+)\\s*"),
     MOVE_EQUIPMENT("move equipment -x1 (?<x1>\\d+) -y1 (?<y1>\\d+) -x2 (?<x2>\\d+) -y2 (?<y2>\\d+)"),
-    MAKE__("make equipment (?<name>\\S+)");
+    MAKE__("make equipment (?<name>\\S+)"),
+    SWITCH("switch");
     private final String regex;
     GameMenuCommand(String regex){
         this.regex = regex;

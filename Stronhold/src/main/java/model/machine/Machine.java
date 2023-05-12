@@ -23,6 +23,10 @@ public class Machine {
         hitPoint = engineers.size() * WorkerDetails.ENGINEER.getMaxHitPoint();
     }
 
+    public void setCell(Cell cell) {
+        this.cell = cell;
+    }
+
     public Government getGovernment() {
         return government;
     }
@@ -53,5 +57,13 @@ public class Machine {
 
     public void getDamaged(int damage) {
         hitPoint -= damage;
+    }
+
+    public ArrayList<Engineer> getEngineers(){
+        return engineers;
+    }
+
+    public int getHitPoint(){
+        return hitPoint;
     }
 }

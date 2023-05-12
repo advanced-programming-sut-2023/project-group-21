@@ -82,6 +82,8 @@ public class GameMenu {
                 checkMoveEquipment(matcher);
             else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.MAKE__))!=null)
                 makeSiegeUnit(matcher);
+            else if(GameMenuCommand.getMatcher(line,GameMenuCommand.SWITCH)!= null)
+                switch1();
             else
                 System.out.println("invalid format!");
 
@@ -110,6 +112,11 @@ public class GameMenu {
     }
     private boolean checkWin() {
         return false;
+    }
+
+    private void switch1(){
+        GameMessage gameMessage = gameController.switchProduct();
+        System.out.println(gameMessage.toString());
     }
 
     private void printPopularityFactors() {
@@ -172,7 +179,9 @@ public class GameMenu {
     private void checkCreateUnit(Matcher matcher) {
         String type = matcher.group("type");
         int count = Integer.parseInt(matcher.group("count"));
-        GameMessage gameMessage=gameController.checkMakeTroop(type,count);
+        int x = Integer.parseInt(matcher.group("x"));
+        int y = Integer.parseInt(matcher.group("y"));
+        GameMessage gameMessage=gameController.checkMakeTroop(type,count,x,y);
         System.out.println(gameMessage.toString());
     }
 

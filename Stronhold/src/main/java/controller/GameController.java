@@ -248,7 +248,7 @@ public class GameController {
                                 ((Worker) governments.get(i1).getPeople().get(i2)).getPosition()){
                     Worker tempWorker = ((Worker) governments.get(i1).getPeople().get(i2));
                     callOtherFunction(tempWorker.getPosition().getxCoordinates(),tempWorker.getPosition().getyCoordinates(),
-                            tempWorker.getDestination().getxCoordinates(),tempWorker.getDestination().getyCoordinates());
+                            tempWorker.getDestination().getxCoordinates(),tempWorker.getDestination().getyCoordinates(),'n');
                     doTheMove(tempWorker,path);
                 }
             }
@@ -424,7 +424,7 @@ public class GameController {
         opens.get(total).get(distanceOfStart).add(map[x1][y1]);
     }
 
-    private void find2Path(int x1, int y1, int x2, int y2, int distancesOfStart) {
+    private void find2Path(int x1, int y1, int x2, int y2, int distancesOfStart,char state) {
         int totalDistance = abs(x1 - x2) + abs(y1 - y2) + distancesOfStart;
         int endDistance = abs(x1 - x2) + abs(y1 - y2);
         if (x1 >= map.length || x1 < 0 || x2 >= map.length || x2 < 0 || y1 >= map.length || y1 < 0 || y2 >= map.length
@@ -453,7 +453,7 @@ public class GameController {
                 lastCellX = x1;
                 lastCellY = y1;
         }
-        if (!map[x1][y1].checkCross(map[x1][y1].getDirection(), map[lastCellX][lastCellY]))
+        if (!map[x1][y1].checkCross(map[x1][y1].getDirection(), map[lastCellX][lastCellY],state))
             return;
         map[x1][y1].cross();
         if (map[x1][y1].getTotal() == 0 || map[x1][y1].getTotal() >= totalDistance) {
@@ -477,7 +477,7 @@ public class GameController {
         checkCell(x1, y1 - 1, distancesOfStart + 1, abs(x1 - x2) + abs(y1 - 1 - y2), 'e');
     }
 
-    private void callOtherFunction(int x1, int y1, int x, int y) {
+    private void callOtherFunction(int x1, int y1, int x, int y,char state) {
         checkCell(x1, y1, 0, abs(x1 - x) + abs(y1 - y), 'a');
         while (opens.size() != 0 && map[x][y].getDirection() == 'a') {
             Integer i = opens.firstKey();
@@ -495,7 +495,7 @@ public class GameController {
             } else {
                 Cell cell = myCells.get(0);
                 myCells.remove(0);
-                find2Path(cell.getxCoordinates(), cell.getyCoordinates(), x, y, cell.getDistanceOfStart());
+                find2Path(cell.getxCoordinates(), cell.getyCoordinates(), x, y, cell.getDistanceOfStart(),state);
                 if (myCells.size() == 0)
                     treeMap.remove(i2);
                 if (treeMap.size() == 0)
@@ -599,7 +599,7 @@ public class GameController {
         for (int i = 1; i <= person.getSpeed() && i < length; i++) {
             way.get(length - i).deletePerson(person);
             if (way.get(length - 1 - i).doesHaveHole() || way.get(length - 1 - i).doesHaveOil())
-                person.getDamaged(10);
+                person.getDamaged(40);
             if (person.getHitPoint() > 0) {
                 cell = way.get(length - 1 - i);
                 way.get(length - 1 - i).addPerson(person);
@@ -792,23 +792,57 @@ public class GameController {
         governments.remove(government);
     }
 
+    public String getState(){
+        if(selectedBuilding == null ||(!(selectedBuilding instanceof  WeaponProduction)))
+            return "mistake in selecting building!";
+        return "current product is :"+((WeaponProduction)selectedBuilding).getCurrentProduct().getName();
+    }
     public GameMessage checkMoveEquipments(int x1,int y1,int x2,int y2){
         if (x1 > 200 || x1 < 1 || y1 > 200 || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > 200 || x2 < 1 || y2 > 200 || y2 < 1) return GameMessage.OUT_OF_RANGE;
-        if(map[x1][y1].getMachine().getSpeed() == 0) return GameMessage.UNABLE_TO_MOVE;
-        Cell cell1;
-        Machine machine = map[x1][y1].getMachine();
+        Machine machine = null;
+        for(int i1=0;i1<map[x1][y1].getMachine().size();i1++){
+            if(map[x1][y1].getMachine().get(i1).getSpeed()!=0) machine = map[x1][y1].getMachine().get(i1);
+        }
+        if(machine == null) return GameMessage.UNABLE_TO_MOVE;
+        Cell cell1,cell2;
         calculateDistance(x1,y1,x2,y2);
         int length = path.size();
         for (int i = 1; i <= machine.getSpeed() && i < length; i++){
-            path.get(length - i).deleteMachine();
+            path.get(length - i).deleteMachine(machine);
             if (path.get(length - 1 - i).doesHaveHole() || path.get(length - 1 - i).doesHaveOil())
-            if (true) {
+                machine.getDamaged(100);
+            if (machine.getHitPoint()>0) {
                 cell1 = path.get(length - 1 - i);
-//                path.get(length - 1 - i).addPerson(person);
+                path.get(length - 1 - i).addMachine(machine);
+                machine.setCell(path.get(length - 1 + i));
+            }
+            if(machine.getHitPoint()<0){
+                for(int i1=0;i1<machine.getEngineers().size();i1++){
+                    machine.getEngineers().get(i1).delete();
+                    machine.getEngineers().remove(i1);
+                }
+                currentGovernment.removeMachine(machine);
             }
             path.remove(length - i);
         }
+        cell2 = machine.getCell();
+        for(int i2=0;i2<machine.getEngineers().size();i2++){
+            machine.getEngineers().get(i2).transport(cell2);
+        }
+        return GameMessage.SUCCESS;
+    }
+    public GameMessage switchProduct(){
+        if(selectedBuilding == null)
+            return GameMessage.NO_SELECTED_BUILDING;
+        if(!(selectedBuilding instanceof  WeaponProduction))
+            return GameMessage.NO_SUITABLE_BUILDING;
+        WeaponProduction productMaker = (WeaponProduction) selectedBuilding;
+        if(selectedBuilding.getBuildingsDetails()!=BuildingsDetails.POLETURNER &&
+        selectedBuilding.getBuildingsDetails() != BuildingsDetails.FLETCHER &&
+        selectedBuilding.getBuildingsDetails() != BuildingsDetails.BLACKSMITH)
+            return GameMessage.NO_SUITABLE_BUILDING;
+        productMaker.switch1();
         return GameMessage.SUCCESS;
     }
     //to do: finish the commands processing with all considerations

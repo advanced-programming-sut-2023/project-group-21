@@ -22,6 +22,7 @@ public class MapController {
     private int size, xCoordinates, yCoordinates;
     private Cell[][] map;
     private int countHold = 0;
+    private ArrayList<Cell> myHolds = new ArrayList<>();
 
     public MapMessages initializeMap(int size, boolean behave) {
         if (map != null && behave)
@@ -37,6 +38,7 @@ public class MapController {
 
 
     public MapMessages initializeMap(ArrayList<String> myMap) {
+        myHolds = new ArrayList<>();
         int size = myMap.size();
         if (size != 200 && size != 400)
             return null;
@@ -49,6 +51,8 @@ public class MapController {
                 Extras extra = null;
                 if (myMap.get(i1).charAt(i2) == '!')
                     extra = Extras.getExtrasByCode(String.valueOf(myMap.get(i1).charAt(i2)));
+                if(extra == Extras.HOLD)
+                    myHolds.add(map[i1][i2]);
                 map[i1][i2].setExtras(extra);
                 GroundTexture groundTexture;
                 groundTexture = GroundTexture.getTextureBySaveCode((String.valueOf(myMap.get(i1).charAt(i2 + 1))));
@@ -62,8 +66,10 @@ public class MapController {
         xCoordinates = x;
         yCoordinates = y;
         StringBuilder output = new StringBuilder();
+        if(x>map.length || x<=0 ||y>map.length||y<=0)
+            return "out of index!";
         boolean hasPerson = false;
-        int yMax = min(y + 2, size) - 1, yMin = max(y - 2, 0) - 1, xMax = min(x + 2, size) - 1, xMin = max(x - 2, 0) - 1;
+        int yMax = min(y + 2, size) - 1, yMin = max(y - 2, 1) - 1, xMax = min(x + 2, size) - 1, xMin = max(x - 2, 1) - 1;
         for (int j = yMin; j <= yMax; j++) {
             for (int i = xMin; i <= xMax; i++) {
                 output.append(map[i][j].getGroundTexture().getColor());
@@ -131,6 +137,7 @@ public class MapController {
 
     public MapMessages setTexture(int x, int y, String type) {
         GroundTexture texture = GroundTexture.getTextureByName(type);
+        if(x<0||x>=map.length||y<0||y>=map.length) return MapMessages.OUT_OF_INDEX;
         if (texture == null) return MapMessages.NO_TEXTURE;
         map[x - 1][y - 1].setGroundTexture(texture);
         return MapMessages.SUCCESS;
@@ -138,6 +145,8 @@ public class MapController {
 
     public MapMessages setTexture(int x1, int x2, int y1, int y2, String type) {
         if (x1 >= x2 || y1 >= y2) return MapMessages.INVALID_NUMBER;
+        if(x1<0||x1>=map.length||y1<0||y1>map.length) return MapMessages.OUT_OF_INDEX;
+        if(x1<0||x1>=map.length||y1<0||y1>map.length) return MapMessages.OUT_OF_INDEX;
         GroundTexture texture = GroundTexture.getTextureByName(type);
         if (texture == null) return MapMessages.NO_TEXTURE;
         for (int i = x1 - 1; i < x2; i++) {
@@ -177,6 +186,7 @@ public class MapController {
     public void loadMap(String username) {
         if (!FileController.checkExistenceOfMap(username))
             return;
+
         ArrayList<String> savedMap = FileController.loadMap(username);
         if (savedMap == null)
             return;
@@ -201,10 +211,15 @@ public class MapController {
             return MapMessages.TOO_MANY_HOLD;
         countHold++;
         map[x][y].setExtras(Extras.HOLD);
+        myHolds.add(map[x][y]);
         return MapMessages.SUCCESS;
     }
 
     public Cell[][] getMap() {
         return map;
+    }
+
+    public ArrayList<Cell> getMyHolds(){
+        return myHolds;
     }
 }

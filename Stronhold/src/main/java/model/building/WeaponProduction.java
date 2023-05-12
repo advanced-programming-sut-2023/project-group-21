@@ -14,4 +14,14 @@ public class WeaponProduction extends ProductMaker {
         super(government, cell, productMakerDetails, workers);
         currentWeapon = productMakerDetails.getProducts().get(0);
     }
+    public void switch1(){
+        if(currentWeapon.equals(productMakerDetails.getProducts().get(0)))
+            currentWeapon = productMakerDetails.getProducts().get(1);
+        else
+            currentWeapon = productMakerDetails.getProducts().get(0);
+    }
+
+    public Resource getCurrentProduct(){
+        return currentWeapon;
+    }
 }

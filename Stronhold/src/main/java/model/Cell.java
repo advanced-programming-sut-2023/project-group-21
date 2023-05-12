@@ -4,6 +4,7 @@ import controller.GameController;
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.building.Gate;
+import model.building.Tower;
 import model.generalenums.GroundTexture;
 import model.generalenums.Extras;
 import model.human.Person;
@@ -156,40 +157,44 @@ public class Cell {
         this.direction = dir;
     }
 
-    public boolean checkCross(char myDirection,Cell anotherCell){//repair
-        int lastCellX = 0;
-        int lastCellY = 0;
-        switch (myDirection){
-            case 'n':
-                lastCellY = yCoordinates-1;
-                lastCellX = xCoordinates;
-                break;
-            case 's':
-                lastCellY = yCoordinates + 1;
-                lastCellX = xCoordinates;
-                break;
-            case 'e':
-                lastCellX = xCoordinates-1;
-                lastCellY = yCoordinates;
-                break;
-            case 'w':
-                lastCellX = xCoordinates + 1;
-                lastCellY = yCoordinates;
-                break;
-            default:
-                lastCellX = xCoordinates;
-                lastCellY = yCoordinates;
+    public boolean checkCross(char myDirection,Cell anotherCell,char state){
+        //repair
+        if(state == 'n') {
+            if (groundTexture != GroundTexture.SOIL || extra != null)
+                return false;
+            if (building != null) {
+                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
+                    return true;
+                if (building instanceof Gate && ((Gate) building).checkState())
+                    return true;
+                return false;
+            }
+            return true;
         }
-        if(groundTexture!=GroundTexture.SOIL)
-            return false;
-        if(building != null){
-            if(building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
-                return true;
-            if(building instanceof Gate && ((Gate)building).checkState())
-                return true;
-            return false;
+        if(state == 'a') {
+            if (groundTexture != GroundTexture.SOIL || extra != null)
+                return false;
+            if (building != null) {
+                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
+                    return true;
+                if (building instanceof Gate && ((Gate) building).checkState())
+                    return true;
+                return false;
+            }
+            if (groundTexture != GroundTexture.SOIL || extra != null)
+                return false;
+            if(building != null && building instanceof Tower
+                    && (((Tower)building).getBuildingsDetails()==BuildingsDetails.SQUARE_TOWER ||
+                    ((Tower)building).getBuildingsDetails() == BuildingsDetails.ROUND_TOWER))
+            return true;
         }
-        return true;
+        if (groundTexture != GroundTexture.SOIL || extra != null)
+            return false;
+        if(building != null && building instanceof Tower
+                && (((Tower)building).getBuildingsDetails()==BuildingsDetails.SQUARE_TOWER ||
+                ((Tower)building).getBuildingsDetails() == BuildingsDetails.ROUND_TOWER))
+            return true;
+        return false;
     }
     public void putLadder(){
         hasLadder = true;
@@ -211,7 +216,7 @@ public class Cell {
     }
 
     public void addMachine(Machine machine) {
-        machine=machine;
+        machines.add(0,machine);
     }
 
     public boolean doesHaveOil() {
@@ -225,5 +230,6 @@ public class Cell {
     public void deleteMachine(Machine machine){
         machines.remove(machine);
     }
+
 
 }

@@ -36,4 +36,5 @@ public class ProductMaker extends Building {
     public int getRate() {
         return productMakerDetails.getRate();
     }
+
 }

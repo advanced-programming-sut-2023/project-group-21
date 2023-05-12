@@ -34,7 +34,8 @@ public enum GameMessage {
     NO_OIL("the worker does not have oil!"),
     REPAIR("no need to repair the building"),
     FACTORS("repair me!"),
-    UNABLE_TO_MOVE("unable to move!");
+    UNABLE_TO_MOVE("unable to move!"),
+    NO_SUITABLE_BUILDING("the building is not suitable for this purpose");
     private final String message;
     GameMessage(String message){
         this.message = message;

@@ -114,4 +114,8 @@ public class Worker extends Person {
         isOnTower = onTower;
     }
 
+    public void transport(Cell destination){
+        this.position = destination;
+    }
+
 }

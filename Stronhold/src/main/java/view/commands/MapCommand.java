@@ -6,15 +6,16 @@ import java.util.regex.Pattern;
 public enum MapCommand {
     BACK("back"),
     SHOW_MAP("\\s*show\\s+map\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
-    MOVE_MAP("\\s+move\\s+(?<left>.*)"),
+    MOVE_MAP("\\s*move\\s+(?<left>.*)"),
     CLEAR("\\s*clear\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)"),
-    SET_TEXTURE("\\s*set\\s+texture\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\d+)\\s+y2\\s+(?<y2>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
-    DROP_TREE("\\s*drop\\s+tree\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
-    DROP_ROCK("\\s*drop\\s+rock\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
+    SET_TEXTURE("\\s*set\\s+texture\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\d+)\\s+-y2\\s+(?<y2>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
+    DROP_TREE("\\s*drop\\s*tree\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
+    DROP_ROCK("\\s*drop\\s+rock\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-d\\s+(?<type>\\S+)\\s*"),
     SET_TEXTURE_ONE_SQUARE("\\s*set\\s+texture\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
     SAVE_MAP("\\s*save\\s+map\\s*"),
     MAKE_NEW_MAP("\\s*make\\s+new\\s+map\\s*-s\\s+(?<size>\\d+)\\s*"),
-    SET_HOLD("set hold -x (?<x>\\d+) -y (?<y>\\d+)");
+    SET_HOLD("set hold -x (?<x>\\d+) -y (?<y>\\d+)"),
+    SHOW_DETAIL("\\s*show\\s+detail -x (?<x>\\d+) -y (?<y>\\d+)\\s*");
 
 
     private final String regex;

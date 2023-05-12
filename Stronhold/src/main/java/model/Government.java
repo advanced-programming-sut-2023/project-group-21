@@ -270,4 +270,8 @@ public class Government {
         }
     }
 
+    public void removeMachine(Machine machine){
+        machines.remove(machine);
+    }
+
 }
