@@ -1,16 +1,14 @@
 package model.building.Enums;
 
-import model.building.Tower;
-
 public enum TowerDetails {
     LOOKOUT_TOWER(BuildingsDetails.LOOKOUT_TOWER, 8, 1, false),
     PERIMETER_TOWER(BuildingsDetails.PERIMETER_TOWER, 6, 3, false),
     TURRET(BuildingsDetails.TURRET, 6, 3, false),
     SQUARE_TOWER(BuildingsDetails.SQUARE_TOWER, 7, 3, true),
     ROUND_TOWER(BuildingsDetails.ROUND_TOWER,  7, 3, true);
-    BuildingsDetails buildingsDetails;
-    int fireRange, defenseRange;
-    boolean canStandMachines;
+    private final BuildingsDetails buildingsDetails;
+    private final int fireRange, defenseRange;
+    private final boolean canStandMachines;
 
     TowerDetails(BuildingsDetails buildingsDetails, int fireRange, int defenseRange, boolean canStandMachines) {
         this.buildingsDetails = buildingsDetails;
@@ -35,5 +33,9 @@ public enum TowerDetails {
         for (TowerDetails towerDetails: TowerDetails.values())
             if (towerDetails.buildingsDetails.equals(buildingsDetails)) return towerDetails;
         return null;
+    }
+
+    public boolean CanStandMachines() {
+        return canStandMachines;
     }
 }

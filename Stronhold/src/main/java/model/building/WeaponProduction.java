@@ -24,4 +24,8 @@ public class WeaponProduction extends ProductMaker {
     public Resource getCurrentProduct(){
         return currentWeapon;
     }
+
+    public Resource getCurrentWeapon() {
+        return currentWeapon;
+    }
 }

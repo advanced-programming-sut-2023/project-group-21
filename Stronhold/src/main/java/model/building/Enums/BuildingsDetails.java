@@ -53,13 +53,16 @@ public enum BuildingsDetails {
     public enum BuildingType {
         PRODUCT_MAKER, GATE, STORAGE, TOWER, TROOP_TRAINER, QUARRY, SIEGE_TENT, STABLE, TRAP, WEAPON_PRODUCTION, OIL_SMELTER, CAGED_WAR_DOGS, RESIDENCY
     }
-    private String name;
-    private BuildingType buildingType;
-    private int maxHitPoints, workersCount;
-    private Map<Resource, Integer> requiredResource;
+    private final String name;
+    private final BuildingType buildingType;
+    private final int maxHitPoints, workersCount;
+    private final Map<Resource, Integer> requiredResource;
     BuildingsDetails(String name, BuildingType buildingType, int maxHitPoints, Map<Resource, Integer> requiredResource, int workersCount){
         this.name = name;
         this.buildingType = buildingType;
+        this.maxHitPoints = maxHitPoints;
+        this.requiredResource = requiredResource;
+        this.workersCount = workersCount;
     }
 
     public int getMaxHitPoints() {

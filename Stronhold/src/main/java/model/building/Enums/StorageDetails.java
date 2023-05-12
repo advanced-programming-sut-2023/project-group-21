@@ -5,8 +5,8 @@ public enum StorageDetails {
     GRANARY(BuildingsDetails.GRANARY, 60),
     STOCKPILE(BuildingsDetails.STOCKPILE, 100),
     STABLE(BuildingsDetails.STABLE, 4);
-    BuildingsDetails buildingsDetails;
-    int capacity;
+    private final BuildingsDetails buildingsDetails;
+    private final int capacity;
 
     StorageDetails(BuildingsDetails buildingsDetails, int capacity) {
         this.buildingsDetails = buildingsDetails;

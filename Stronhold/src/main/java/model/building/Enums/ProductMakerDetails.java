@@ -23,10 +23,10 @@ public enum ProductMakerDetails {
     BAKERY(BuildingsDetails.BAKERY, Resource.FLOUR, Arrays.asList(Resource.BREAD), 2),
     BREWERY(BuildingsDetails.BREWERY, Resource.HOPS, Arrays.asList(Resource.ALE), 2);
 
-    BuildingsDetails buildingsDetails;
-    Resource consumption;
-    List<Resource> products;
-    int rate;
+    private final BuildingsDetails buildingsDetails;
+    private final Resource consumption;
+    private final List<Resource> products;
+    private final int rate;
     ProductMakerDetails(BuildingsDetails buildingsDetails, Resource consumption, List<Resource> products, int rate){
         this.buildingsDetails = buildingsDetails;
         this.rate = rate;

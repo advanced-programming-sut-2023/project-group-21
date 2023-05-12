@@ -1,15 +1,13 @@
 package model.building.Enums;
 
-import model.building.Residency;
-
 public enum ResidencyDetails {
     SMALL_STONE_GATEHOUSE(BuildingsDetails.SMALL_STONE_GATEHOUSE, 8),
     BIG_STONE_GATEHOUSE(BuildingsDetails.BIG_STONE_GATEHOUSE, 10),
     HOVEL(BuildingsDetails.HOVEL, 8),
     DRAWBRIDGE(BuildingsDetails.DRAWBRIDGE, 0);
 
-    BuildingsDetails buildingsDetails;
-    int maxPopularity;
+    private final BuildingsDetails buildingsDetails;
+    private final int maxPopularity;
 
     ResidencyDetails(BuildingsDetails buildingsDetails, int maxPopularity) {
         this.buildingsDetails = buildingsDetails;

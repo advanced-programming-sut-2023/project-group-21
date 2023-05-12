@@ -153,7 +153,7 @@ public class GameMenu {
 
     private void checkSetTaxRate(Matcher matcher) {
         int rate = Integer.parseInt(matcher.group("rate"));
-        GameMessage gameMessage = gameController.setTax(rate);
+        GameMessage gameMessage = gameController.setTaxRate(rate);
         System.out.println(gameMessage.toString());
     }
 
