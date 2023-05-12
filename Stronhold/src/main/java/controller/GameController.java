@@ -165,6 +165,7 @@ public class GameController {
     public GameMessage checkMakeTroop(String type, int count, int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedBuilding == null) return GameMessage.NO_SELECTED_BUILDING;
+        if (map[x-1][y-1].getBuilding() != null) return null;
         WorkerDetails worker = WorkerDetails.getWorkerDetailsByName(type);
         BuildingsDetails.BuildingType buildingType = selectedBuilding.getBuildingsDetails().getBuildingType();
         if (worker == null) return GameMessage.ANOTHER_PURPOSE;
