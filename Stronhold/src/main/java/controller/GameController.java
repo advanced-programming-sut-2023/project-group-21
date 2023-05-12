@@ -894,18 +894,23 @@ public class GameController {
     public GameMessage checkMoveEquipments(int x1,int y1,int x2,int y2){
         if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
-        if(map[x1][y1].getMachine().getSpeed() == 0) return GameMessage.UNABLE_TO_MOVE;
+        Machine myMachine = null;
+        for(int i1 = 0;i1<map[x1][y1].getMachine().size();i1++){
+            if(map[x1-1][y1-1].getMachine().get(i1).getSpeed()==0)
+                myMachine = map[x1][y1].getMachine().get(i1);
+        }
+        if(myMachine == null)
+            return GameMessage.UNABLE_TO_MOVE;
         Cell cell1;
-        Machine machine = map[x1 - 1][y1 - 1].getMachine();
         calculateDistance(x1 - 1,y1 - 1,x2 - 1,y2 - 1);
-        if (x1 > 200 || x1 < 1 || y1 > 200 || y1 < 1) return GameMessage.OUT_OF_RANGE;
-        if (x2 > 200 || x2 < 1 || y2 > 200 || y2 < 1) return GameMessage.OUT_OF_RANGE;
+        if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
+        if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         Machine machine = null;
         for(int i1=0;i1<map[x1][y1].getMachine().size();i1++){
             if(map[x1][y1].getMachine().get(i1).getSpeed()!=0) machine = map[x1][y1].getMachine().get(i1);
         }
         if(machine == null) return GameMessage.UNABLE_TO_MOVE;
-        Cell cell1,cell2;
+        Cell cell2;
         calculateDistance(x1,y1,x2,y2);
         int length = path.size();
         for (int i = 1; i <= machine.getSpeed() && i < length; i++){
