@@ -951,4 +951,14 @@ public class GameController {
         productMaker.switch1();
         return GameMessage.SUCCESS;
     }
+
+    public String getResourceName(String name){
+        if(name == null)
+            return currentGovernment.showStorage(null);
+        BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(name);
+        StorageDetails details = StorageDetails.getStorageDetailsByBuildingDetails(buildingsDetails);
+        if(details==null)
+            return "Storage name is invalid";
+        return currentGovernment.showStorage(details);
+    }
 }

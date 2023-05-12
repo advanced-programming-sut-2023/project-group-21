@@ -40,14 +40,18 @@ public class MapController {
     public MapMessages initializeMap(ArrayList<String> myMap) {
         myHolds = new ArrayList<>();
         int size = myMap.size();
+        map = new Cell[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++)
+                map[i][j] = new Cell(i, j);
+        }
         if (size != 200 && size != 400)
             return null;
         for (String s : myMap)
             if (s.length() != (size * 2))
                 return null;
-        map = new Cell[size][size];
         for (int i1 = 0; i1 < size; i1++) {
-            for (int i2 = 0; i2 < myMap.get(i1).length(); i2 += 2) {
+            for (int i2 = 0; i2 < (myMap.get(i1).length()/2); i2 += 2) {
                 Extras extra = null;
                 if (myMap.get(i1).charAt(i2) == '!')
                     extra = Extras.getExtrasByCode(String.valueOf(myMap.get(i1).charAt(i2)));
@@ -63,9 +67,10 @@ public class MapController {
     }
 
     public String showMap(int x, int y) {
+        System.out.println("chert");
         xCoordinates = x;
         yCoordinates = y;
-        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
+        if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!";
         StringBuilder output = new StringBuilder();
         if(x>map.length || x<=0 ||y>map.length||y<=0)
             return "out of index!";
@@ -123,7 +128,7 @@ public class MapController {
     }
 
     public MapMessages dropTree(int x, int y, String type) {
-        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
+        if (x > map.length || x < 1 || y > map.length || y < 1) return MapMessages.OUT_OF_INDEX;
         Extras tree = Extras.getExtrasByName(type);
         if (tree == null) return MapMessages.NO_TREE;
         map[x - 1][y - 1].setExtras(tree);
@@ -131,7 +136,7 @@ public class MapController {
     }
 
     public MapMessages dropRock(int x, int y, String direction) {
-        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
+        if (x > map.length || x < 1 || y > map.length || y < 1) return MapMessages.OUT_OF_INDEX;
         if (direction.length() > 1) return MapMessages.INVALID_FORMAT;
         if (!Game.directions.contains(direction)) return MapMessages.INVALID_DIRECTION;
         if (direction.equals("r")) direction = String.valueOf(Game.directions.charAt((int) System.currentTimeMillis() % 4));
@@ -162,7 +167,7 @@ public class MapController {
     }
 
     public MapMessages clear(int x, int y) {
-        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
+        if (x > map.length || x < 1 || y > map.length || y < 1) return MapMessages.OUT_OF_INDEX;
         try {
             map[x - 1][y - 1].clear();
             return MapMessages.SUCCESS;
@@ -172,7 +177,7 @@ public class MapController {
     }
 
     public String showDetails(int x, int y) {
-        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
+        if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!!";
         try {
             return map[x - 1][y - 1].showDetails();
         } catch (ArrayIndexOutOfBoundsException e) {
