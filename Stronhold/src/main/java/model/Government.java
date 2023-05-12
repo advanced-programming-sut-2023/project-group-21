@@ -301,4 +301,18 @@ public class Government {
         machines.remove(machine);
     }
 
+    public String showStorage(StorageDetails storageDetails) {
+        StringBuilder string = new StringBuilder();
+        if (storageDetails == null) {
+            for (Map.Entry<Resource, Integer> entry: resources.entrySet())
+                string.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
+        } else {
+            for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
+                if (entry.getKey().getResourceKeeper().equals(storageDetails))
+                    string.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
+            }
+        }
+        return string.toString();
+    }
+
 }
