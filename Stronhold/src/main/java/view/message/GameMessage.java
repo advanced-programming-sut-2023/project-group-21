@@ -35,7 +35,8 @@ public enum GameMessage {
     REPAIR("no need to repair the building"),
     FACTORS("repair me!"),
     UNABLE_TO_MOVE("unable to move!"),
-    NO_SUITABLE_BUILDING("the building is not suitable for this purpose");
+    NO_SUITABLE_BUILDING("the building is not suitable for this purpose"),
+    INVALID_RESOURCE_NAME("Storage name is invalid");
     private final String message;
     GameMessage(String message){
         this.message = message;
