@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Building {
-    private Government government;
-    private BuildingsDetails buildingsDetails;
+    private final Government government;
+    private final BuildingsDetails buildingsDetails;
     private int hitPoint;
-    private Cell cell;
+    private final Cell cell;
 
-    private ArrayList<Person> workers = new ArrayList<>();
+    private ArrayList<Person> workers;
     public Building(Government government, BuildingsDetails buildingsDetails, Cell cell, ArrayList<Person> workers) {
         this.government = government;
         this.buildingsDetails = buildingsDetails;
@@ -64,5 +64,9 @@ public class Building {
 
     public int getRequiredWorkersCount() {
         return buildingsDetails.getWorkersCount();
+    }
+
+    public void getDamaged(int damage) {
+        hitPoint -= damage;
     }
 }

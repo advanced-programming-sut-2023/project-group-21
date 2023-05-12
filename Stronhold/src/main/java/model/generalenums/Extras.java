@@ -2,10 +2,10 @@ package model.generalenums;
 
 public enum Extras {
     SHRUB("shrub","a"),
-    CHERRY_TREE("cherry tree","b"),
-    OLIVE_TREE("olive tree","c"),
-    COCONUT_TREE("coconut tree","d"),
-    PALM_TREE("palm tree","d"),
+    CHERRY_TREE("cherry","b"),
+    OLIVE_TREE("olive","c"),
+    COCONUT_TREE("coconut","d"),
+    PALM_TREE("palm","d"),
     NORTH_ROCK("n","e"),
     SOUTH_ROCK("s","f"),
     WEST_ROCK("w","g"),

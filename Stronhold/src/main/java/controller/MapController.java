@@ -61,9 +61,10 @@ public class MapController {
     public String showMap(int x, int y) {
         xCoordinates = x;
         yCoordinates = y;
+        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
         StringBuilder output = new StringBuilder();
         boolean hasPerson = false;
-        int yMax = min(y + 2, size) - 1, yMin = max(y - 2, 0) - 1, xMax = min(x + 2, size) - 1, xMin = max(x - 2, 0) - 1;
+        int yMax = min(y + 4, size) - 1, yMin = max(y - 4, 1) - 1, xMax = min(x + 4, size) - 1, xMin = max(x - 4, 1) - 1;
         for (int j = yMin; j <= yMax; j++) {
             for (int i = xMin; i <= xMax; i++) {
                 output.append(map[i][j].getGroundTexture().getColor());
@@ -80,6 +81,8 @@ public class MapController {
                 else if (building != null) output.append("B");
                 else if (map[i][j].getExtra() != null && !Game.directions.contains(map[i][j].getExtra().getName()))
                     output.append("T");
+                else if (map[i][j].getExtra() != null)
+                    output.append("R");
                 else output.append(" ");
             }
             output.append("\033[0m").append("\n");
@@ -106,7 +109,7 @@ public class MapController {
                 }
             }
         }
-        if (xCoordinates + xChange > 200 || xCoordinates + xChange <= 0 || yCoordinates + yChange > 200 || yCoordinates + yChange <= 0)
+        if (xCoordinates + xChange > map.length || xCoordinates + xChange <= 0 || yCoordinates + yChange > map.length || yCoordinates + yChange <= 0)
             return "";
         xCoordinates += xChange;
         yCoordinates += yChange;
@@ -114,6 +117,7 @@ public class MapController {
     }
 
     public MapMessages dropTree(int x, int y, String type) {
+        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
         Extras tree = Extras.getExtrasByName(type);
         if (tree == null) return MapMessages.NO_TREE;
         map[x - 1][y - 1].setExtras(tree);
@@ -121,8 +125,10 @@ public class MapController {
     }
 
     public MapMessages dropRock(int x, int y, String direction) {
+        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
         if (direction.length() > 1) return MapMessages.INVALID_FORMAT;
         if (!Game.directions.contains(direction)) return MapMessages.INVALID_DIRECTION;
+        if (direction.equals("r")) direction = String.valueOf(Game.directions.charAt((int) System.currentTimeMillis() % 4));
         Extras stone = Extras.getExtrasByName(direction);
         if (stone == null) return MapMessages.NO_STONE;
         map[x - 1][y - 1].setExtras(stone);
@@ -147,6 +153,7 @@ public class MapController {
     }
 
     public MapMessages clear(int x, int y) {
+        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
         try {
             map[x - 1][y - 1].clear();
             return MapMessages.SUCCESS;
@@ -156,6 +163,7 @@ public class MapController {
     }
 
     public String showDetails(int x, int y) {
+        if (x > map.length || x < 1 || y > map.length || y < 1) return null;
         try {
             return map[x - 1][y - 1].showDetails();
         } catch (ArrayIndexOutOfBoundsException e) {

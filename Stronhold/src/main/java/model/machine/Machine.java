@@ -11,7 +11,7 @@ public class Machine {
     private MachineDetails machineDetails;
     private Government government;
     private Cell cell;
-    int hitPoint;
+    int hitPoint = 0;
     ArrayList<Engineer> engineers;
 
     public Machine(MachineDetails machineDetails, Government government, Cell cell, ArrayList<Engineer> engineers) {
@@ -20,7 +20,8 @@ public class Machine {
         this.cell = cell;
         cell.addMachine(this);
         this.engineers = engineers;
-        hitPoint = engineers.size() * WorkerDetails.ENGINEER.getMaxHitPoint();
+        for (Engineer engineer: engineers)
+            hitPoint += engineer.getHitPoint();
     }
 
     public Government getGovernment() {
@@ -53,5 +54,9 @@ public class Machine {
 
     public void getDamaged(int damage) {
         hitPoint -= damage;
+    }
+
+    public MachineDetails getMachineDetails() {
+        return machineDetails;
     }
 }

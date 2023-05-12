@@ -14,4 +14,8 @@ public class WeaponProduction extends ProductMaker {
         super(government, cell, productMakerDetails, workers);
         currentWeapon = productMakerDetails.getProducts().get(0);
     }
+
+    public Resource getCurrentWeapon() {
+        return currentWeapon;
+    }
 }
