@@ -124,10 +124,15 @@ public class MapMenu {
     }
 
     public Cell[][] getMyMap() {
-        return mapController.getMap();
+        if(mapController.getMap() != null)
+            return mapController.getMap();
+        return mapController.getMapByUsername(user.getUserName());
     }
 
     public MapController getMapController(){
         return mapController;
+    }
+    public Cell[][] getMapInFile(String username){
+        return mapController.getMapByUsername(username);
     }
 }

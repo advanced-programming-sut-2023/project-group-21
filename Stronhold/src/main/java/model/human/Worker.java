@@ -6,12 +6,13 @@ import model.human.Enums.WorkerDetails;
 
 public class Worker extends Person {
     private String state;
-    private WorkerDetails workerDetails;
+    private final WorkerDetails workerDetails;
     private Cell position;
     private Cell destination;
     private boolean isPatrolOn = false;
     private int patrolX1, patrolY1, patrolX2, patrolY2;
     private Worker enemy;
+    private boolean hasLadder = false;
 
     public Worker(WorkerDetails workerDetails, Government government, Cell position, Cell destination) {
         super(government);
@@ -19,6 +20,8 @@ public class Worker extends Person {
         this.position = position;
         this.destination = destination;
         state = "standing";
+        if(workerDetails == WorkerDetails.LADDERMAN)
+            hasLadder = true;
     }
 
     public String getName() {
@@ -91,7 +94,15 @@ public class Worker extends Person {
         position.deletePerson(this);
     }
 
+    public void putLadder(){
+        this.delete();
+    }
+
     public void getDamaged(int amount){
         hitPoint-=amount;
+    }
+
+    public WorkerDetails getWorkerDetails(){
+        return workerDetails;
     }
 }

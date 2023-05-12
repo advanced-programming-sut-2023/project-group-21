@@ -13,8 +13,8 @@ public enum EuropeanSoldiersDetails {
     MACEMAN(WorkerDetails.MACEMAN, Arrays.asList(Resource.MACE, Resource.LEATHER_ARMOR)),
     SWORDSMAN(WorkerDetails.SWORDSMAN, Arrays.asList(Resource.SWORD, Resource.METAL_ARMOR)),
     KNIGHT(WorkerDetails.KNIGHT, Arrays.asList(Resource.SWORD, Resource.METAL_ARMOR, Resource.HORSE));
-    private WorkerDetails workerDetails;
-    private List<Resource> equipments;
+    private final WorkerDetails workerDetails;
+    private final List<Resource> equipments;
 
     EuropeanSoldiersDetails(WorkerDetails workerDetails, List<Resource> equipments) {
         this.workerDetails = workerDetails;

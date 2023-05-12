@@ -13,7 +13,8 @@ public enum MapCommand {
     DROP_ROCK("\\s*drop\\s+rock\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
     SET_TEXTURE_ONE_SQUARE("\\s*set\\s+texture\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
     SAVE_MAP("\\s*save\\s+map\\s*"),
-    MAKE_NEW_MAP("\\s*make\\s+new\\s+map\\s*-s\\s+(?<size>\\d+)\\s*");
+    MAKE_NEW_MAP("\\s*make\\s+new\\s+map\\s*-s\\s+(?<size>\\d+)\\s*"),
+    SET_HOLD("set hold -x (?<x>\\d+) -y (?<y>\\d+)");
 
 
     private final String regex;

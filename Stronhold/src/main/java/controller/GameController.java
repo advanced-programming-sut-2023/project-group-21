@@ -192,6 +192,10 @@ public class GameController {
         return count;
     }
 
+    public void setFoodRate(int rate){
+        currentGovernment.setFoodRate(rate);
+    }
+
     public GameMessage repair() {
         if (selectedBuilding.getHitPoint() == selectedBuilding.getMaxHitPoint()) return GameMessage.REPAIR;
         double ratio = ((double) selectedBuilding.getHitPoint()) / ((double) selectedBuilding.getMaxHitPoint());
@@ -239,7 +243,20 @@ public class GameController {
         map[x - 1][y - 1].getPeople().get(0).setState(mode);
         return GameMessage.SUCCESS;
     }
-
+    private void startMove(){
+        for(int i1=0;i1<governments.size();i1++){
+            for(int i2=0;i2<governments.get(i1).getPeople().size();i2++){
+                if(governments.get(i1).getPeople().get(i2) instanceof Worker &&
+                        ((Worker) governments.get(i1).getPeople().get(i2)).getDestination()!=
+                                ((Worker) governments.get(i1).getPeople().get(i2)).getPosition()){
+                    Worker tempWorker = ((Worker) governments.get(i1).getPeople().get(i2));
+                    callOtherFunction(tempWorker.getPosition().getxCoordinates(),tempWorker.getPosition().getyCoordinates(),
+                            tempWorker.getDestination().getxCoordinates(),tempWorker.getDestination().getyCoordinates());
+                    doTheMove(tempWorker,path);
+                }
+            }
+        }
+    }
     public GameMessage attack(int x, int y) {
         if (x > 200 || x < 1 || y > 200 || y < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedWorker == null || selectedWorker instanceof Engineer) return GameMessage.NO_SELECTED_UNIT;
@@ -335,12 +352,12 @@ public class GameController {
         if (numberOfEngineers() < machineDetail.getEngineersNeeded()) return null;
         currentGovernment.addBuilding(new Building(currentGovernment, BuildingsDetails.SIEGE_TENT, selectedWorker.getPosition()));
         for (Worker person : selectedWorker.getPosition().getPeople()) {
-            if(person instanceof Engineer&& !((Engineer) person).hasMachine())
+            if (person instanceof Engineer && !((Engineer) person).hasMachine())
                 engineers.add((Engineer) person);
-            if(engineers.size()>=machineDetail.getEngineersNeeded())
+            if (engineers.size() >= machineDetail.getEngineersNeeded())
                 break;
         }
-        if(engineers.size()<machineDetail.getEngineersNeeded())
+        if (engineers.size() < machineDetail.getEngineersNeeded())
             return null;
         for (Engineer engineer : engineers) {
             engineer.giveHimMachine(true);
@@ -351,8 +368,8 @@ public class GameController {
 //                engineers.add((Engineer) currentGovernment.getPeople().get(i));
 //        for (Engineer engineer : engineers) engineer.setDestination(selectedWorker.getPosition());
         commands.add(new Command("build equipment", machineDetail, selectedWorker.getPosition().getxCoordinates(),
-                selectedWorker.getPosition().getyCoordinates(),engineers));
-        return null;
+                selectedWorker.getPosition().getyCoordinates(), engineers));
+        return GameMessage.SUCCESS;
     }
 
     private int numberOfEngineers() {
@@ -424,7 +441,30 @@ public class GameController {
         if (x1 >= map.length || x1 < 0 || x2 >= map.length || x2 < 0 || y1 >= map.length || y1 < 0 || y2 >= map.length
                 || y2 < 0)
             return;
-        if (!map[x1][y1].checkCross(map[x1][y1].getDirection()))
+        int lastCellX = 0;
+        int lastCellY = 0;
+        switch (map[x1][y1].getDirection()) {
+            case 'n':
+                lastCellY = y1 - 1;
+                lastCellX = x1;
+                break;
+            case 's':
+                lastCellY = y1 + 1;
+                lastCellX = x1;
+                break;
+            case 'e':
+                lastCellX = x1 - 1;
+                lastCellY = y1;
+                break;
+            case 'w':
+                lastCellX = x1 + 1;
+                lastCellY = y1;
+                break;
+            default:
+                lastCellX = x1;
+                lastCellY = y1;
+        }
+        if (!map[x1][y1].checkCross(map[x1][y1].getDirection(), map[lastCellX][lastCellY]))
             return;
         map[x1][y1].cross();
         if (map[x1][y1].getTotal() == 0 || map[x1][y1].getTotal() >= totalDistance) {
@@ -474,7 +514,7 @@ public class GameController {
 
             }
         }
-        decodePath(x,y);
+        decodePath(x, y);
     }
 
     private void decodePath(int x2, int y2) {
@@ -510,32 +550,40 @@ public class GameController {
         updateStorage();
         currentGovernment.doActionInTurnFirst();
         clearDeadSoldiers();
+        startMove();
+        if (currentGovernment.checkDefeat()) {
+            int score = currentGovernment.calculateScore();
+            FileController.modifyScore(currentGovernment.getLord().getUserName(), score);
+            governments.remove(currentGovernment);
+            currentGovernment.killAllPeople();
+        }
     }
 
     //moving
 
-    public void attackInRange(Worker soldier){
-        int x=soldier.getPosition().getxCoordinates();
-        int y=soldier.getPosition().getyCoordinates();
-        int range=0;
-        if(soldier.getState().equals("standing"))
-            range=soldier.getRange();
+    public void attackInRange(Worker soldier) {
+        int x = soldier.getPosition().getxCoordinates();
+        int y = soldier.getPosition().getyCoordinates();
+        int range = 0;
+        if (soldier.getState().equals("standing"))
+            range = soldier.getRange();
         else if (soldier.getState().equals("defensive"))
-            range= soldier.getRange()+1;
-        else if(soldier.getState().equals("attacking"))
-            range=soldier.getRange()+ soldier.getSpeed();
-        for(int b=0;b<=range;b++) {
+            range = soldier.getRange() + 1;
+        else if (soldier.getState().equals("attacking"))
+            range = soldier.getRange() + soldier.getSpeed();
+        for (int b = 0; b <= range; b++) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     for (Worker person : map[i - 1][j - 1].getPeople()) {
-                        if (!person.getGovernment().equals(soldier.getGovernment())&&person.getEnemy()!=null)
+                        if (!person.getGovernment().equals(soldier.getGovernment()) && person.getEnemy() != null)
                             soldier.setEnemy(person);
                     }
                 }
             }
         }
     }
-    public void clearDeadSoldiers(){
+
+    public void clearDeadSoldiers() {
         for (Government government : governments) {
             for (Person person : government.getPeople()) {
                 if (person.getHitPoint() <= 0) {
@@ -545,29 +593,42 @@ public class GameController {
         }
     }
 
-    public void doTheMove(Worker person,ArrayList<Cell> way){
-            //the array is from last to first
-        int length= way.size();
-        for(int i=1;i<=person.getSpeed();i++) {
-            way.get(length-i).deletePerson(person);
-            if(way.get(length- 1- i).doesHaveHole()||way.get(length- 1- i).doesHaveOil())
+    public void doTheMove(Worker person, ArrayList<Cell> way) {//put ladder & remove ladder
+        //the array is from last to first
+        int length = way.size();
+        Cell cell = map[0][0];//fake initialize
+        for (int i = 1; i <= person.getSpeed() && i < length; i++) {
+            way.get(length - i).deletePerson(person);
+            if (way.get(length - 1 - i).doesHaveHole() || way.get(length - 1 - i).doesHaveOil())
                 person.getDamaged(10);
-            if(person.getHitPoint()>0)
-                way.get(length- 1- i).addPerson(person);
-            way.remove(length-i);
+            if (person.getHitPoint() > 0) {
+                cell = way.get(length - 1 - i);
+                way.get(length - 1 - i).addPerson(person);
+            }
+            way.remove(length - i);
             //check if goes well..{the changes in the cell and the hitpoint of the person
+        }
+        if (person.getWorkerDetails() == WorkerDetails.LADDERMAN) {
+            ArrayList<Cell> neighbours = this.getNeighbours(cell);
+            for (int i1 = 0; i1 < neighbours.size(); i1++)
+                if (neighbours.get(i1).getBuilding().getBuildingsDetails() == BuildingsDetails.WALL)
+                    cell.putLadder();
+        }
+        if (person.getWorkerDetails() == WorkerDetails.SPEARMAN || person.getWorkerDetails() == WorkerDetails.MACEMAN) {
+            if (cell.checkHasLadder())
+                cell.removeLadder();
         }
     }
 
     private void updateStorage() {
-        for (Government government: governments) {
-            for (Building building: government.getBuildings()) {
+        for (Government government : governments) {
+            for (Building building : government.getBuildings()) {
                 if (building instanceof ProductMaker) {
                     if (((ProductMaker) building).getConsumingProduct() != null) {
                         if (currentGovernment.getResources().containsKey(((ProductMaker) building).getConsumingProduct()))
                             currentGovernment.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
                     }
-                    for (Resource resource: ((ProductMaker) building).getProducts())
+                    for (Resource resource : ((ProductMaker) building).getProducts())
                         currentGovernment.addToResource(resource,
                                 Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
                 }
@@ -589,21 +650,20 @@ public class GameController {
     }
 
     private void damage(Person person) {
-        int hitDamage=((Worker)person).getDamage();
-        if(isEnemyInRange(person)==true) {
-            int defenseRate=((Worker)person).getEnemy().getDefense();
-            if(hitDamage>defenseRate)
-                ((Worker) person).getEnemy().getDamaged(hitDamage-defenseRate);
-        }
-        else if(((Worker)findRandomEnemy(person))!=null){
-            int defenseRate=((Worker)findRandomEnemy(person)).getDefense();
-            ((Worker)findRandomEnemy(person)).getDamaged(hitDamage-defenseRate);
+        int hitDamage = ((Worker) person).getDamage();
+        if (isEnemyInRange(person) == true) {
+            int defenseRate = ((Worker) person).getEnemy().getDefense();
+            if (hitDamage > defenseRate)
+                ((Worker) person).getEnemy().getDamaged(hitDamage - defenseRate);
+        } else if (((Worker) findRandomEnemy(person)) != null) {
+            int defenseRate = ((Worker) findRandomEnemy(person)).getDefense();
+            ((Worker) findRandomEnemy(person)).getDamaged(hitDamage - defenseRate);
         }
     }
 
-    private Person findRandomEnemy(Person person){
-        int range=((Worker)person).getRange();
-        for(int b=0;b<=range;b++) {
+    private Person findRandomEnemy(Person person) {
+        int range = ((Worker) person).getRange();
+        for (int b = 0; b <= range; b++) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     for (Worker worker : map[i - 1][j - 1].getPeople()) {
@@ -615,19 +675,21 @@ public class GameController {
         }
         return null;
     }
-    private boolean isEnemyInRange(Person person){
-        int x1=((Worker)person).getEnemy().getPosition().getxCoordinates();
-        int y1=((Worker)person).getEnemy().getPosition().getyCoordinates();
-        int x2=((Worker) person).getPosition().getxCoordinates();
-        int y2=((Worker) person).getPosition().getyCoordinates();
-        int distance=calculateDistance(x1,y1,x2,y2);
-        if(distance<=((Worker)person).getRange())
+
+    private boolean isEnemyInRange(Person person) {
+        int x1 = ((Worker) person).getEnemy().getPosition().getxCoordinates();
+        int y1 = ((Worker) person).getEnemy().getPosition().getyCoordinates();
+        int x2 = ((Worker) person).getPosition().getxCoordinates();
+        int y2 = ((Worker) person).getPosition().getyCoordinates();
+        int distance = calculateDistance(x1, y1, x2, y2);
+        if (distance <= ((Worker) person).getRange())
             return true;
         return false;
     }
+
     private void doCommands() {
         for (Command command : commands) {
-            switch (command.getName()){
+            switch (command.getName()) {
                 case "repair":
                     command.getBuilding().repairHitpoint();
                     break;
@@ -642,7 +704,7 @@ public class GameController {
                     break;
                 case "build equipment":
                     //repair: build a machine with passing the machine details to the constructor
-                    Machine machine=new Machine();
+                    Machine machine = new Machine();
                     for (Engineer engineer : command.getEngineers())
                         engineer.setMachine(machine);
                     machine.getCell().addMachine(machine);
@@ -652,11 +714,11 @@ public class GameController {
     }
 
     public void pourOil(Command command) {
-        String direction=command.getDirection();
-        int x= command.getWorker().getPosition().getxCoordinates();
-        int y= command.getWorker().getPosition().getyCoordinates();
+        String direction = command.getDirection();
+        int x = command.getWorker().getPosition().getxCoordinates();
+        int y = command.getWorker().getPosition().getyCoordinates();
         //check the logic of direction
-        switch (direction){
+        switch (direction) {
             case "n":
                 for (int i = y - 1; i >= y - 3; i--) {
                     for (Worker person : map[x][i].getPeople()) {
@@ -690,11 +752,60 @@ public class GameController {
         command.getWorker().setDestination(currentGovernment.getBuildingByName("oil smelter").getCell());
     }
 
+    public ArrayList<Cell> getNeighbours(Cell cell) {
+        if (cell == null)
+            return null;
+        ArrayList<Cell> results = new ArrayList<>();
+        int x = cell.getxCoordinates();
+        int y = cell.getyCoordinates();
+        if ((x + 1) < map.length && (x + 1) >= 0)
+            results.add(map[x + 1][y]);
+        if ((x - 1) < map.length && (x - 1) >= 0)
+            results.add(map[x - 1][y]);
+        if ((y - 1) < map.length && (y - 1) >= 0)
+            results.add(map[x][y - 1]);
+        if ((y + 1) < map.length && (y + 1) >= 0)
+            results.add(map[x][y + 1]);
+        return results;
+    }
 
+    public boolean checkEndGame() {
+        if (governments.size() == 0)
+            return false;
+        return true;
+    }
+
+    public void removeGovernment(Government government) {//recursively remove government!
+        ArrayList<Person> peopleArraylist = government.getPeople();
+        for (int i1 = 0; i1 < peopleArraylist.size(); i1++) {
+            peopleArraylist.get(i1).delete();
+        }
+        governments.remove(government);
+    }
+
+    public GameMessage checkMoveEquipments(int x1,int y1,int x2,int y2){
+        if (x1 > 200 || x1 < 1 || y1 > 200 || y1 < 1) return GameMessage.OUT_OF_RANGE;
+        if (x2 > 200 || x2 < 1 || y2 > 200 || y2 < 1) return GameMessage.OUT_OF_RANGE;
+        if(map[x1][y1].getMachine().getSpeed() == 0) return GameMessage.UNABLE_TO_MOVE;
+        Cell cell1;
+        Machine machine = map[x1][y1].getMachine();
+        calculateDistance(x1,y1,x2,y2);
+        int length = path.size();
+        for (int i = 1; i <= machine.getSpeed() && i < length; i++){
+            path.get(length - i).deleteMachine();
+            if (path.get(length - 1 - i).doesHaveHole() || path.get(length - 1 - i).doesHaveOil())
+            if (true) {
+                cell1 = path.get(length - 1 - i);
+//                path.get(length - 1 - i).addPerson(person);
+            }
+            path.remove(length - i);
+        }
+        return GameMessage.SUCCESS;
+    }
     //to do: finish the commands processing with all considerations
     //update troop but what written
     //update and consider all the government factors
-    //what check archer attack does and what consequences it have while next turn
+    //what check archer attack does and what consequences it has while next turn
     //pour oil
     //dig tunnel
 }

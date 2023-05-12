@@ -21,7 +21,7 @@ public enum GameMessage {
     INVALID_FOOD_RATE("invalid food rate!"),
     ALREADY_BUILDING("already there is a building"),
     FAILURE1("failure due to ...1"),
-    FAILURE2("failure due to ...2"),
+    FAILURE2("sorry unable to dig tunnel!"),
     FAILURE3("failure due to ...3"),
     FAILURE4("failure due to ...4"),
     FAILURE5("failure due to ...5"),
@@ -33,7 +33,8 @@ public enum GameMessage {
     INVALID_DIRECTION("invalid direction!"),
     NO_OIL("the worker does not have oil!"),
     REPAIR("no need to repair the building"),
-    FACTORS("repair me!");
+    FACTORS("repair me!"),
+    UNABLE_TO_MOVE("unable to move!");
     private final String message;
     GameMessage(String message){
         this.message = message;

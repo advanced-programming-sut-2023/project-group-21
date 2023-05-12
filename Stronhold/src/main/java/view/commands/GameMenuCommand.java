@@ -22,11 +22,14 @@ public enum GameMenuCommand {
     ATTACK("\\s*attack\\s+-e\\s+(?<enemy>\\S+)\\s*"),
     ATTACK2("\\s*attack\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
     POUR_OIL("\\s*pour\\s+oil\\s+-d\\s+(?<direction>\\d+)s*"),
-    DIG_TUNNEL("\\s*dig\\s+tunnel\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
+    DIG_TUNNEL("\\s*dig\\s+tunnel\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+(?<direction>\\S+)"),
     DISBAND_UNIT("\\s*disband\\s+unit\\s*"),
     NEXT_TURN("\\s*next\\s+turn\\s*"),
     SELECT_MACHINE("move\\s+machine\\s+-x"),//repair!
-    GO_TO_TRADE("\\s*go\\s+to\\s+trade\\s*");
+    GO_TO_TRADE("\\s*go\\s+to\\s+trade\\s*"),
+    PATROL("\\s*patrol\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\x2)\\s+(?<y2>\\d+)\\s*"),
+    MOVE_EQUIPMENT("move equipment -x1 (?<x1>\\d+) -y1 (?<y1>\\d+) -x2 (?<x2>\\d+) -y2 (?<y2>\\d+)"),
+    MAKE__("make equipment (?<name>\\S+)");
     private final String regex;
     GameMenuCommand(String regex){
         this.regex = regex;

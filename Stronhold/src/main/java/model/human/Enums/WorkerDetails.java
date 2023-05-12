@@ -20,12 +20,27 @@ public enum WorkerDetails {
     ASSASSIN("assassin", BuildingsDetails.MERCENARY_POST, 30, 3, 3, 3, 0, 60),
     HORSE_ARCHER("horse archer", BuildingsDetails.MERCENARY_POST, 30, 2, 3, 5, 5, 80),
     ARABIAN_SWORDSMAN("arabian swordsman", BuildingsDetails.MERCENARY_POST, 35, 4, 4, 5, 0, 80),
-    FIRE_THROWER("fire thrower", BuildingsDetails.MERCENARY_POST, 25, 4, 2, 5, 3, 100);
-    private String name;
-    private BuildingsDetails trainerBuilding;
-    private int maxHitPoint, damage, defense, speed, range, gold;
+    FIRE_THROWER("fire thrower", BuildingsDetails.MERCENARY_POST, 25, 4, 2, 5, 3, 100),
+    LORD("lord",BuildingsDetails.HOLD,200,0,0,0,0,0);
+    private final String name;
+    private final BuildingsDetails trainerBuilding;
+    private final int maxHitPoint;
+    private final int damage;
+    private final int defense;
+    private final int speed;
+    private final int range;
+    private final int gold;
 
-    WorkerDetails(String name,BuildingsDetails BuildingsDetails, int maxHitPoint, int damage, int defense, int speed, int range, int gold){}
+    WorkerDetails(String name,BuildingsDetails BuildingsDetails, int maxHitPoint, int damage, int defense, int speed, int range, int gold){
+        this.name = name;
+        trainerBuilding = BuildingsDetails;
+        this.maxHitPoint = maxHitPoint;
+        this.damage = damage;
+        this.defense = defense;
+        this.speed = speed;
+        this.range = range;
+        this.gold = gold;
+    }
 
     public String getName() {
         return name;

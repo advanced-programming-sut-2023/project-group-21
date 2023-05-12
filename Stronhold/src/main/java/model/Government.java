@@ -4,6 +4,7 @@ import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.StorageDetails;
 import model.building.Gate;
+import model.building.Residency;
 import model.building.Storage;
 import model.generalenums.GroundTexture;
 import model.generalenums.Resource;
@@ -22,14 +23,26 @@ public class Government {
     private final User lord;
     private int foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0;
     private ArrayList<Building> buildings;
-    private ArrayList<Person> people;
-    private ArrayList<Machine> machines;
-    private HashMap<Resource, Integer> resources;
+    private ArrayList<Person> people = new ArrayList<>();
+    private ArrayList<Machine> machines = new ArrayList<>();
+    private HashMap<Resource, Integer> resources = new HashMap<>();
     private Building castle;
     private ArrayList<Trade> trades;
 
-    public Government(User lord) {
+    public Government(User lord,Cell cell) {
+        Worker myLord = new Worker(WorkerDetails.LORD,this,cell,cell);
+        people.add(myLord);
+        cell.setExtras(null);
+        cell.setGroundTexture(GroundTexture.SOIL);
+        resources.put(Resource.GOLD,100);
+        resources.put(Resource.APPLE,30);
+        resources.put(Resource.BREAD,60);
+        resources.put(Resource.WOOD,15);
+        castle = new Building(this,BuildingsDetails.HOLD,cell);
         this.lord = lord;
+        for(int i1=0;i1<10;i1++){
+            people.add(new Person(this));
+        }
     }
 
     public User getLord() {
@@ -219,6 +232,38 @@ public class Government {
 
     public void deletePerson(Person person){
         people.remove(person);
+    }
+    public int calculateScore(){
+        int result = 0;
+        result += resources.get(Resource.GOLD);
+        for (Person person : people)
+            if (person instanceof Worker)
+                ((Worker) person).getWorkerDetails().getGold();
+
+        return result;
+    }
+
+    public boolean checkDefeat(){
+        if(people.size()==0 || ((Worker)(people.get(0))).getHitPoint()<=0)
+            return true;
+        return castle.getHitPoint() <= 0;
+    }
+
+    public int calculateLeftPopulationCapacity(){
+        int result = 0;
+        for(int i1=0;i1<buildings.size();i1++){
+            if(buildings.get(i1) instanceof Residency)
+                result += ((Residency)buildings.get(i1)).getMaxPopularity();
+        }
+        result = result - people.size();
+        return result;
+    }
+
+    public void killAllPeople(){
+        while (people.size()>1){
+            people.get(0).delete();
+            people.remove(0);
+        }
     }
 
 }

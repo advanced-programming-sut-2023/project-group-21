@@ -1,5 +1,7 @@
 package controller;
 
+import model.Cell;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -110,5 +112,17 @@ public class OtherController {
         if (input.charAt(0) != '"')
             return input.trim();
         return input.substring(1, input.length() - 1);
+    }
+
+    public static ArrayList<String> startTheGame(int numberOfUser,int size){
+        if(numberOfUser==0)
+            return null;
+        ArrayList<String> result= new ArrayList<>();
+        for(int i1=0;i1<numberOfUser;i1++){
+            int x = (int) (0.8 * size * Math.cos(i1/numberOfUser));
+            int y = (int) (0.8 * size * Math.sin(i1/numberOfUser));
+            result.add(x+" "+y);
+        }
+        return result;
     }
 }

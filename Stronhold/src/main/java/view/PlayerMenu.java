@@ -5,7 +5,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 
 import controller.FileController;
-import controller.MapController;
+
+import controller.OtherController;
 import model.Cell;
 import model.Government;
 import model.User;
@@ -36,7 +37,7 @@ public class PlayerMenu {
     }
 
     private void help() {
-        System.out.println("You can go to profile, map or game menu. Also you can logout by inputting so");
+        System.out.println("you are in player menu!\nYou can go to profile, map or game menu. Also you can logout by inputting so");
     }
 
 
@@ -55,19 +56,28 @@ public class PlayerMenu {
                 myMap = mapMenu.getMyMap();
             }
             case "game" -> {
-                if(myMap==null && FileController.checkExistenceOfMap(user.getUserName())){
-                    System.out.println("you should first make the map!");
-                    return;
-                }
                 if(mapMenu==null){
                     mapMenu = new MapMenu(user);
+                    myMap = mapMenu.getMyMap();
                 }
+                if(myMap==null){
+                    System.out.println("no map found!\nplease try again!");
+                    return;
+                }
+
                 System.out.println("first enter number of player and then enter their username");
                 int numberOfPlayer;
                 try {
-                    numberOfPlayer = Integer.parseInt(scanner.nextLine());
+                    numberOfPlayer = Integer.parseInt(scanner.nextLine().trim());
+                    if(numberOfPlayer <=2 || numberOfPlayer>= 8){
+                        System.out.println("invalid number");
+                        return;
+                    }
+                    ArrayList<String> castlePlaces = OtherController.startTheGame(numberOfPlayer, myMap.length);
                     ArrayList<Government> governments = new ArrayList<>();
-                    Government government = new Government(user);
+                    assert castlePlaces != null;
+                    String[] split = castlePlaces.get(0).split("");
+                    Government government = new Government(user,myMap[Integer.parseInt(split[0])][Integer.parseInt(split[1])]);
                     governments.add(government);
                     for (int i1=1;i1<numberOfPlayer;i1++){
                         String username1 = scanner.nextLine();
@@ -77,9 +87,10 @@ public class PlayerMenu {
                             System.out.println("no user found,please try again!");
                             return;
                         }
-                        tempGovernment = new Government(tempUser);
+                        split = castlePlaces.get(i1).split("");
+                        tempGovernment = new Government(tempUser,myMap[Integer.parseInt(split[0])][Integer.parseInt(split[1])]);
                         governments.add(tempGovernment);
-                        GameMenu gameMenu = new GameMenu(user,governments);
+                        GameMenu gameMenu = new GameMenu(user,governments,myMap);
                         gameMenu.setMapMenu(mapMenu);
                         gameMenu.run(scanner);
                     }

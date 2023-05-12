@@ -1,6 +1,9 @@
 package model;
 
+import controller.GameController;
 import model.building.Building;
+import model.building.Enums.BuildingsDetails;
+import model.building.Gate;
 import model.generalenums.GroundTexture;
 import model.generalenums.Extras;
 import model.human.Person;
@@ -21,10 +24,11 @@ public class Cell {
     private int xCoordinates, yCoordinates;
     private boolean hadCross = false,hasOil=false,hasHole=false;
     private  char direction;
-
+    private boolean hasLadder = false;
     public Cell(int xCoordinates, int yCoordinates) {
         this.xCoordinates = xCoordinates;
         this.yCoordinates = yCoordinates;
+        people = new ArrayList<>();
     }
     public void setDistanceOfStart(int distanceOfStart){
         this.distanceOfStart = distanceOfStart;
@@ -152,7 +156,7 @@ public class Cell {
         this.direction = dir;
     }
 
-    public boolean checkCross(char myDirection){//repair
+    public boolean checkCross(char myDirection,Cell anotherCell){//repair
         int lastCellX = 0;
         int lastCellY = 0;
         switch (myDirection){
@@ -179,11 +183,25 @@ public class Cell {
         if(groundTexture!=GroundTexture.SOIL)
             return false;
         if(building != null){
+            if(building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
+                return true;
+            if(building instanceof Gate && ((Gate)building).checkState())
+                return true;
             return false;
         }
         return true;
     }
+    public void putLadder(){
+        hasLadder = true;
+    }
 
+    public boolean checkHasLadder(){
+        return hasLadder;
+    }
+
+    public void removeLadder(){
+        hasLadder = false;
+    }
     public void deletePerson(Person person){
         people.remove(person);
     }
@@ -203,4 +221,9 @@ public class Cell {
     public boolean doesHaveHole() {
         return hasHole;
     }
+
+    public void deleteMachine(){
+        this.machine = null;
+    }
+
 }

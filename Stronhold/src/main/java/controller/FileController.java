@@ -32,19 +32,18 @@ public class FileController {
         }
     }
 
-    public static String encode(String input){
+    public static String encode(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
-        }
-        catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             System.out.println("ERROR SHA256!");
         }
         return "";
     }
 
-    public static int getSecurityQuestion(String username){
+    public static int getSecurityQuestion(String username) {
         JSONObject temp;
         for (Object allUser : allUsers) {
             temp = (JSONObject) allUser;
@@ -54,7 +53,7 @@ public class FileController {
         return 0;
     }
 
-    public static String getInfo(String username,String info) {
+    public static String getInfo(String username, String info) {
         JSONObject jsonObject;
         for (Object j : allUsers) {
             jsonObject = (JSONObject) j;
@@ -64,7 +63,7 @@ public class FileController {
         return "";
     }
 
-    public static void modifyInfo(String field,String username,String newValue){
+    public static void modifyInfo(String field, String username, String newValue) {
         JSONObject tempJsonObject;
         for (Object allUser : allUsers) {
             tempJsonObject = (JSONObject) allUser;
@@ -72,17 +71,19 @@ public class FileController {
                 tempJsonObject.put(field, newValue);
         }
     }
+
     public static void finish() {
         try {
-            FileWriter fileWriter = new FileWriter(jsonAddress,false);
+            FileWriter fileWriter = new FileWriter(jsonAddress, false);
             fileWriter.write(allUsers.toJSONString());
             fileWriter.flush();
             fileWriter.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
-    public static User getStayedUser(){
+
+    public static User getStayedUser() {
         JSONObject jsonObject;
         for (Object allUser : allUsers) {
             jsonObject = (JSONObject) allUser;
@@ -91,7 +92,8 @@ public class FileController {
         }
         return null;
     }
-    public static User getUserByUsername(String username){
+
+    public static User getUserByUsername(String username) {
         JSONObject tempObject;
         for (Object allUser : allUsers) {
             tempObject = (JSONObject) allUser;
@@ -119,7 +121,7 @@ public class FileController {
         return false;
     }
 
-    public static void changeStayed(String username){
+    public static void changeStayed(String username) {
         JSONObject jsonObject;
         for (Object allUser : allUsers) {
             jsonObject = (JSONObject) allUser;
@@ -143,7 +145,7 @@ public class FileController {
         jsonObject.put("number", number);
         jsonObject.put("answer", answer);
         jsonObject.put("score", 0);
-        jsonObject.put("stayed-logged-in","f");
+        jsonObject.put("stayed-logged-in", "f");
         allUsers.add(jsonObject);
         try {
             FileWriter fileWriter = new FileWriter(jsonAddress, false);
@@ -155,7 +157,7 @@ public class FileController {
         }
     }
 
-    public static void updateScore(String username,int newScore){
+    public static void updateScore(String username, int newScore) {
         for (Object allUser : allUsers) {
             JSONObject jo = (JSONObject) allUser;
             if (jo.get("username").equals(username))
@@ -163,7 +165,7 @@ public class FileController {
         }
     }
 
-    public static void saveMap(String username,String code){
+    public static void saveMap(String username, String code) {
         String address = maps + username + ".txt";
         try {
             FileWriter fileWriter = new FileWriter(address, false);
@@ -175,56 +177,75 @@ public class FileController {
         }
     }
 
-    public static ArrayList<String> loadMap(String username){
+    public static ArrayList<String> loadMap(String username) {
         ArrayList<String> myMap = new ArrayList<>();
-        if(!checkExistenceOfMap(username))
+        if (!checkExistenceOfMap(username))
             return null;
         String address = maps + username + ".txt";
         try {
             FileReader fileReader = new FileReader(address);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
-            while (line != null){
+            while (line != null) {
                 myMap.add(line);
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
             fileReader.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        if(myMap.size() != 200 && myMap.size() != 400)
+        if (myMap.size() != 200 && myMap.size() != 400)
             return null;
         return myMap;
     }
 
-    public static boolean checkExistenceOfMap(String username){
+    public static boolean checkExistenceOfMap(String username) {
         String fileName = maps + username + ".txt";
         File f = new File(fileName);
         return f.exists() && !f.isDirectory();
     }
 
-    public static int getRank(String username){
+    public static int getRank(String username) {
         int score = -1;
-        for(int i1=0;i1<allUsers.size();i1++){
-            if(((JSONObject)allUsers.get(i1)).get("username").equals(username))
-                score = (Integer) (((JSONObject)allUsers.get(i1)).get("score"));
+        for (int i1 = 0; i1 < allUsers.size(); i1++) {
+            if (((JSONObject) allUsers.get(i1)).get("username").equals(username))
+                score = (Integer) (((JSONObject) allUsers.get(i1)).get("score"));
         }
-        if(score == -1)
+        if (score == -1)
             return -1;
         int rank = 1;
-        for(int i2 = 0;i2<allUsers.size();i2++){
-            if(score<(Integer)(((JSONObject)allUsers.get(i2)).get("score")))
+        for (int i2 = 0; i2 < allUsers.size(); i2++) {
+            if (score < (Integer) (((JSONObject) allUsers.get(i2)).get("score")))
                 rank++;
         }
         return rank;
     }
 
-    public static String suggestUsername(String username){
-        if(!checkExistenceOfUserOrEmail(username,true))
+    public static void modifyScore(String username, int change) {
+        JSONObject temp;
+        for (int i1 = 0; i1 < allUsers.size(); i1++) {
+            temp = (JSONObject) allUsers.get(i1);
+            if (temp.get("username").equals(username))
+                temp.replace("score", (int) temp.get("score") + change);
+        }
+    }
+
+
+    public void sortUsers(){
+        JSONObject tempReplace;
+        for(int i1=0;i1<allUsers.size();i1++){
+            for(int i2=i1+1;i2<allUsers.size();i2++)
+                if(((int)((JSONObject)allUsers.get(i1)).get("score"))>((int)((JSONObject)allUsers.get(i2)).get("score"))){
+                    tempReplace = (JSONObject) allUsers.get(i1);
+                }
+        }
+    }
+    public static String suggestUsername(String username) {
+        if (!checkExistenceOfUserOrEmail(username, true))
             return username;
-        for(int i1=0;i1<100;i1++) {
-            if (!checkExistenceOfUserOrEmail(username + String.valueOf(i1),true))
+        for (int i1 = 0; i1 < 100; i1++) {
+            if (!checkExistenceOfUserOrEmail(username + String.valueOf(i1), true))
                 return username + String.valueOf(i1);
         }
         return suggestUsername(username + "a");

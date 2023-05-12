@@ -13,7 +13,9 @@ public class Gate extends Residency {
         this.direction = direction;
         this.isOpen = isOpen;
     }
-
+    public boolean checkState(){
+        return isOpen;
+    }
     public void openGate() {
         isOpen = true;
     }

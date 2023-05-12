@@ -21,9 +21,10 @@ import static java.lang.Math.*;
 public class MapController {
     private int size, xCoordinates, yCoordinates;
     private Cell[][] map;
+    private int countHold = 0;
 
-    public MapMessages initializeMap(int size,boolean behave) {
-        if(map != null && behave)
+    public MapMessages initializeMap(int size, boolean behave) {
+        if (map != null && behave)
             return null;
         map = new Cell[size][size];
         this.size = size;
@@ -35,22 +36,22 @@ public class MapController {
     }
 
 
-    public MapMessages initializeMap(ArrayList<String> myMap){
+    public MapMessages initializeMap(ArrayList<String> myMap) {
         int size = myMap.size();
-        if(size != 200 && size != 400)
+        if (size != 200 && size != 400)
             return null;
         for (String s : myMap)
             if (s.length() != (size * 2))
                 return null;
         map = new Cell[size][size];
-        for(int i1=0;i1<size;i1++){
-            for(int i2=0;i2<myMap.get(i1).length();i2+=2){
+        for (int i1 = 0; i1 < size; i1++) {
+            for (int i2 = 0; i2 < myMap.get(i1).length(); i2 += 2) {
                 Extras extra = null;
-                if(myMap.get(i1).charAt(i2)=='!')
+                if (myMap.get(i1).charAt(i2) == '!')
                     extra = Extras.getExtrasByCode(String.valueOf(myMap.get(i1).charAt(i2)));
                 map[i1][i2].setExtras(extra);
                 GroundTexture groundTexture;
-                groundTexture = GroundTexture.getTextureBySaveCode((String.valueOf(myMap.get(i1).charAt(i2+1))));
+                groundTexture = GroundTexture.getTextureBySaveCode((String.valueOf(myMap.get(i1).charAt(i2 + 1))));
                 map[i1][i2].setGroundTexture(groundTexture);
             }
         }
@@ -67,7 +68,7 @@ public class MapController {
             for (int i = xMin; i <= xMax; i++) {
                 output.append(map[i][j].getGroundTexture().getColor());
                 Building building = map[i][j].getBuilding();
-                for (Person person: map[i][j].getPeople()) {
+                for (Person person : map[i][j].getPeople()) {
                     if (person instanceof Worker && ((Worker) person).getDestination().equals(((Worker) person).getPosition())) {
                         hasPerson = true;
                         break;
@@ -77,7 +78,8 @@ public class MapController {
                 else if (building != null && (building instanceof Tower || building.getBuildingsDetails().equals(BuildingsDetails.WALL) ||
                         building instanceof Gate)) output.append("W");
                 else if (building != null) output.append("B");
-                else if (map[i][j].getExtra() != null && !Game.directions.contains(map[i][j].getExtra().getName())) output.append("T");
+                else if (map[i][j].getExtra() != null && !Game.directions.contains(map[i][j].getExtra().getName()))
+                    output.append("T");
                 else output.append(" ");
             }
             output.append("\033[0m").append("\n");
@@ -110,44 +112,45 @@ public class MapController {
         yCoordinates += yChange;
         return showMap(xCoordinates, yCoordinates);
     }
-    public MapMessages dropTree(int x,int y, String type){
+
+    public MapMessages dropTree(int x, int y, String type) {
         Extras tree = Extras.getExtrasByName(type);
         if (tree == null) return MapMessages.NO_TREE;
-        map[x-1][y-1].setExtras(tree);
+        map[x - 1][y - 1].setExtras(tree);
         return MapMessages.SUCCESS;
     }
 
-    public MapMessages dropRock(int x,int y, String direction){
+    public MapMessages dropRock(int x, int y, String direction) {
         if (direction.length() > 1) return MapMessages.INVALID_FORMAT;
         if (!Game.directions.contains(direction)) return MapMessages.INVALID_DIRECTION;
         Extras stone = Extras.getExtrasByName(direction);
         if (stone == null) return MapMessages.NO_STONE;
-        map[x-1][y-1].setExtras(stone);
+        map[x - 1][y - 1].setExtras(stone);
         return MapMessages.SUCCESS;
     }
 
-    public MapMessages setTexture(int x,int y,String type){
+    public MapMessages setTexture(int x, int y, String type) {
         GroundTexture texture = GroundTexture.getTextureByName(type);
         if (texture == null) return MapMessages.NO_TEXTURE;
-        map[x-1][y-1].setGroundTexture(texture);
+        map[x - 1][y - 1].setGroundTexture(texture);
         return MapMessages.SUCCESS;
     }
 
-    public MapMessages setTexture(int x1,int x2,int y1,int y2,String type){
+    public MapMessages setTexture(int x1, int x2, int y1, int y2, String type) {
         if (x1 >= x2 || y1 >= y2) return MapMessages.INVALID_NUMBER;
         GroundTexture texture = GroundTexture.getTextureByName(type);
         if (texture == null) return MapMessages.NO_TEXTURE;
-        for (int i = x1-1; i <x2; i++) {
-            for (int j = y1-1; j < y2; j++) map[i][j].setGroundTexture(texture);
+        for (int i = x1 - 1; i < x2; i++) {
+            for (int j = y1 - 1; j < y2; j++) map[i][j].setGroundTexture(texture);
         }
         return MapMessages.SUCCESS;
     }
 
-    public MapMessages clear(int x,int y){
+    public MapMessages clear(int x, int y) {
         try {
             map[x - 1][y - 1].clear();
             return MapMessages.SUCCESS;
-        }catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             return MapMessages.OUT_OF_INDEX;
         }
     }
@@ -155,32 +158,53 @@ public class MapController {
     public String showDetails(int x, int y) {
         try {
             return map[x - 1][y - 1].showDetails();
-        }catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             return "out of index";
         }
     }
 
-    public void saveMap(String username){
+    public void saveMap(String username) {
         String temp = "";
-        for(int i1=0;i1<map.length;i1++){
-            for (int i2=0;i2<map[i1].length;i2++)
+        for (int i1 = 0; i1 < map.length; i1++) {
+            for (int i2 = 0; i2 < map[i1].length; i2++)
                 temp += map[i1][i2].makeSaveCode();
-            if(i1!=map.length-1)
+            if (i1 != map.length - 1)
                 temp += "\n";
         }
-        FileController.saveMap(username,temp);
+        FileController.saveMap(username, temp);
     }
 
-    public void loadMap(String username){
-        if(!FileController.checkExistenceOfMap(username))
+    public void loadMap(String username) {
+        if (!FileController.checkExistenceOfMap(username))
             return;
         ArrayList<String> savedMap = FileController.loadMap(username);
-        if(savedMap == null)
+        if (savedMap == null)
             return;
         initializeMap(savedMap);
     }
 
-    public Cell[][] getMap(){
+    public Cell[][] getMapByUsername(String username) {
+        loadMap(username);
+        return map;
+    }
+
+    public MapMessages setHold(int x, int y) {
+        if(x<0||x>=map.length||y<0||y>=map.length)
+            return MapMessages.OUT_OF_INDEX;
+        if (map[x][y].getExtra() != null)
+            return MapMessages.UNABLE_TO_PUT_HOLD;
+        if(map[x][y].getBuilding()!=null)
+            return MapMessages.UNABLE_TO_PUT_HOLD;
+        if(map[x][y].getGroundTexture()!=GroundTexture.SOIL)
+            return MapMessages.UNABLE_TO_PUT_HOLD;
+        if(countHold>=8)
+            return MapMessages.TOO_MANY_HOLD;
+        countHold++;
+        map[x][y].setExtras(Extras.HOLD);
+        return MapMessages.SUCCESS;
+    }
+
+    public Cell[][] getMap() {
         return map;
     }
 }
