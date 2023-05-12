@@ -107,7 +107,7 @@ public class GameMenu {
 
     private void checkShowResource(Matcher matcher){
         String resourceName = matcher.group("resource");
-
+        System.out.println(gameController.getResourceName(resourceName));
     }
     public void patrol(Matcher matcher){
         int x1 = Integer.parseInt(matcher.group("x1"));
