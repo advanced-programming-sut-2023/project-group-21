@@ -2,11 +2,26 @@ package model.machine;
 
 import model.Cell;
 import model.Government;
+import model.human.Engineer;
+import model.human.Enums.WorkerDetails;
+
+import java.util.ArrayList;
 
 public class Machine {
-    MachineDetails machineDetails;
-    Government government;
-    Cell cell;
+    private MachineDetails machineDetails;
+    private Government government;
+    private Cell cell;
+    int hitPoint;
+    ArrayList<Engineer> engineers;
+
+    public Machine(MachineDetails machineDetails, Government government, Cell cell, ArrayList<Engineer> engineers) {
+        this.machineDetails = machineDetails;
+        this.government = government;
+        this.cell = cell;
+        cell.addMachine(this);
+        this.engineers = engineers;
+        hitPoint = engineers.size() * WorkerDetails.ENGINEER.getMaxHitPoint();
+    }
 
     public Government getGovernment() {
         return government;
@@ -34,5 +49,9 @@ public class Machine {
 
     public int getSpeed() {
         return machineDetails.getSpeed();
+    }
+
+    public void getDamaged(int damage) {
+        hitPoint -= damage;
     }
 }

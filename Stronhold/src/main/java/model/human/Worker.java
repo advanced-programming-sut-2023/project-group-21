@@ -9,7 +9,7 @@ public class Worker extends Person {
     private final WorkerDetails workerDetails;
     private Cell position;
     private Cell destination;
-    private boolean isPatrolOn = false;
+    private boolean isPatrolOn = false, isOnTower = false;
     private int patrolX1, patrolY1, patrolX2, patrolY2;
     private Worker enemy;
     private boolean hasLadder = false;
@@ -105,4 +105,13 @@ public class Worker extends Person {
     public WorkerDetails getWorkerDetails(){
         return workerDetails;
     }
+
+    public boolean isOnTower() {
+        return isOnTower;
+    }
+
+    public void setOnTower(boolean onTower) {
+        isOnTower = onTower;
+    }
+
 }

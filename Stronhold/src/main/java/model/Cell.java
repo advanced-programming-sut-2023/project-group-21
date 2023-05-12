@@ -18,7 +18,7 @@ public class Cell {
     private int distanceOfDestination=0;
     private int totalDistance=0;
     private Building building;
-    private Machine machine;
+    private ArrayList<Machine> machines = new ArrayList<>();
     private Extras extra;
     private ArrayList<Worker> people;
     private int xCoordinates, yCoordinates;
@@ -58,8 +58,8 @@ public class Cell {
         return building;
     }
 
-    public Machine getMachine() {
-        return machine;
+    public ArrayList<Machine> getMachine() {
+        return machines;
     }
 
     public ArrayList<Worker> getPeople() {
@@ -105,7 +105,7 @@ public class Cell {
 
     public void clear() {
         building = null;
-        machine = null;
+        machines.clear();
         extra = null;
         people.clear();
         setGroundTexture(GroundTexture.SOIL);
@@ -211,7 +211,7 @@ public class Cell {
     }
 
     public void addMachine(Machine machine) {
-        this.machine=machine;
+        machine=machine;
     }
 
     public boolean doesHaveOil() {

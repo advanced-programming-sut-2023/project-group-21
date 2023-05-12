@@ -5,7 +5,9 @@ import model.Government;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.StorageDetails;
 import model.generalenums.Resource;
+import model.human.Person;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +15,8 @@ public class Storage extends Building {
     private StorageDetails storageDetails;
     private Map<Resource, Integer> availableResources = new HashMap<>();
 
-    public Storage(Government government, Cell cell, StorageDetails storageDetails) {
-        super(government, storageDetails.getBuildingsDetails(), cell);
+    public Storage(Government government, Cell cell, StorageDetails storageDetails, ArrayList<Person> workers) {
+        super(government, storageDetails.getBuildingsDetails(), cell, workers);
         this.storageDetails = storageDetails;
     }
 

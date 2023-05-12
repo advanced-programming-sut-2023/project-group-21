@@ -1,10 +1,12 @@
 package model.human;
 
 import model.Government;
+import model.building.Building;
 
 public class Person {
     int hitPoint;
     Government government;
+    Building workPlace;
 
     public Person(Government government) {
         this.government = government;
@@ -20,5 +22,13 @@ public class Person {
 
     public void delete() {
         government.deletePerson(this);
+    }
+
+    public void setWorkPlace(Building workPlace) {
+        this.workPlace = workPlace;
+    }
+
+    public Building getWorkPlace() {
+        return workPlace;
     }
 }

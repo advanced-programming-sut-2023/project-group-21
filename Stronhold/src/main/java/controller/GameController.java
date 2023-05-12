@@ -15,15 +15,8 @@ import model.human.Worker;
 import model.machine.Machine;
 import model.machine.MachineDetails;
 import view.message.GameMessage;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
-
+import java.util.*;
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
 
 public class GameController {
     private ArrayList<Cell> path = new ArrayList<>();
@@ -37,7 +30,7 @@ public class GameController {
     private Government currentGovernment;
     private ArrayList<Command> commands = new ArrayList<>();
     private MapController mapController;
-
+    private Map<Engineer, String> pouringOils = new HashMap<>();
     public GameMessage showFactor() {
         return GameMessage.FACTORS;
     }
@@ -97,50 +90,58 @@ public class GameController {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
             if (!textureMatches(buildingsDetails, x, y)) return GameMessage.FAILURE1;
+        if (getNumberOfPeasants() < buildingsDetails.getWorkersCount()) return null;
         for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
             if (currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
                 return GameMessage.NOT_ENOUGH_RESOURCE;
         for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
             currentGovernment.reduceResources(entry.getKey(), entry.getValue());
-        commands.add(new Command("drop building", buildingsDetails, x, y));
+        dropBuilding(x, y, buildingsDetails);
         return GameMessage.SUCCESS;
     }
 
-    private GameMessage dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
+    private void dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
+        ArrayList<Person> persons = new ArrayList<>();
+        for (Person person: currentGovernment.getPeople())
+            if (!(person instanceof Worker) && person.getWorkPlace() == null) persons.add(person);
+
         switch (buildingType) {
             case PRODUCT_MAKER:
                 currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x - 1][y - 1],
-                        ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails)));
+                        ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
                 break;
             case STORAGE:
                 currentGovernment.addBuilding(new Storage(currentGovernment, map[x - 1][y - 1],
-                        StorageDetails.getStorageDetailsByBuildingDetails(buildingsDetails)));
+                        StorageDetails.getStorageDetailsByBuildingDetails(buildingsDetails), persons));
                 break;
             case RESIDENCY:
                 currentGovernment.addBuilding(new Residency(currentGovernment, map[x - 1][y - 1],
-                        ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails)));
+                        ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons));
                 break;
             case GATE:
                 currentGovernment.addBuilding(new Gate(currentGovernment, map[x - 1][y - 1],
-                        ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), true, false));
+                        ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons, true, false));
                 break;
             case WEAPON_PRODUCTION:
                 currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x - 1][y - 1],
-                        ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails)));
+                        ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
                 break;
             case STABLE:
-                currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x - 1][y - 1]));
+                currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x - 1][y - 1], persons));
                 break;
             case TRAP:
-                currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x - 1][y - 1]));
+                currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
                 break;
             case QUARRY:
-                currentGovernment.addBuilding(new Quarry(currentGovernment, map[x - 1][y - 1]));
+                currentGovernment.addBuilding(new Quarry(currentGovernment, map[x - 1][y - 1], persons));
+            case TOWER:
+                currentGovernment.addBuilding(new Tower(currentGovernment, map[x-1][y-1],
+                        TowerDetails.getTowerDetailsByBuildingDetails(buildingsDetails), persons));
             default:
-                currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1]));
+                currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
         }
-        return GameMessage.SUCCESS;
+
     }
 
     private boolean textureMatches(BuildingsDetails buildingsDetails, int x, int y) {
@@ -158,7 +159,8 @@ public class GameController {
         return GameMessage.NO_BUILDING_TO_SELECT;
     }
 
-    public GameMessage checkMakeTroop(String type, int count) {
+    public GameMessage checkMakeTroop(String type, int count, int x, int y) {
+        if (x > 200 || x < 1 || y > 200 || y < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedBuilding == null) return GameMessage.NO_SELECTED_BUILDING;
         WorkerDetails worker = WorkerDetails.getWorkerDetailsByName(type);
         BuildingsDetails.BuildingType buildingType = selectedBuilding.getBuildingsDetails().getBuildingType();
@@ -177,18 +179,14 @@ public class GameController {
             for (Resource equipment : europeanSoldiers.getEquipments())
                 currentGovernment.reduceResources(equipment, 1);
         }
-        commands.add(new Command("drop unit", worker, count));
+        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(worker, map[x - 1][y - 1]);
         return GameMessage.SUCCESS;
     }
 
-    private void makeTroop(WorkerDetails workerDetails, int count, int x, int y) {
-        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(workerDetails, map[x - 1][y - 1]);
-    }
-
-    public int getNumberOfPeasants() {
+    private int getNumberOfPeasants() {
         int count = 0;
         for (Person person : currentGovernment.getPeople())
-            if (!(person instanceof Worker)) count++;
+            if (!(person instanceof Worker) && person.getWorkPlace() == null) count++;
         return count;
     }
 
@@ -205,7 +203,7 @@ public class GameController {
         }
         for (Map.Entry<Resource, Integer> entry : selectedBuilding.getRequiredResource().entrySet())
             currentGovernment.reduceResources(entry.getKey(), (int) Math.floor(ratio * entry.getValue()));
-        commands.add(new Command("repair", selectedBuilding));
+        selectedBuilding.repairHitPoint();
         return GameMessage.SUCCESS;
     }
 
@@ -300,7 +298,7 @@ public class GameController {
         if (!((Engineer) selectedWorker).hasOil()) return GameMessage.NO_OIL;
         if (direction.length() > 1) return GameMessage.INVALID_DIRECTION;
         if (!(Game.directions.contains(direction))) return GameMessage.INVALID_DIRECTION;
-        commands.add(new Command("pour oil", selectedWorker, direction));
+        pouringOils.put((Engineer) selectedWorker, direction);
         return GameMessage.SUCCESS;
     }
 
@@ -350,26 +348,18 @@ public class GameController {
         MachineDetails machineDetail = MachineDetails.getMachineDetailsByName(name);
         if (machineDetail == null) return null;
         if (numberOfEngineers() < machineDetail.getEngineersNeeded()) return null;
-        currentGovernment.addBuilding(new Building(currentGovernment, BuildingsDetails.SIEGE_TENT, selectedWorker.getPosition()));
         for (Worker person : selectedWorker.getPosition().getPeople()) {
-            if (person instanceof Engineer && !((Engineer) person).hasMachine())
+            if(person instanceof Engineer&& !((Engineer) person).hasMachine())
                 engineers.add((Engineer) person);
-            if (engineers.size() >= machineDetail.getEngineersNeeded())
+            if(engineers.size()>=machineDetail.getEngineersNeeded())
                 break;
         }
-        if (engineers.size() < machineDetail.getEngineersNeeded())
+        if(engineers.size()<machineDetail.getEngineersNeeded())
             return null;
-        for (Engineer engineer : engineers) {
+        for (Engineer engineer : engineers)
             engineer.giveHimMachine(true);
-        }
-//        for (int i = 0; i < currentGovernment.getPopularity(); i++)
-//            if (currentGovernment.getPeople().get(i) instanceof Engineer &&
-//                    !(currentGovernment.getPeople().get(i).equals(selectedWorker)))
-//                engineers.add((Engineer) currentGovernment.getPeople().get(i));
-//        for (Engineer engineer : engineers) engineer.setDestination(selectedWorker.getPosition());
-        commands.add(new Command("build equipment", machineDetail, selectedWorker.getPosition().getxCoordinates(),
-                selectedWorker.getPosition().getyCoordinates(), engineers));
-        return GameMessage.SUCCESS;
+        currentGovernment.addBuilding(new Building(currentGovernment, BuildingsDetails.SIEGE_TENT, selectedWorker.getPosition(), null));
+        return null;
     }
 
     private int numberOfEngineers() {
@@ -545,7 +535,8 @@ public class GameController {
     }
 
     public void nextTurn() {
-        doCommands();
+        buildEquipments();
+        for (Map.Entry<Engineer, String> entry: pouringOils.entrySet()) pourOil(entry.getValue(), entry.getKey());
         updateTroops();
         updateStorage();
         currentGovernment.doActionInTurnFirst();
@@ -557,16 +548,23 @@ public class GameController {
             governments.remove(currentGovernment);
             currentGovernment.killAllPeople();
         }
+        currentGovernment = currentGovernment.equals(governments.get(governments.size()-1)) ?
+                governments.get(0) : governments.get(governments.indexOf(currentGovernment) + 1);
+
+    }
+
+    private void calculatePopularity() {
+
     }
 
     //moving
 
-    public void attackInRange(Worker soldier) {
-        int x = soldier.getPosition().getxCoordinates();
-        int y = soldier.getPosition().getyCoordinates();
-        int range = 0;
-        if (soldier.getState().equals("standing"))
-            range = soldier.getRange();
+    public void attackInRange(Worker soldier){
+        int x=soldier.getPosition().getxCoordinates();
+        int y=soldier.getPosition().getyCoordinates();
+        int range=0;
+        if(soldier.getState().equals("standing"))
+            range=soldier.getRange();
         else if (soldier.getState().equals("defensive"))
             range = soldier.getRange() + 1;
         else if (soldier.getState().equals("attacking"))
@@ -588,6 +586,8 @@ public class GameController {
             for (Person person : government.getPeople()) {
                 if (person.getHitPoint() <= 0) {
                     person.delete();
+                    if (person.getWorkPlace() != null)
+                        person.getWorkPlace().getWorkers().remove(person);
                 }
             }
         }
@@ -621,12 +621,25 @@ public class GameController {
     }
 
     private void updateStorage() {
+        for (Government government: governments) {
+            for (Building building: government.getBuildings()) {
+                if (building instanceof ProductMaker productMaker) {
         for (Government government : governments) {
             for (Building building : government.getBuildings()) {
                 if (building instanceof ProductMaker) {
                     if (((ProductMaker) building).getConsumingProduct() != null) {
-                        if (currentGovernment.getResources().containsKey(((ProductMaker) building).getConsumingProduct()))
+                        if (currentGovernment.getResources().containsKey(productMaker.getConsumingProduct()) &&
+                            productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()) {
                             currentGovernment.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
+                            for (Resource resource: ((ProductMaker) building).getProducts())
+                                currentGovernment.addToResource(resource,
+                                        Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                        }
+                    }
+                    else if (productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()){
+                        for (Resource resource : ((ProductMaker) building).getProducts())
+                            currentGovernment.addToResource(resource,
+                                    Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
                     }
                     for (Resource resource : ((ProductMaker) building).getProducts())
                         currentGovernment.addToResource(resource,
@@ -637,14 +650,16 @@ public class GameController {
     }
 
     private void updateTroops() {
-        //moving
-        for (Government government : governments) {
-            for (Person person : government.getPeople()) {
-                //doTheMove(person,Morteza);
-            }
-        }
         for (Person person : currentGovernment.getPeople()) {
-            damage(person);
+            if (!(person instanceof Worker worker)) continue;
+            worker.setOnTower(worker.getPosition().equals(worker.getDestination()) && worker.getPosition().getBuilding() instanceof Tower);
+            if (worker.getName().equals("slave") && worker.getPosition().equals(worker.getDestination()) &&
+                worker.getPosition().getBuilding().getName().equals("pitch ditch"))
+                ((Trap) worker.getPosition().getBuilding()).setOnFire(true);
+            if (worker instanceof Engineer && worker.getPosition().equals(worker.getDestination()) &&
+                    worker.getPosition().getBuilding().getName().equals("oil smelter"))
+                ((Engineer) worker).setHasOil(true);
+            damage(worker);
         }
         clearDeadSoldiers();
     }
@@ -658,6 +673,25 @@ public class GameController {
         } else if (((Worker) findRandomEnemy(person)) != null) {
             int defenseRate = ((Worker) findRandomEnemy(person)).getDefense();
             ((Worker) findRandomEnemy(person)).getDamaged(hitDamage - defenseRate);
+    private void damage(Worker worker) {
+        Worker enemy;
+        int range = worker.isOnTower() ? worker.getRange()*2 : worker.getRange();
+        int hitDamage = worker.getDamage();
+        if(worker.getEnemy() != null && isEnemyInRange(worker)) {
+            int defenseRate=worker.getEnemy().getDefense();
+            if (worker.getEnemy() instanceof Engineer && ((Engineer) worker.getEnemy()).getMachine() != null)
+                ((Engineer) worker.getEnemy()).getMachine().getDamaged(hitDamage);
+            else if(hitDamage>defenseRate)
+                worker.getEnemy().getDamaged(hitDamage-defenseRate);
+        }
+        else if((enemy = findRandomEnemy(worker))!=null){
+            if (calculateDistance(worker.getPosition().getxCoordinates(), worker.getPosition().getyCoordinates(),
+                    enemy.getPosition().getxCoordinates(), enemy.getPosition().getyCoordinates()) > range)
+                return;
+            if (enemy instanceof Engineer && ((Engineer) enemy).getMachine() != null)
+                ((Engineer) enemy).getMachine().getDamaged(hitDamage);
+            int defenseRate= enemy.getDefense();
+            enemy.getDamaged(hitDamage-defenseRate);
         }
     }
 
@@ -670,10 +704,22 @@ public class GameController {
                         if (!person.getGovernment().equals(worker.getGovernment()))
                             return worker;
                     }
+    private Worker findRandomEnemy(Worker worker) {
+        int distance = 10000;
+        Worker selected = null;
+        for (Government government: governments) {
+            if (government.equals(worker.getGovernment())) continue;
+            for (Person person: government.getPeople()) {
+                if (!(person instanceof Worker)) continue;
+                int d = calculateDistance(worker.getPosition().getxCoordinates(), worker.getPosition().getyCoordinates(),
+                        ((Worker) person).getPosition().getxCoordinates(), ((Worker) person).getPosition().getyCoordinates());
+                if (d < distance) {
+                    distance = d;
+                    selected = (Worker) person;
                 }
             }
         }
-        return null;
+        return selected;
     }
 
     private boolean isEnemyInRange(Person person) {
@@ -685,73 +731,63 @@ public class GameController {
         if (distance <= ((Worker) person).getRange())
             return true;
         return false;
+    private boolean isEnemyInRange(Person person) {
+        int x1=((Worker)person).getEnemy().getPosition().getxCoordinates();
+        int y1=((Worker)person).getEnemy().getPosition().getyCoordinates();
+        int x2=((Worker) person).getPosition().getxCoordinates();
+        int y2=((Worker) person).getPosition().getyCoordinates();
+        int distance=calculateDistance(x1,y1,x2,y2);
+        return distance <= ((Worker) person).getRange();
     }
-
-    private void doCommands() {
-        for (Command command : commands) {
-            switch (command.getName()) {
-                case "repair":
-                    command.getBuilding().repairHitpoint();
-                    break;
-                case "drop building":
-                    dropBuilding(command.getX(), command.getY(), command.getBuildingsDetails());
-                    break;
-                case "drop unit":
-                    makeTroop(command.getWorkerDetails(), command.getSoldierCount(), command.getX(), command.getY());
-                    break;
-                case "pour oil":
-                    pourOil(command);
-                    break;
-                case "build equipment":
-                    //repair: build a machine with passing the machine details to the constructor
-                    Machine machine = new Machine();
-                    for (Engineer engineer : command.getEngineers())
-                        engineer.setMachine(machine);
-                    machine.getCell().addMachine(machine);
-//                case "the rest":??
+    private void buildEquipments() {
+        for (Building building: currentGovernment.getBuildings()) {
+            if (building instanceof SiegeTent) {
+                currentGovernment.addMachine(new Machine(((SiegeTent) building).getMachineToMake(), currentGovernment,
+                        building.getCell(), ((SiegeTent) building).getEngineers()));
+                for (Engineer engineer: ((SiegeTent) building).getEngineers())
+                    engineer.setMachine(currentGovernment.getMachines().get(currentGovernment.getMachines().size()-1));
+                removeBuilding(building);
             }
         }
     }
 
-    public void pourOil(Command command) {
-        String direction = command.getDirection();
-        int x = command.getWorker().getPosition().getxCoordinates();
-        int y = command.getWorker().getPosition().getyCoordinates();
-        //check the logic of direction
+    public void pourOil(String direction, Engineer engineer) {
+        int x= engineer.getPosition().getxCoordinates();
+        int y= engineer.getPosition().getyCoordinates();
         switch (direction) {
-            case "n":
+            case "n" -> {
                 for (int i = y - 1; i >= y - 3; i--) {
-                    for (Worker person : map[x][i].getPeople()) {
-                        person.getDamaged(5);
-                    }
+                    for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
                     if (i == 0) break;
                 }
-                break;
-            case "s":
+            }
+            case "s" -> {
                 for (int i = y + 1; i <= y + 3; i++) {
                     for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
                     if (i == 200) break;
                 }
-                break;
-            case "e":
+            }
+            case "e" -> {
                 for (int i = x + 1; i <= x + 3; i++) {
                     for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
                     if (i == 0) break;
                 }
-                break;
-            case "w":
+            }
+            case "w" -> {
                 for (int i = x - 1; i >= x - 3; i--) {
-                    for (Worker person : map[x][i].getPeople()) {
-                        person.getDamaged(5);
-                    }
+                    for (Worker person : map[x][i].getPeople()) person.getDamaged(5);
                     if (i == 0) break;
                 }
-                break;
+            }
         }
-        ((Engineer) command.getWorker()).setHasOil(false);
-        command.getWorker().setDestination(currentGovernment.getBuildingByName("oil smelter").getCell());
+        engineer.setHasOil(false);
+        engineer.setDestination(currentGovernment.getBuildingByName("oil smelter").getCell());
     }
 
+    private void removeBuilding(Building building) {
+        building.getGovernment().getBuildings().remove(building);
+        building.getCell().setBuilding(null);
+    }
     public ArrayList<Cell> getNeighbours(Cell cell) {
         if (cell == null)
             return null;
@@ -775,6 +811,10 @@ public class GameController {
         return true;
     }
 
+    public void openOrCloseGate(boolean state) {
+        if (!(selectedBuilding instanceof Gate)) return;
+        ((Gate) selectedBuilding).setGate(state);
+    }
     public void removeGovernment(Government government) {//recursively remove government!
         ArrayList<Person> peopleArraylist = government.getPeople();
         for (int i1 = 0; i1 < peopleArraylist.size(); i1++) {
