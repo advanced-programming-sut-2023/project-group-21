@@ -82,8 +82,10 @@ public class GameMenu {
                 checkMoveEquipment(matcher);
             else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.MAKE__))!=null)
                 makeSiegeUnit(matcher);
-            else if(GameMenuCommand.getMatcher(line,GameMenuCommand.SWITCH)!= null)
+            else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.SWITCH))!= null)
                 switch1();
+            else if(true)
+                checkShowResource(matcher);
             else
                 System.out.println("invalid format!");
 
@@ -101,6 +103,11 @@ public class GameMenu {
         int y2 = Integer.parseInt(matcher.group("y2"));
         GameMessage message = gameController.checkMoveEquipments(x1,y1,x2,y2);
         System.out.println(message);
+    }
+
+    private void checkShowResource(Matcher matcher){
+        String resourceName = matcher.group("resource");
+
     }
     public void patrol(Matcher matcher){
         int x1 = Integer.parseInt(matcher.group("x1"));

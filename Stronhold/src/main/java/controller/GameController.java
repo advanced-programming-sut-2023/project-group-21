@@ -950,4 +950,11 @@ public class GameController {
         productMaker.switch1();
         return GameMessage.SUCCESS;
     }
+
+    public String getResourceName(String name){
+        if(name == null){
+
+        }
+        return "";
+    }
 }
