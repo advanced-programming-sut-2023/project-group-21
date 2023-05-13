@@ -183,8 +183,10 @@ public class Government {
             if (building.getBuildingsDetails().equals(buildingsDetails))
                 capacity += ((Storage) building).getCapacity();
         int full = 0;
-        for (Map.Entry<Resource, Integer> entry: resources.entrySet())
-            if (entry.getKey().getResourceKeeper().equals(buildingsDetails)) full += entry.getValue();
+        for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
+            if (entry.getKey().getResourceKeeper()!=null&&
+                    entry.getKey().getResourceKeeper().equals(buildingsDetails)) full += entry.getValue();
+        }
         return capacity - full;
     }
 

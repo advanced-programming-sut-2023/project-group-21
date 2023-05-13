@@ -20,7 +20,7 @@ public class Game {
             "The harder the conflict, the more glorious the triumph",
             "The only easy day was yesterday"
             );
-    private static ArrayList<Trade> trades;
+    private static ArrayList<Trade> trades = new ArrayList<>();
 
     public static final String[] SECURITY_QUESTION = { "what is your favorite food ?", "what is your father s name ?",
             "what is your oldest sibling's first name?" };

@@ -119,8 +119,14 @@ public class GameController {
     private void dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         ArrayList<Person> persons = new ArrayList<>();
-        for (Person person: currentGovernment.getPeople())
-            if (!(person instanceof Worker) && person.getWorkPlace() == null) persons.add(person);
+        int number = buildingsDetails.getWorkersCount();
+        for (Person person: currentGovernment.getPeople()) {
+            if (!(person instanceof Worker) && person.getWorkPlace() == null){
+                if(number ==0) break;
+                persons.add(person);
+                number--;
+            }
+        }
 
         switch (buildingType) {
             case PRODUCT_MAKER:

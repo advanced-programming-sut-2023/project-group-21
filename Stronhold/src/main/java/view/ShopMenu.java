@@ -37,7 +37,7 @@ public class ShopMenu {
     }
 
     private void help() {
-        System.out.println("You are in the shop menu\n You can buy,sell or see the items");
+        System.out.println("You are in the shop menu\nYou can buy,sell or see the items");
     }
 
     private void showPrice(){
