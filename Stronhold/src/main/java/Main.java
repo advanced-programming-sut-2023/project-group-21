@@ -20,3 +20,5 @@ public class Main {
         FileController.finish();
     }
 }
+
+// login -u shayaaaan -p n₨Oqm.U0Q19hb --stay-logged-in

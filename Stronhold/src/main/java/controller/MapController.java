@@ -51,16 +51,16 @@ public class MapController {
             if (s.length() != (size * 2))
                 return null;
         for (int i1 = 0; i1 < size; i1++) {
-            for (int i2 = 0; i2 < (myMap.get(i1).length()/2); i2 += 2) {
+            for (int i2 = 0, i = 0; i < (myMap.get(i1).length()/2); i2 += 2, i++) {
                 Extras extra = null;
-                if (myMap.get(i1).charAt(i2) == '!')
+                if (myMap.get(i1).charAt(i2) != '!')
                     extra = Extras.getExtrasByCode(String.valueOf(myMap.get(i1).charAt(i2)));
                 if(extra == Extras.HOLD)
-                    myHolds.add(map[i1][i2]);
-                map[i1][i2].setExtras(extra);
+                    myHolds.add(map[i1][i]);
+                map[i1][i].setExtras(extra);
                 GroundTexture groundTexture;
                 groundTexture = GroundTexture.getTextureBySaveCode((String.valueOf(myMap.get(i1).charAt(i2 + 1))));
-                map[i1][i2].setGroundTexture(groundTexture);
+                map[i1][i].setGroundTexture(groundTexture);
             }
         }
         return MapMessages.SUCCESS;
@@ -71,10 +71,8 @@ public class MapController {
         yCoordinates = y;
         if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!";
         StringBuilder output = new StringBuilder();
-        if(x>map.length || x<=0 ||y>map.length||y<=0)
-            return "out of index!";
         boolean hasPerson = false;
-        int yMax = min(y + 4, size) - 1, yMin = max(y - 4, 1) - 1, xMax = min(x + 4, size) - 1, xMin = max(x - 4, 1) - 1;
+        int yMax = min(y + 4, map.length) - 1, yMin = max(y - 4, 1) - 1, xMax = min(x + 4, map.length) - 1, xMin = max(x - 4, 1) - 1;
         for (int j = yMin; j <= yMax; j++) {
             for (int i = xMin; i <= xMax; i++) {
                 output.append(map[i][j].getGroundTexture().getColor());

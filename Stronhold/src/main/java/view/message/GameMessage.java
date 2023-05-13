@@ -20,11 +20,11 @@ public enum GameMessage {
     NO_BUILDING("there is no building with this name!"),
     INVALID_FOOD_RATE("invalid food rate!"),
     ALREADY_BUILDING("already there is a building"),
-    FAILURE1("failure due to ...1"),
-    FAILURE2("sorry unable to dig tunnel!"),
-    FAILURE3("failure due to ...3"),
-    FAILURE4("failure due to ...4"),
-    FAILURE5("failure due to ...5"),
+    BAD_TEXTURE("the ground texture is appropriate"),
+    CANT_TUNNEL("sorry unable to dig tunnel!"),
+    BAD_WORK("the selected engineer is not on .."),
+    BAD_BUILDING("the building is not suitable for this purpose"),
+    MONEY_PROBLEM("not enough gold!"),
     NOT_ENOUGH_RESOURCE("not enough resource!"),
     NO_BUILDING_TO_SELECT("there is no building to select!"),
     NO_SELECTED_BUILDING("no selected building!"),
@@ -36,7 +36,12 @@ public enum GameMessage {
     FACTORS("repair me!"),
     UNABLE_TO_MOVE("unable to move!"),
     NO_SUITABLE_BUILDING("the building is not suitable for this purpose"),
-    INVALID_RESOURCE_NAME("Storage name is invalid");
+    INVALID_RESOURCE_NAME("Storage name is invalid"),
+    NOT_ENOUGH_PEOPLE("your population is too low!"),
+    INVALID_TEX_RATE("invalid text rate"),
+    ENGINEER_NEEDED("please first select an engineer!"),
+    NO_SUCH_CAR_EXIST("no such machine found!"),
+    NOT_ENOUGH_ENGINEER("you need more engineer");
     private final String message;
     GameMessage(String message){
         this.message = message;

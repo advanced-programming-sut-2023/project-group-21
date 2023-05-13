@@ -57,12 +57,13 @@ public enum BuildingsDetails {
     private final BuildingType buildingType;
     private final int maxHitPoints, workersCount;
     private final Map<Resource, Integer> requiredResource;
-    BuildingsDetails(String name, BuildingType buildingType, int maxHitPoints, Map<Resource, Integer> requiredResource, int workersCount){
+
+    BuildingsDetails(String name, BuildingType buildingType, int maxHitPoints, Map<Resource, Integer> requiredResource, int workersCount) {
         this.name = name;
         this.buildingType = buildingType;
         this.maxHitPoints = maxHitPoints;
-        this.requiredResource = requiredResource;
         this.workersCount = workersCount;
+        this.requiredResource = requiredResource;
     }
 
     public int getMaxHitPoints() {

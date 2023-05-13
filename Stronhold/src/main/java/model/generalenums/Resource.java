@@ -1,37 +1,37 @@
 package model.generalenums;
 
-import model.building.Enums.StorageDetails;
+import model.building.Enums.BuildingsDetails;
 import model.building.Storage;
 
 public enum Resource {
-    MEAT("meat", StorageDetails.GRANARY,5),
-    APPLE("apple", StorageDetails.GRANARY,3),
-    CHEESE("cheese", StorageDetails.GRANARY,3),
-    BREAD("bread", StorageDetails.GRANARY,2),
-    WHEAT("wheat", StorageDetails.STOCKPILE,2),
-    FLOUR("flour", StorageDetails.STOCKPILE,3),
-    HOPS("hops", StorageDetails.STOCKPILE,4),
-    ALE("ale", StorageDetails.STOCKPILE,4),
-    STONE("stone", StorageDetails.STOCKPILE,4),
-    IRON("iron", StorageDetails.STOCKPILE,4),
-    WOOD("wood", StorageDetails.STOCKPILE,6),
-    PITCH("pitch", StorageDetails.STOCKPILE,8),
+    MEAT("meat", BuildingsDetails.GRANARY,5),
+    APPLE("apple", BuildingsDetails.GRANARY,3),
+    CHEESE("cheese", BuildingsDetails.GRANARY,3),
+    BREAD("bread", BuildingsDetails.GRANARY,2),
+    WHEAT("wheat", BuildingsDetails.STOCKPILE,2),
+    FLOUR("flour", BuildingsDetails.STOCKPILE,3),
+    HOPS("hops", BuildingsDetails.STOCKPILE,4),
+    ALE("ale", BuildingsDetails.STOCKPILE,4),
+    STONE("stone", BuildingsDetails.STOCKPILE,4),
+    IRON("iron", BuildingsDetails.STOCKPILE,4),
+    WOOD("wood", BuildingsDetails.STOCKPILE,6),
+    PITCH("pitch", BuildingsDetails.STOCKPILE,8),
     GOLD("gold", null,1),
-    BOW("bow", StorageDetails.ARMOURY,9),
-    CROSSBOW("crossbow", StorageDetails.ARMOURY,12),
-    SPEAR("spear", StorageDetails.ARMOURY,6),
-    PIKE("pike", StorageDetails.ARMOURY,5),
-    MACE("mace", StorageDetails.ARMOURY,4),
-    SWORD("sword", StorageDetails.ARMOURY,2),
-    LEATHER_ARMOR("leather armor", StorageDetails.ARMOURY,3),
-    METAL_ARMOR("metal armor", StorageDetails.ARMOURY,2),
+    BOW("bow", BuildingsDetails.ARMOURY,9),
+    CROSSBOW("crossbow", BuildingsDetails.ARMOURY,12),
+    SPEAR("spear", BuildingsDetails.ARMOURY,6),
+    PIKE("pike", BuildingsDetails.ARMOURY,5),
+    MACE("mace", BuildingsDetails.ARMOURY,4),
+    SWORD("sword", BuildingsDetails.ARMOURY,2),
+    LEATHER_ARMOR("leather armor", BuildingsDetails.ARMOURY,3),
+    METAL_ARMOR("metal armor", BuildingsDetails.ARMOURY,2),
     HORSE("horse", null,15);
     private final String name;
     private final int costBuy;
     private final int costSell;
-    private final StorageDetails resourceKeeper;
+    private final BuildingsDetails resourceKeeper;
 
-    Resource(String name, StorageDetails resourceKeeper,int cost) {
+    Resource(String name, BuildingsDetails resourceKeeper,int cost) {
         this.name = name;
         this.resourceKeeper = resourceKeeper;
         this.costBuy = cost;
@@ -42,7 +42,7 @@ public enum Resource {
         return name;
     }
 
-    public StorageDetails getResourceKeeper() {
+    public BuildingsDetails getResourceKeeper() {
         return resourceKeeper;
     }
 
