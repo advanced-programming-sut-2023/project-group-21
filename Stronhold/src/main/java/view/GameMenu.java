@@ -31,9 +31,10 @@ public class GameMenu {
     public void run(Scanner scanner) {
         String line;
         Matcher matcher;
+        System.out.println("You are in game menu.");
         while (gameController.checkEndGame()) {
             line = scanner.nextLine();
-            if (line.equals("back") || checkWin())
+            if (line.equals("back") || gameController.checkWin())
                 break;
             else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FACTORS)) != null)
                 printPopularityFactors();
@@ -73,7 +74,7 @@ public class GameMenu {
                 pourOil(matcher);
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.DIG_TUNNEL)) != null)
                 digTunnel(matcher);
-            else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.DISBAND_UNIT)) != null)
+            else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.DISBAND_UNIT)) != null)
                 disbandUnit();
             else if (GameMenuCommand.getMatcher(line, GameMenuCommand.NEXT_TURN) != null)
                 nextTurn();
@@ -103,8 +104,8 @@ public class GameMenu {
                 showUnemployed();
             else
                 System.out.println("invalid format!");
-
         }
+        System.out.println("Game ended.");
     }
 
     private void showUnemployed(){

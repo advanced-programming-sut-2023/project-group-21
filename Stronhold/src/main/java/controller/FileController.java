@@ -227,7 +227,7 @@ public class FileController {
         for (int i1 = 0; i1 < allUsers.size(); i1++) {
             temp = (JSONObject) allUsers.get(i1);
             if (temp.get("username").equals(username))
-                temp.replace("score", (int) temp.get("score") + change);
+                temp.replace("score", ((Long)temp.get("score"))+ change);
         }
     }
 
