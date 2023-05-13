@@ -4,36 +4,35 @@ import model.building.Enums.BuildingsDetails;
 import model.building.Storage;
 
 public enum Resource {
-    MEAT("meat", BuildingsDetails.GRANARY,5),
-    APPLE("apple", BuildingsDetails.GRANARY,3),
-    CHEESE("cheese", BuildingsDetails.GRANARY,3),
-    BREAD("bread", BuildingsDetails.GRANARY,2),
-    WHEAT("wheat", BuildingsDetails.STOCKPILE,2),
-    FLOUR("flour", BuildingsDetails.STOCKPILE,3),
-    HOPS("hops", BuildingsDetails.STOCKPILE,4),
-    ALE("ale", BuildingsDetails.STOCKPILE,4),
-    STONE("stone", BuildingsDetails.STOCKPILE,4),
-    IRON("iron", BuildingsDetails.STOCKPILE,4),
-    WOOD("wood", BuildingsDetails.STOCKPILE,6),
-    PITCH("pitch", BuildingsDetails.STOCKPILE,8),
+    MEAT("meat", "granary",5),
+    APPLE("apple", "granary",3),
+    CHEESE("cheese", "granary",3),
+    BREAD("bread", "granary",2),
+    WHEAT("wheat", "stockpile",2),
+    FLOUR("flour", "stockpile",3),
+    HOPS("hops", "stockpile",4),
+    ALE("ale", "stockpile",4),
+    STONE("stone", "stockpile",4),
+    IRON("iron", "stockpile",4),
+    WOOD("wood", "stockpile",6),
+    PITCH("pitch", "stockpile",8),
     GOLD("gold", null,1),
-    BOW("bow", BuildingsDetails.ARMOURY,9),
-    CROSSBOW("crossbow", BuildingsDetails.ARMOURY,12),
-    SPEAR("spear", BuildingsDetails.ARMOURY,6),
-    PIKE("pike", BuildingsDetails.ARMOURY,5),
-    MACE("mace", BuildingsDetails.ARMOURY,4),
-    SWORD("sword", BuildingsDetails.ARMOURY,2),
-    LEATHER_ARMOR("leather armor", BuildingsDetails.ARMOURY,3),
-    METAL_ARMOR("metal armor", BuildingsDetails.ARMOURY,2),
-    HORSE("horse", null,15);
-    private final String name;
+    BOW("bow", "armoury",9),
+    CROSSBOW("crossbow", "armoury",12),
+    SPEAR("spear", "armoury",6),
+    PIKE("pike", "armoury",5),
+    MACE("mace", "armoury",4),
+    SWORD("sword", "armoury",2),
+    LEATHER_ARMOR("leather armor", "armoury",3),
+    METAL_ARMOR("metal armor", "armoury",2),
+    HORSE("horse", "stable",15);
+    private final String name, keeper;
     private final int costBuy;
     private final int costSell;
-    private final BuildingsDetails resourceKeeper;
 
-    Resource(String name, BuildingsDetails resourceKeeper,int cost) {
+    Resource(String name, String keeper,int cost) {
         this.name = name;
-        this.resourceKeeper = resourceKeeper;
+        this.keeper = keeper;
         this.costBuy = cost;
         this.costSell = costBuy - 1;
     }
@@ -43,7 +42,7 @@ public enum Resource {
     }
 
     public BuildingsDetails getResourceKeeper() {
-        return resourceKeeper;
+        return BuildingsDetails.getBuildingDetailsByName(keeper);
     }
 
     public int getCostBuy() {

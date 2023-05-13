@@ -4,7 +4,7 @@ import model.Government;
 import model.building.Building;
 
 public class Person {
-    int hitPoint;
+    int hitPoint = 15;
     Government government;
     Building workPlace = null;
 

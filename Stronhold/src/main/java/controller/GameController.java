@@ -37,9 +37,6 @@ public class GameController {
     private MapController mapController;
     private Map<Engineer, String> pouringOils = new HashMap<>();
     private final List<WorkerDetails> ARCHERS = Arrays.asList(WorkerDetails.ARCHER, WorkerDetails.CROSSBOWMAN, WorkerDetails.ARABIAN_BOW);
-    public GameMessage showFactor() {
-        return GameMessage.FACTORS;
-    }
 
     public GameController(ArrayList<Government> governments, Cell[][] map) {
         this.governments = governments;
@@ -48,15 +45,18 @@ public class GameController {
     }
 
     public String showFoodList() {
-        StringBuilder list = new StringBuilder();
-        Storage storage = null;
-        for (Building building : currentGovernment.getBuildings())
-            if (building instanceof Storage && building.getBuildingsDetails().equals(BuildingsDetails.GRANARY))
-                storage = (Storage) building;
-        if (storage == null) return "";
-        for (Map.Entry<Resource, Integer> entry : storage.getAvailableResources().entrySet())
-            list.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
-        return list.toString();
+        return currentGovernment.showStorage(BuildingsDetails.GRANARY);
+    }
+
+    public String showPopularityFactors() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("1. Food Variety: ").append(currentGovernment.getFoodVariety()).append("\n");
+        stringBuilder.append("2. Food Rate: ").append(currentGovernment.getFoodRate());
+        stringBuilder.append(" | Food Count: ").append(currentGovernment.getLeftFood()).append("\n");
+        stringBuilder.append("3. Tax Rate: ").append(currentGovernment.getTaxRate()).append("\n");
+        stringBuilder.append("4. Fear Rate: ").append(currentGovernment.getFearRate()).append("\n\n");
+        stringBuilder.append("Popularity Rate: ").append(currentGovernment.getPopularityRate());
+        return stringBuilder.toString();
     }
 
     public GameMessage setFoodRate(int newRate) {
@@ -98,6 +98,17 @@ public class GameController {
         if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
             if (!textureMatches(buildingsDetails, x, y)) return GameMessage.BAD_TEXTURE;
         if (getNumberOfPeasants() < buildingsDetails.getWorkersCount()) return GameMessage.NOT_ENOUGH_PEOPLE;
+        if (buildingType.equals(BuildingsDetails.BuildingType.OIL_SMELTER)) {
+            boolean hasEngineer = false;
+            for (Worker worker: map[x-1][y-1].getPeople()) {
+                if (worker instanceof Engineer && !((Engineer) worker).hasOil() && !((Engineer) worker).hasMachine() &&
+                    ((Engineer) worker).getWorkplace() == null) {
+                    hasEngineer =true;
+                    break;
+                }
+            }
+            if (!hasEngineer) return GameMessage.NO_ENGINEERS;
+        }
         if (buildingsDetails.getRequiredResource() != null) {
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
                 if (currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
@@ -119,9 +130,13 @@ public class GameController {
     private void dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         ArrayList<Person> persons = new ArrayList<>();
-        for (Person person: currentGovernment.getPeople())
-            if (!(person instanceof Worker) && person.getWorkPlace() == null) persons.add(person);
-
+        int number = buildingsDetails.getWorkersCount();
+        for (Person person: currentGovernment.getPeople()) {
+            if (!(person instanceof Worker) && person.getWorkPlace() == null) {
+                if (number-- == 0) break;
+                persons.add(person);
+            }
+        }
         switch (buildingType) {
             case PRODUCT_MAKER:
                 currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x - 1][y - 1],
@@ -172,6 +187,7 @@ public class GameController {
     public GameMessage selectBuilding(int x, int y) {
         selectedBuilding = map[x - 1][y - 1].getBuilding();
         if (selectedBuilding == null) return GameMessage.NO_BUILDING_TO_SELECT;
+        if (!selectedBuilding.getGovernment().equals(currentGovernment)) return GameMessage.NOT_YOUR_BUILDING;
         return GameMessage.SUCCESS;
     }
 
@@ -181,13 +197,13 @@ public class GameController {
         if (map[x-1][y-1].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
         WorkerDetails worker = WorkerDetails.getWorkerDetailsByName(type);
         BuildingsDetails.BuildingType buildingType = selectedBuilding.getBuildingsDetails().getBuildingType();
-        if (worker == null) return GameMessage.ANOTHER_PURPOSE;
+        if (worker == null) return GameMessage.NO_SUCH_UNIT;
         if (!buildingType.equals(BuildingsDetails.BuildingType.TROOP_TRAINER)) return GameMessage.BAD_BUILDING;
         EuropeanSoldiersDetails europeanSoldiers = EuropeanSoldiersDetails.getDetailsByWorkerDetails(worker);
         if (!worker.getTrainerBuilding().equals(selectedBuilding.getBuildingsDetails())) return GameMessage.NO_SUITABLE_BUILDING;
         if (getNumberOfPeasants() < count) return GameMessage.NOT_ENOUGH_PEOPLE;
         if (worker.getGold() * count >
-                ((Storage) (currentGovernment.getBuildingByName("stockpile"))).getAvailableResources().get(Resource.GOLD))
+                currentGovernment.getResources().get(Resource.GOLD))
             return GameMessage.MONEY_PROBLEM;
         if (europeanSoldiers != null) {
             for (Resource equipment : europeanSoldiers.getEquipments())
@@ -706,6 +722,7 @@ public class GameController {
                 worker.setOnTower(worker.getPosition().equals(worker.getDestination()) &&
                         worker.getPosition().getBuilding() instanceof Tower);
                 if (worker.getName().equals("slave") && worker.getPosition().equals(worker.getDestination()) &&
+                        worker.getPosition().getBuilding() != null &&
                         worker.getPosition().getBuilding().getName().equals("pitch ditch"))
                     ((Trap) worker.getPosition().getBuilding()).setOnFire(true);
                 if (worker instanceof Engineer && worker.getPosition().equals(worker.getDestination()) &&
@@ -750,6 +767,7 @@ public class GameController {
                 machine.getDamaged(hitDamage - machine.getDefense());
             }
             int defenseRate= enemy.getDefense();
+            System.out.println(hitDamage - defenseRate);
             enemy.getDamaged(Math.max(hitDamage-defenseRate, 0));
             if (worker.getState().equals("defensive")) worker.setDestination(enemy.getPosition());
         }
@@ -967,7 +985,7 @@ public class GameController {
                 output.append(map[i][j].getGroundTexture().getColor());
                 Building building = map[i][j].getBuilding();
                 for (Person person : map[i][j].getPeople()) {
-                    if (person instanceof Worker && ((Worker) person).getDestination().equals(((Worker) person).getPosition())) {
+                    if (person instanceof Worker) {
                         hasPerson = true;
                         break;
                     }
@@ -981,6 +999,7 @@ public class GameController {
                 else if (map[i][j].getExtra() != null)
                     output.append("R");
                 else output.append(" ");
+                hasPerson = false;
             }
             output.append("\033[0m").append("\n");
         }

@@ -7,7 +7,7 @@ public enum MapCommand {
     BACK("back"),
     SHOW_MAP("\\s*show\\s+map\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
     MOVE_MAP("\\s*move\\s+(?<left>.*)"),
-    CLEAR("\\s*clear\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)"),
+    CLEAR("\\s*clear\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s*"),
     SET_TEXTURE("\\s*set\\s+texture\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\d+)\\s+-y2\\s+(?<y2>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
     DROP_TREE("\\s*drop\\s*tree\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-t\\s+(?<type>\\S+)\\s*"),
     DROP_ROCK("\\s*drop\\s+rock\\s+-x\\s+(?<x>\\d+)\\s+-y\\s+(?<y>\\d+)\\s+-d\\s+(?<type>\\S+)\\s*"),

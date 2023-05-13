@@ -22,6 +22,7 @@ public class Worker extends Person {
         state = "standing";
         if(workerDetails == WorkerDetails.LADDERMAN)
             hasLadder = true;
+        this.hitPoint = workerDetails.getMaxHitPoint();
     }
 
     public String getName() {
