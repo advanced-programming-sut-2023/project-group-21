@@ -67,7 +67,6 @@ public class MapController {
     }
 
     public String showMap(int x, int y) {
-        System.out.println("chert");
         xCoordinates = x;
         yCoordinates = y;
         if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!";
