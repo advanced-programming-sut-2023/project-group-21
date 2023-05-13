@@ -3,8 +3,8 @@ package model.human.Enums;
 import model.building.Enums.BuildingsDetails;
 
 public enum WorkerDetails {
-    ARCHER("archer", BuildingsDetails.BARRACKS, 20, 2, 2, 4, 4, 12),
-    CROSSBOWMAN("crossbowman", BuildingsDetails.BARRACKS, 30, 2, 3, 2, 3, 20),
+    ARCHER("archer", BuildingsDetails.BARRACKS, 20, 2, 2, 4, 20, 12),
+    CROSSBOWMAN("crossbowman", BuildingsDetails.BARRACKS, 30, 2, 3, 2, 15, 20),
     SPEARMAN("spearman", BuildingsDetails.BARRACKS, 25, 3, 1, 3, 1, 8),
     PIKEMAN("pikeman", BuildingsDetails.BARRACKS, 35, 3, 4, 2, 1, 20),
     MACEMAN("maceman", BuildingsDetails.BARRACKS, 30, 4, 3, 3, 0, 20),
@@ -14,9 +14,9 @@ public enum WorkerDetails {
     LADDERMAN("ladderman", BuildingsDetails.ENGINEERS_GUILD, 15, 0, 1, 4, 0, 4),
     ENGINEER("engineer", BuildingsDetails.ENGINEERS_GUILD, 15, 0, 1, 3, 0, 30),
     BLACK_MONK("black monk", BuildingsDetails.CATHEDRAL, 30, 3, 3, 2, 0, 10),
-    ARABIAN_BOW("archer bow", BuildingsDetails.MERCENARY_POST, 20, 2, 2, 4, 4, 75),
+    ARABIAN_BOW("archer bow", BuildingsDetails.MERCENARY_POST, 20, 2, 2, 4, 20, 75),
     SLAVE("slave", BuildingsDetails.MERCENARY_POST, 15, 1, 1, 4, 0, 5),
-    SLINGER("slinger", BuildingsDetails.MERCENARY_POST, 20, 4, 1, 4, 2, 12),
+    SLINGER("slinger", BuildingsDetails.MERCENARY_POST, 20, 4, 1, 4, 7, 12),
     ASSASSIN("assassin", BuildingsDetails.MERCENARY_POST, 30, 3, 3, 3, 0, 60),
     HORSE_ARCHER("horse archer", BuildingsDetails.MERCENARY_POST, 30, 2, 3, 5, 5, 80),
     ARABIAN_SWORDSMAN("arabian swordsman", BuildingsDetails.MERCENARY_POST, 35, 4, 4, 5, 0, 80),

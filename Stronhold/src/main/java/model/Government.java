@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.decrementExact;
 import static java.lang.Math.min;
 
 public class Government {
@@ -97,6 +98,7 @@ public class Government {
             }
         }
         people.add(new Worker(workerDetails, this, cell, cell));
+        cell.addPeople((Worker) people.get(people.size()-1));
     }
 
     public void setFoodRate(int foodRate) {
@@ -144,12 +146,12 @@ public class Government {
             resources.put(resource, amount);
     }
 
-    private int getLeftFood() {
+    public int getLeftFood() {
         int number = 0;
         for (Map.Entry<Resource, Integer> entry : resources.entrySet()) {
             Resource resource = entry.getKey();
             Integer amount = entry.getValue();
-            if (resource.getResourceKeeper() == BuildingsDetails.GRANARY)
+            if (resource.getResourceKeeper() != null && resource.getResourceKeeper() == BuildingsDetails.GRANARY)
                 number += amount;
         }
         return number;
@@ -183,10 +185,9 @@ public class Government {
             if (building.getBuildingsDetails().equals(buildingsDetails))
                 capacity += ((Storage) building).getCapacity();
         int full = 0;
-        for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
-            if (entry.getKey().getResourceKeeper()!=null&&
+        for (Map.Entry<Resource, Integer> entry: resources.entrySet())
+            if (entry.getKey().getResourceKeeper() != null &&
                     entry.getKey().getResourceKeeper().equals(buildingsDetails)) full += entry.getValue();
-        }
         return capacity - full;
     }
 
@@ -237,32 +238,54 @@ public class Government {
                     resources.remove(resource);
             }
         }
-        int variety = getFoodVariety();
-        popularityRate += variety - foodVariety;
-        foodVariety = variety;
+        getFoodVariety();
         addPopularity();
     }
 
     private void addPopularity() {
         int addition = Math.min(calculateLeftPopulationCapacity(), popularityRate);
-        for (int i = 1; i <= addition; i++) people.add(new Person(this));
+        if (addition >= 0) for (int i = 1; i <= addition; i++) people.add(new Person(this));
+        else removePeople(addition);
     }
 
-    private int getFoodVariety() {
+    private void removePeople(int number) {
+        number *= -1;
+        ArrayList<Person> toRemove = new ArrayList<>();
+        for (Person person: people) {
+            if (!(person instanceof Worker) && person.getWorkPlace() == null) toRemove.add(person);
+            number--;
+            if (number == 0 || toRemove.size() == people.size()) break;
+        }
+        for (Person person: people) {
+            if (number == 0 || toRemove.size() == people.size()) break;
+            if (!toRemove.contains(person)) {
+                toRemove.add(person);
+                number--;
+            }
+        }
+        for (Person person : toRemove) deletePerson(person);
+    }
+
+    public int getFoodVariety() {
         int i = 0;
         for (Map.Entry<Resource, Integer> entry: resources.entrySet())
-            if (entry.getKey().getResourceKeeper().equals(BuildingsDetails.GRANARY)) i++;
+            if (entry.getKey().getResourceKeeper() != null &&
+                    entry.getKey().getResourceKeeper().equals(BuildingsDetails.GRANARY)) i++;
+        popularityRate += i - foodVariety;
+        foodVariety = i;
         return i;
     }
 
     public void deletePerson(Person person){
+        if (person instanceof Worker) ((Worker) person).getPosition().getPeople().remove(person);
         people.remove(person);
     }
 
     private void removeAllFood() {
         ArrayList<Resource> toRemove = new ArrayList<>();
         for (Map.Entry<Resource, Integer> entry: resources.entrySet())
-            if (entry.getKey().getResourceKeeper().equals(BuildingsDetails.GRANARY)) toRemove.add(entry.getKey());
+            if (entry.getKey().getResourceKeeper() != null &&
+        entry.getKey().getResourceKeeper().equals(BuildingsDetails.GRANARY)) toRemove.add(entry.getKey());
         for (Resource resource: toRemove) resources.remove(resource);
     }
     public int calculateScore(){
@@ -309,11 +332,14 @@ public class Government {
                 string.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
         } else {
             for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
-                if (entry.getKey().getResourceKeeper().equals(buildingsDetails))
+                if (entry.getKey().getResourceKeeper() != null && entry.getKey().getResourceKeeper().equals(buildingsDetails))
                     string.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
             }
         }
         return string.toString();
     }
 
+    public int getPopularityRate() {
+        return popularityRate;
+    }
 }

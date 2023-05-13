@@ -237,5 +237,7 @@ public class Cell {
         machines.remove(machine);
     }
 
-
+    public void addPeople(Worker worker) {
+        people.add(worker);
+    }
 }

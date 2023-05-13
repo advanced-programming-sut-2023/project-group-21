@@ -41,7 +41,10 @@ public enum GameMessage {
     INVALID_TEX_RATE("invalid text rate"),
     ENGINEER_NEEDED("please first select an engineer!"),
     NO_SUCH_CAR_EXIST("no such machine found!"),
-    NOT_ENOUGH_ENGINEER("you need more engineer");
+    NOT_ENOUGH_ENGINEER("you need more engineer"),
+    NO_SUCH_UNIT("no such unit exists."),
+    NOT_YOUR_BUILDING("this building is not yours"),
+    NO_ENGINEERS("no engineers in this place");
     private final String message;
     GameMessage(String message){
         this.message = message;

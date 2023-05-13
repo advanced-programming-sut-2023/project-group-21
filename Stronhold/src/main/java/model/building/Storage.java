@@ -13,7 +13,6 @@ import java.util.Map;
 
 public class Storage extends Building {
     private ContainerDetails containerDetails;
-    private Map<Resource, Integer> availableResources = new HashMap<>();
 
     public Storage(Government government, Cell cell, ContainerDetails containerDetails, ArrayList<Person> workers) {
         super(government, containerDetails.getBuildingsDetails(), cell, workers);
@@ -32,18 +31,4 @@ public class Storage extends Building {
         return containerDetails.getCapacity();
     }
 
-    public int getOccupation(ContainerDetails details){
-        int sum = 0;
-        for (Map.Entry<Resource, Integer> entry : availableResources.entrySet()) {
-            Resource resource = entry.getKey();
-            Integer amount = entry.getValue();
-            if(resource.getResourceKeeper() == details.getBuildingsDetails())
-                sum += amount;
-        }
-        return sum;
-    }
-
-    public Map<Resource, Integer> getAvailableResources() {
-        return availableResources;
-    }
 }

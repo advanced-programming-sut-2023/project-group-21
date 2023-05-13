@@ -174,7 +174,7 @@ public class GameMenu {
     }
 
     private void printPopularityFactors() {
-        System.out.println("repair");
+        System.out.println(gameController.showPopularityFactors());
     }
 
     private void goToTradeMenu(Scanner scanner) {
@@ -197,12 +197,11 @@ public class GameMenu {
 
     private void setFoodRate(Matcher matcher) {
         int rate = Integer.parseInt(matcher.group("rate"));
-        gameController.setFoodRate(rate);
-
+        System.out.println(gameController.setFoodRate(rate).toString());
     }
 
     private void showFoodRate() {
-        System.out.println(gameController.showFoodRate());
+        System.out.println("Food Rate: " + gameController.showFoodRate());
     }
 
     private void checkSetTaxRate(Matcher matcher) {
@@ -231,7 +230,7 @@ public class GameMenu {
     }
 
     private void checkCreateUnit(Matcher matcher) {
-        String type = matcher.group("type");
+        String type = OtherController.myTrim(matcher.group("type"));
         int count = Integer.parseInt(matcher.group("count"));
         int x = Integer.parseInt(matcher.group("x"));
         int y = Integer.parseInt(matcher.group("y"));
@@ -310,7 +309,7 @@ public class GameMenu {
 
     private void nextTurn() {
         gameController.nextTurn();
-        System.out.println("now " + government.getLord().getUserName() + " is playing!");
+        System.out.println("now " + gameController.getCurrentGovernment().getLord().getUserName() + " is playing!");
     }
 
 
