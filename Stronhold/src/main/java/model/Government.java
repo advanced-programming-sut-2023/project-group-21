@@ -215,18 +215,18 @@ public class Government {
             taxRate = 0;
             resources.remove(Resource.GOLD);
         }
-        else resources.replace(Resource.GOLD, resources.get(Resource.GOLD) + (int)(resources.get(Resource.GOLD) + people.size() * tax));
+        else resources.replace(Resource.GOLD, (int) (resources.get(Resource.GOLD) + people.size() * tax));
         if (resources.get(Resource.GOLD) == 0) resources.remove(Resource.GOLD);
 
         if (getLeftFood() < Game.FoodRate.getFoodRate(foodRate) * people.size()) {
             removeAllFood();
             setFoodRate(-2);
         }
-        int foodNumber = (int) Game.FoodRate.getFoodRate(foodRate);
+        int foodNumber = (int) Game.FoodRate.getFoodRate(foodRate) * people.size();
         for (Map.Entry<Resource, Integer> entry : resources.entrySet()) {
             Resource resource = entry.getKey();
             Integer amount = entry.getValue();
-            if (resource.getResourceKeeper() == BuildingsDetails.GRANARY) {
+            if (resource.getResourceKeeper() != null && resource.getResourceKeeper() == BuildingsDetails.GRANARY) {
                 change = min(amount, foodNumber);
                 amount -= change;
                 foodNumber -= change;
@@ -242,7 +242,7 @@ public class Government {
     private void addPopularity() {
         int addition = Math.min(calculateLeftPopulationCapacity(), popularityRate);
         if (addition >= 0) for (int i = 1; i <= addition; i++) people.add(new Person(this));
-        else removePeople(addition);
+        else removePeople(popularityRate);
     }
 
     private void removePeople(int number) {
@@ -254,6 +254,7 @@ public class Government {
             if (number == 0 || toRemove.size() == people.size()) break;
         }
         for (Person person: people) {
+            if (person instanceof Worker && ((Worker) person).getWorkerDetails().equals(WorkerDetails.LORD)) continue;
             if (number == 0 || toRemove.size() == people.size()) break;
             if (!toRemove.contains(person)) {
                 toRemove.add(person);
@@ -290,8 +291,7 @@ public class Government {
         result += resources.get(Resource.GOLD);
         for (Person person : people)
             if (person instanceof Worker)
-                result += ((Worker) person).getWorkerDetails().getGold();
-
+                ((Worker) person).getWorkerDetails().getGold();
         return result;
     }
 
@@ -302,10 +302,10 @@ public class Government {
     }
 
     public int calculateLeftPopulationCapacity(){
-        int result = 0;
-        for (Building building : buildings) {
-            if (building instanceof Residency)
-                result += ((Residency) building).getMaxPopularity();
+        int result = 11;
+        for(int i1=0;i1<buildings.size();i1++){
+            if(buildings.get(i1) instanceof Residency)
+                result += ((Residency)buildings.get(i1)).getMaxPopularity();
         }
         result = result - people.size();
         return result;

@@ -60,7 +60,7 @@ public class GameController {
     }
 
     public GameMessage setFoodRate(int newRate) {
-        if (newRate > 5 || newRate < -5) return GameMessage.INVALID_FOOD_RATE;
+        if (newRate > 2 || newRate < -2) return GameMessage.INVALID_FOOD_RATE;
         currentGovernment.setFoodRate(newRate);
         return GameMessage.SUCCESS;
     }
@@ -93,6 +93,7 @@ public class GameController {
         BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(type);
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (buildingsDetails == null) return GameMessage.NO_BUILDING;
+        if (map[x - 1][y - 1].getExtra() != null) return GameMessage.OCCUPIED;
         if (map[x - 1][y - 1].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
@@ -177,11 +178,11 @@ public class GameController {
 
     private boolean textureMatches(BuildingsDetails buildingsDetails, int x, int y) {
         Cell cell = map[x - 1][y - 1];
-        return (!buildingsDetails.getName().equals("quarry") || cell.getGroundTexture() == GroundTexture.STONE) &&
-                (!buildingsDetails.getName().equals("iron mine") || cell.getGroundTexture() == GroundTexture.IRON) &&
+        return (!buildingsDetails.getName().equals("quarry") || cell.getGroundTexture().equals(GroundTexture.STONE)) &&
+                (!buildingsDetails.getName().equals("iron mine") || cell.getGroundTexture().equals(GroundTexture.IRON)) &&
                 ((!buildingsDetails.getName().contains("farm") && !buildingsDetails.getName().equals("apple orchard")) ||
-                        (cell.getGroundTexture() == GroundTexture.GRASS && cell.getGroundTexture() == GroundTexture.DENSE_MEADOW)) &&
-                (!buildingsDetails.getName().equals("pitch rig") || cell.getGroundTexture() == GroundTexture.PLAIN);
+                        (cell.getGroundTexture().equals(GroundTexture.GRASS) || cell.getGroundTexture().equals(GroundTexture.DENSE_MEADOW))) &&
+                (!buildingsDetails.getName().equals("pitch rig") || cell.getGroundTexture().equals(GroundTexture.PLAIN));
     }
 
     public GameMessage selectBuilding(int x, int y) {
@@ -559,6 +560,7 @@ public class GameController {
                     x2--;
                     break;
             }
+            System.out.println(map[x2][y2].toString() + map[x2][y2].getDirection());
             path.add(map[x2][y2]);
         }
     }
@@ -617,8 +619,17 @@ public class GameController {
 
     private void updateBuildings() {
         for (Government government: governments) {
-            for (Building building: government.getBuildings())
+            for (Building building: government.getBuildings()) {
                 if (building.getHitPoint() <= 0 && building.getHitPoint() > -900) removeBuilding(building);
+                if (building.getWorkers().size() < building.getRequiredWorkersCount()) {
+                    for (Person person: currentGovernment.getPeople()) {
+                        if (!(person instanceof Worker) && person.getWorkPlace() == null) {
+                            building.getWorkers().add(person);
+                            if (building.getWorkers().size() == building.getRequiredWorkersCount()) break;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -767,7 +778,6 @@ public class GameController {
                 machine.getDamaged(hitDamage - machine.getDefense());
             }
             int defenseRate= enemy.getDefense();
-            System.out.println(hitDamage - defenseRate);
             enemy.getDamaged(Math.max(hitDamage-defenseRate, 0));
             if (worker.getState().equals("defensive")) worker.setDestination(enemy.getPosition());
         }

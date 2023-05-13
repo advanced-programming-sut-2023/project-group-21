@@ -74,7 +74,7 @@ public class GameMenu {
                 pourOil(matcher);
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.DIG_TUNNEL)) != null)
                 digTunnel(matcher);
-            else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.DISBAND_UNIT)) != null)
+            else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.DISBAND_UNIT)) != null)
                 disbandUnit();
             else if (GameMenuCommand.getMatcher(line, GameMenuCommand.NEXT_TURN) != null)
                 nextTurn();
