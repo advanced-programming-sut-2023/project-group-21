@@ -15,18 +15,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.decrementExact;
 import static java.lang.Math.min;
 
 public class Government {
     private final User lord;
-    private int foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0, foodVariety = 0;
+    private int foodRate, taxRate, fearRate, popularityRate = 0, foodVariety = 0;
     private ArrayList<Building> buildings = new ArrayList<>();
-    private ArrayList<Person> people = new ArrayList<>();
-    private ArrayList<Machine> machines = new ArrayList<>();
-    private HashMap<Resource, Integer> resources = new HashMap<>();
-    private Building hold;
-    private ArrayList<Trade> trades;
+    private final ArrayList<Person> people = new ArrayList<>();
+    private final ArrayList<Machine> machines = new ArrayList<>();
+    private final HashMap<Resource, Integer> resources = new HashMap<>();
+    private final Building hold;
+    private final ArrayList<Trade> trades = new ArrayList<>();
 
     public Government(User lord,Cell cell) {
         Worker myLord = new Worker(WorkerDetails.LORD,this,cell,cell);
@@ -39,6 +38,7 @@ public class Government {
         resources.put(Resource.WOOD,70);
         resources.put(Resource.STONE, 70);
         hold = new Building(this,BuildingsDetails.HOLD,cell, null);
+        cell.setBuilding(hold);
         this.lord = lord;
         for(int i1=0;i1<10;i1++){
             people.add(new Person(this));
@@ -120,9 +120,6 @@ public class Government {
         this.buildings = buildings;
     }
 
-    public void setReligionRate(boolean check) {
-        religionRate += check ? 2 : -2;
-    }
 
     public Building getBuildingByName(String name) {
         for (Building building : buildings)
@@ -212,7 +209,7 @@ public class Government {
         return trades;
     }
     public void doActionInTurnFirst () {
-        int change = 0;
+        int change;
         double tax = Game.TaxDetails.getTax(taxRate);
         if (resources.get(Resource.GOLD) + people.size() * tax < 0) {
             taxRate = 0;
@@ -293,7 +290,7 @@ public class Government {
         result += resources.get(Resource.GOLD);
         for (Person person : people)
             if (person instanceof Worker)
-                ((Worker) person).getWorkerDetails().getGold();
+                result += ((Worker) person).getWorkerDetails().getGold();
 
         return result;
     }
@@ -306,9 +303,9 @@ public class Government {
 
     public int calculateLeftPopulationCapacity(){
         int result = 0;
-        for(int i1=0;i1<buildings.size();i1++){
-            if(buildings.get(i1) instanceof Residency)
-                result += ((Residency)buildings.get(i1)).getMaxPopularity();
+        for (Building building : buildings) {
+            if (building instanceof Residency)
+                result += ((Residency) building).getMaxPopularity();
         }
         result = result - people.size();
         return result;

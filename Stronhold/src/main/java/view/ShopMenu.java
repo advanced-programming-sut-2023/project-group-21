@@ -17,6 +17,7 @@ public class ShopMenu {
         shopController = new ShopController(government);
     }
     public void run(Scanner scanner){
+        System.out.println("you are in shop menu!");
         String line;
         Matcher matcher;
         while (true){
@@ -34,6 +35,7 @@ public class ShopMenu {
             else
                 System.out.println("invalid command");
         }
+        System.out.println("you are in game menu!");
     }
 
     private void help() {

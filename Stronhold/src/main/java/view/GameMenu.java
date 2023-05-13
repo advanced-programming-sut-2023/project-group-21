@@ -31,9 +31,10 @@ public class GameMenu {
     public void run(Scanner scanner) {
         String line;
         Matcher matcher;
+        System.out.println("you are in game menu!");
         while (gameController.checkEndGame()) {
             line = scanner.nextLine();
-            if (line.equals("back") || checkWin())
+            if (line.equals("back") || gameController.checkWin())
                 break;
             else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FACTORS)) != null)
                 printPopularityFactors();
@@ -101,10 +102,12 @@ public class GameMenu {
                 showMap(matcher);
             else if(GameMenuCommand.getMatcher(line,GameMenuCommand.CALCULATE_UNEMPLOYMENT)!=null)
                 showUnemployed();
+            else if(line.equals("help"))
+                System.out.println("you are playing!");
             else
                 System.out.println("invalid format!");
-
         }
+        System.out.println("game ended!");
     }
 
     private void showUnemployed(){
