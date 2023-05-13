@@ -119,7 +119,6 @@ public class MapMenu {
     private void checkMove(Matcher matcher) {
         String left = matcher.group("left");
         String mapShow = mapController.moveMap(left);
-        clearScreen();
         System.out.println(mapShow);
     }
 

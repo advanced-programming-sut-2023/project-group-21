@@ -1,10 +1,13 @@
 package view;
 
+
 import controller.GameController;
+import controller.OtherController;
 import model.Cell;
 import model.Government;
 import model.User;
 import view.commands.GameMenuCommand;
+import view.commands.MapCommand;
 import view.message.GameMessage;
 
 import java.util.ArrayList;
@@ -34,11 +37,11 @@ public class GameMenu {
                 break;
             else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FACTORS)) != null)
                 printPopularityFactors();
-            else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_POPULARITY)) != null)
+            else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_POPULARITY)) != null)
                 showPopularity();
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SET_FOOD_RATE)) != null)
                 setFoodRate(matcher);
-            else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FOOD_LIST)) != null)
+            else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FOOD_LIST)) != null)
                 showFoodList();
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SET_TAX)) != null)
                 checkSetTaxRate(matcher);
@@ -46,11 +49,11 @@ public class GameMenu {
                 showTaxRate();
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.DROP_BUILDING)) != null)
                 dropBuilding(matcher);
-            else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.GO_TO_SHOP)) != null)
-                goToShop(matcher, scanner);
+            else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.GO_TO_SHOP)) != null)
+                goToShop(scanner);
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SELECT_BUILDING)) != null)
                 chooseBuilding(matcher);
-            else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FOOD_RATE)) != null)
+            else if ((GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_FOOD_RATE)) != null)
                 showFoodRate();
             else if ((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.CREATE_UNIT)) != null)
                 checkCreateUnit(matcher);
@@ -84,14 +87,58 @@ public class GameMenu {
                 makeSiegeUnit(matcher);
             else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.SWITCH))!= null)
                 switch1();
-            else if(true)
+            else if((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_RESOURCE)) != null)
                 checkShowResource(matcher);
+            else if((matcher = MapCommand.getMatcher(line,MapCommand.SHOW_DETAIL))!=null)
+                showDetails(matcher);
+            else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.SET_FEAR_RATE))!=null)
+                setFearRate(matcher);
+            else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.CHANGE_STATE))!=null)
+                changeState(matcher);
+            else if ((matcher = MapCommand.getMatcher(line,MapCommand.MOVE_MAP))!=null)
+                checkMove(matcher);
+            else if ((matcher = MapCommand.getMatcher(line,MapCommand.SHOW_MAP))!=null)
+                showMap(matcher);
+            else if(GameMenuCommand.getMatcher(line,GameMenuCommand.CALCULATE_UNEMPLOYMENT)!=null)
+                showUnemployed();
             else
                 System.out.println("invalid format!");
 
         }
     }
 
+    private void showUnemployed(){
+        System.out.println("number of unemployed is: "+gameController.getNumberOfPeasants());
+    }
+
+    private void showMap(Matcher matcher) {
+        int x = Integer.parseInt(matcher.group("x"));
+        int y = Integer.parseInt(matcher.group("y"));
+        System.out.println(gameController.showMap(x, y));
+    }
+    private void checkMove(Matcher matcher) {
+        String left = matcher.group("left");
+        String mapShow = gameController.moveMap(left);
+        System.out.println(mapShow);
+    }
+    private void changeState(Matcher matcher){
+        String state  = matcher.group("state");
+        gameController.openOrCloseGate(state);
+    }
+    private void setFearRate(Matcher matcher){
+        try {
+            int fearRate = Integer.parseInt(matcher.group("rate"));
+            GameMessage message = gameController.setFearRate(fearRate);
+            System.out.println(message.toString());
+        }catch (NumberFormatException exception){
+            System.out.println("enter integer!");
+        }
+    }
+    private void showDetails(Matcher matcher) {
+        int x = Integer.parseInt(matcher.group("x"));
+        int y = Integer.parseInt(matcher.group("y"));
+        System.out.println(gameController.showDetails(x, y));
+    }
     public void setMapMenu(MapMenu mapMenu) {
         this.mapMenu = mapMenu;
     }
@@ -135,17 +182,17 @@ public class GameMenu {
         tradeMenu.run(scanner, gameController.getCurrentGovernment());
     }
 
-    private void goToShop(Matcher matcher, Scanner scanner) {
+    private void goToShop(Scanner scanner) {
         ShopMenu shopMenu = new ShopMenu(government);
         shopMenu.run(scanner);
     }
 
     private void showPopularity() {
-        System.out.println("your popularity is :" + government.getPopularity());
+        System.out.println("your popularity is :" + gameController.getPopularity());
     }
 
     private void showFoodList() {
-        System.out.println(gameController.showFoodRate());
+        System.out.println(gameController.showFoodList());
     }
 
     private void setFoodRate(Matcher matcher) {
@@ -165,13 +212,13 @@ public class GameMenu {
     }
 
     private void showTaxRate() {
-        System.out.println("your tax rate is :" + gameController.showFoodRate());
+        System.out.println("your tax rate is :" + gameController.showTaxRate());
     }
 
     private void dropBuilding(Matcher matcher) {
         int x = Integer.parseInt(matcher.group("x"));
         int y = Integer.parseInt(matcher.group("y"));
-        String type = matcher.group("type");
+        String type = OtherController.myTrim(matcher.group("type"));
         GameMessage gameMessage = gameController.checkDropBuilding(x, y, type);
         System.out.println(gameMessage.toString());
     }
@@ -219,15 +266,20 @@ public class GameMenu {
         System.out.println(gameMessage.toString());
     }
 
-    private void attackEnemy(Matcher matcher) {//ask
-        String enemy = matcher.group("enemy");
-        System.out.println("repair" + enemy);
+    private void attackEnemy(Matcher matcher) {
+        try {
+            int x = Integer.parseInt(matcher.group("x"));
+            int y = Integer.parseInt(matcher.group("y"));
+            gameController.attack(x,y);
+        }catch (NumberFormatException exception){
+            System.out.println("please enter an integer!");
+        }
     }
 
     private void attackXY(Matcher matcher) {
         int x = Integer.parseInt(matcher.group("x"));
         int y = Integer.parseInt(matcher.group("y"));
-        GameMessage gameMessage = gameController.attack(x, y);
+        GameMessage gameMessage = gameController.checkArcherAttack(x,y);
         System.out.println(gameMessage);
     }
 
@@ -246,7 +298,7 @@ public class GameMenu {
     }
 
     private void makeSiegeUnit(Matcher matcher) {
-        String name = matcher.group("name");
+        String name = OtherController.myTrim(matcher.group("name"));
         GameMessage gameMessage = gameController.checkBuildSiegeEquipment(name);
         System.out.println(gameMessage);
     }
@@ -261,16 +313,5 @@ public class GameMenu {
         System.out.println("now " + government.getLord().getUserName() + " is playing!");
     }
 
-    private void clearElement(Matcher matcher) {
-
-    }
-
-    private void dropRock(Matcher matcher) {
-
-    }
-
-    private void dropUnits(Matcher matcher) {
-
-    }
 
 }

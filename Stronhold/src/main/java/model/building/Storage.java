@@ -3,7 +3,7 @@ package model.building;
 import model.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
-import model.building.Enums.StorageDetails;
+import model.building.Enums.ContainerDetails;
 import model.generalenums.Resource;
 import model.human.Person;
 
@@ -12,32 +12,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Storage extends Building {
-    private StorageDetails storageDetails;
+    private ContainerDetails containerDetails;
     private Map<Resource, Integer> availableResources = new HashMap<>();
 
-    public Storage(Government government, Cell cell, StorageDetails storageDetails, ArrayList<Person> workers) {
-        super(government, storageDetails.getBuildingsDetails(), cell, workers);
-        this.storageDetails = storageDetails;
+    public Storage(Government government, Cell cell, ContainerDetails containerDetails, ArrayList<Person> workers) {
+        super(government, containerDetails.getBuildingsDetails(), cell, workers);
+        this.containerDetails = containerDetails;
     }
 
     public BuildingsDetails getBuildingsDetails() {
-        return storageDetails.getBuildingsDetails();
+        return containerDetails.getBuildingsDetails();
     }
 
-    public StorageDetails getStorageDetails(){
-        return storageDetails;
+    public ContainerDetails getcontainerDetails(){
+        return containerDetails;
     }
 
     public int getCapacity() {
-        return storageDetails.getCapacity();
+        return containerDetails.getCapacity();
     }
 
-    public int getOccupation(StorageDetails details){
+    public int getOccupation(ContainerDetails details){
         int sum = 0;
         for (Map.Entry<Resource, Integer> entry : availableResources.entrySet()) {
             Resource resource = entry.getKey();
             Integer amount = entry.getValue();
-            if(resource.getResourceKeeper() == details)
+            if(resource.getResourceKeeper() == details.getBuildingsDetails())
                 sum += amount;
         }
         return sum;

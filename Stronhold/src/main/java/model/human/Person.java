@@ -6,7 +6,7 @@ import model.building.Building;
 public class Person {
     int hitPoint;
     Government government;
-    Building workPlace;
+    Building workPlace = null;
 
     public Person(Government government) {
         this.government = government;

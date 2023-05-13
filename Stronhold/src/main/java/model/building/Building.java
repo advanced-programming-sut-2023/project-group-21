@@ -22,8 +22,10 @@ public class Building {
         this.hitPoint = buildingsDetails.getMaxHitPoints();
         this.cell = cell;
         this.workers = workers;
-        for (Person person: workers)
-            person.setWorkPlace(this);
+        if (workers != null) {
+            for (Person person : workers)
+                person.setWorkPlace(this);
+        }
     }
 
     public Government getGovernment() {

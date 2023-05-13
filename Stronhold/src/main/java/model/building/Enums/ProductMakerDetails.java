@@ -51,8 +51,10 @@ public enum ProductMakerDetails {
     }
 
     public static ProductMakerDetails getProductMakerDetailsByBuildingDetails(BuildingsDetails buildingsDetails) {
-        for (ProductMakerDetails productMakerDetails: ProductMakerDetails.values())
+        for (ProductMakerDetails productMakerDetails: ProductMakerDetails.values()) {
+            System.out.println(productMakerDetails.buildingsDetails);
             if (productMakerDetails.buildingsDetails.equals(buildingsDetails)) return productMakerDetails;
+        }
         return null;
     }
 }

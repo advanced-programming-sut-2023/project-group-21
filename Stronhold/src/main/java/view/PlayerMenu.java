@@ -72,7 +72,7 @@ public class PlayerMenu {
                 int numberOfPlayer;
                 try {
                     numberOfPlayer = Integer.parseInt(scanner.nextLine().trim());
-                    if(numberOfPlayer <=2 || numberOfPlayer>= 8 || numberOfPlayer>= myHolds.size()){
+                    if(numberOfPlayer <2 || numberOfPlayer> 8 || numberOfPlayer> myHolds.size()){
                         System.out.println("invalid number");
                         return;
                     }

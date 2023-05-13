@@ -71,25 +71,31 @@ public class Cell {
         StringBuilder details = new StringBuilder();
         details.append("Texture: ").append(getGroundTexture().getName()).append("\n");
         if (building != null)
-            details.append("Building: ").append(building.getName()).append("\n");
+            details.append("Building: ").append(building.getName()).append(" | hitpoint: ").append(building.getHitPoint()).append("\n");
         if (people.size() != 0) {
-            details.append("People: ").append("\n");
-            for (int i = 0; i < people.size(); i++) {
-                boolean isRepeated = false;
-                for (int j = 0; j < i; j++) {
-                    if (people.get(j).getName().equals(people.get(i).getName())) {
-                        isRepeated = true;
-                        break;
-                    }
-                }
-                if (isRepeated) continue;
-                details.append(people.get(i));
-                int number = 1;
-                for (int j = i + 1; j < people.size(); j++) if (people.get(j).getName().equals(people.get(i).getName())) number++;
-                details.append(" ").append(number).append("\n");
+//            details.append("People: ").append("\n");
+//            for (int i = 0; i < people.size(); i++) {
+//                boolean isRepeated = false;
+//                for (int j = 0; j < i; j++) {
+//                    if (people.get(j).getName().equals(people.get(i).getName())) {
+//                        isRepeated = true;
+//                        break;
+//                    }
+//                }
+//                if (isRepeated) continue;
+//                details.append(people.get(i));
+//                int number = 1;
+//                for (int j = i + 1; j < people.size(); j++) if (people.get(j).getName().equals(people.get(i).getName())) number++;
+//                details.append(" ").append(number).append("\n");
+//            }
+            for (Worker person: people) {
+                details.append(person.getName()).append(": ").append(person.getGovernment().getLord().getUserName());
+                details.append(" | ").append(person.getHitPoint());
+                if (person.getEnemy() != null) details.append(" | enemy: ").append(person.getEnemy().getPosition().toString());
+                details.append("\n");
             }
         }
-        details.append("All People: ").append(people.size());
+        details.append("Number of all People: ").append(people.size());
         return details.toString();
     }
 
@@ -183,9 +189,9 @@ public class Cell {
             }
             if (groundTexture != GroundTexture.SOIL || extra != null)
                 return false;
-            if(building != null && building instanceof Tower
-                    && (((Tower)building).getBuildingsDetails()==BuildingsDetails.SQUARE_TOWER ||
-                    ((Tower)building).getBuildingsDetails() == BuildingsDetails.ROUND_TOWER))
+            if(building != null
+                    && (building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
+                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
             return true;
         }
         if (groundTexture != GroundTexture.SOIL || extra != null)

@@ -37,12 +37,15 @@ public class LoginMenu {
     }
 
     private void help() {
-
+        System.out.println("login menu!");
     }
 
     public void checkLogin(Matcher matcher, Scanner scanner) {
+        boolean state = matcher.group("last") != null;
         String username = OtherController.myTrim(matcher.group("username"));
         String password = OtherController.myTrim(matcher.group("password"));
+        if(state)
+            FileController.modifyInfo("stayed-logged-in",username,"t");
         OtherController.sleepShort();
         System.out.println(OtherController.generateCaptcha());
         String solve = scanner.nextLine();
