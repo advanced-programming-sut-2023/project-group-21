@@ -6,6 +6,8 @@ import model.building.Residency;
 import model.building.Storage;
 import model.generalenums.GroundTexture;
 import model.generalenums.Resource;
+import model.human.Assassin;
+import model.human.Engineer;
 import model.human.Enums.WorkerDetails;
 import model.human.Person;
 import model.human.Worker;
@@ -98,7 +100,9 @@ public class Government {
                 break;
             }
         }
-        people.add(new Worker(workerDetails, this, cell, cell));
+        if (workerDetails.getName().equals("assassin")) people.add(new Assassin(workerDetails, this, cell, cell));
+        else if (workerDetails.getName().equals("engineer")) people.add(new Engineer(workerDetails, this, cell, cell));
+        else people.add(new Worker(workerDetails, this, cell, cell));
         cell.addPeople((Worker) people.get(people.size()-1));
     }
 
@@ -132,11 +136,13 @@ public class Government {
     }
 
     public void reduceResources(Resource resource, int count) {
+        if (!resources.containsKey(resource)) return;
         resources.replace(resource, resources.get(resource) - count);
         if (resources.get(resource) == 0) resources.remove(resource);
     }
 
     public void addToResource(Resource resource, int amount) {
+        if (amount == 0) return;
         if (resources.containsKey(resource))
             resources.replace(resource, resources.get(resource) + amount);
         else
@@ -185,7 +191,7 @@ public class Government {
         for (Map.Entry<Resource, Integer> entry: resources.entrySet())
             if (entry.getKey().getResourceKeeper() != null &&
                     entry.getKey().getResourceKeeper().equals(buildingsDetails)) full += entry.getValue();
-        return capacity - full;
+        return Math.max(capacity - full, 0);
     }
 
     public void sellSuccessfully(Trade trade) {
@@ -210,6 +216,7 @@ public class Government {
     }
     public void doActionInTurnFirst () {
         int change = 0;
+        ArrayList<Resource> toRemove = new ArrayList<>();
         double tax = Game.TaxDetails.getTax(taxRate);
         if (resources.get(Resource.GOLD) + people.size() * tax < 0) {
             taxRate = 0;
@@ -227,14 +234,15 @@ public class Government {
             Resource resource = entry.getKey();
             Integer amount = entry.getValue();
             if (resource.getResourceKeeper() != null && resource.getResourceKeeper() == BuildingsDetails.GRANARY) {
+                if (foodNumber == 0) break;
                 change = min(amount, foodNumber);
                 amount -= change;
                 foodNumber -= change;
                 resources.replace(resource, amount);
-                if (amount == 0)
-                    resources.remove(resource);
+                if (amount == 0) toRemove.add(resource);
             }
         }
+        for (Resource resource: toRemove) resources.remove(resource);
         getFoodVariety();
         addPopularity();
     }
@@ -243,6 +251,15 @@ public class Government {
         int addition = Math.min(calculateLeftPopulationCapacity(), popularityRate);
         if (addition >= 0) for (int i = 1; i <= addition; i++) people.add(new Person(this));
         else removePeople(popularityRate);
+    }
+
+    public String getBuildingDetails() {
+        StringBuilder st = new StringBuilder();
+        for (Building building: buildings) {
+            st.append(building.getName()).append(": ").append(building.getCell().toString()).append(" | ");
+            st.append(building.getHitPoint()).append("\n");
+        }
+        return st.toString();
     }
 
     private void removePeople(int number) {
@@ -291,7 +308,7 @@ public class Government {
         result += resources.get(Resource.GOLD);
         for (Person person : people)
             if (person instanceof Worker)
-                ((Worker) person).getWorkerDetails().getGold();
+                result += ((Worker) person).getWorkerDetails().getGold();
         return result;
     }
 

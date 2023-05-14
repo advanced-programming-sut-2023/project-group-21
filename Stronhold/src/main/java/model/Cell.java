@@ -24,7 +24,7 @@ public class Cell {
     private ArrayList<Worker> people;
     private int xCoordinates, yCoordinates;
     private boolean hadCross = false,hasOil=false,hasHole=false;
-    private  char direction;
+    private char direction = 'a';
     private boolean hasLadder = false;
     public Cell(int xCoordinates, int yCoordinates) {
         this.xCoordinates = xCoordinates;
@@ -93,6 +93,13 @@ public class Cell {
                 details.append(" | ").append(person.getHitPoint());
                 if (person.getEnemy() != null) details.append(" | enemy: ").append(person.getEnemy().getPosition().toString());
                 details.append("\n");
+            }
+        }
+        if (machines != null) {
+            details.append("\n");
+            for (Machine machine: machines) {
+                details.append(machine.getName()).append(": ").append(machine.getGovernment().getLord().getUserName());
+                details.append(" | ").append(machine.getHitPoint()).append("\n");
             }
         }
         details.append("Number of all People: ").append(people.size());
@@ -239,5 +246,9 @@ public class Cell {
 
     public void addPeople(Worker worker) {
         people.add(worker);
+    }
+
+    public void refreshDirection() {
+        this.direction = 'a';
     }
 }

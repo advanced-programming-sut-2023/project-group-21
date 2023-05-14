@@ -31,10 +31,11 @@ public enum GameMenuCommand {
     MOVE_EQUIPMENT("move equipment -x1 (?<x1>\\d+) -y1 (?<y1>\\d+) -x2 (?<x2>\\d+) -y2 (?<y2>\\d+)"),
     MAKE__("make equipment (?<name>(\\S+|\"[^\"]*\"))"),
     SWITCH("\\s*switch\\s*"),
-    SHOW_RESOURCE("\\s*show\\s+resource\\s+(?<resource>\\S+)\\s*"),
+    SHOW_RESOURCE("\\s*show\\s+resource\\s*(?<resource>\\S*)\\s*"),
     SET_FEAR_RATE("set fear rate -r (?<rate>-?\\d+)\\s*"),
     CHANGE_GATE("\\s*(?<state>\\S+)\\s+gate\\s*"),
-    CALCULATE_UNEMPLOYMENT("\\s*show\\s+unemployment\\s*");
+    CALCULATE_UNEMPLOYMENT("\\s*show\\s+unemployment\\s*"),
+    BUILDING_DETAILS("\\s*show\\s+building\\s+details\\s*");
     private final String regex;
     GameMenuCommand(String regex){
         this.regex = regex;

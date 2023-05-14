@@ -86,7 +86,7 @@ public class GameMenu {
                 checkMoveEquipment(matcher);
             else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.MAKE__))!=null)
                 makeSiegeUnit(matcher);
-            else if((matcher = GameMenuCommand.getMatcher(line,GameMenuCommand.SWITCH))!= null)
+            else if((GameMenuCommand.getMatcher(line,GameMenuCommand.SWITCH))!= null)
                 switch1();
             else if((matcher = GameMenuCommand.getMatcher(line, GameMenuCommand.SHOW_RESOURCE)) != null)
                 checkShowResource(matcher);
@@ -102,12 +102,17 @@ public class GameMenu {
                 showMap(matcher);
             else if(GameMenuCommand.getMatcher(line,GameMenuCommand.CALCULATE_UNEMPLOYMENT)!=null)
                 showUnemployed();
+            else if (GameMenuCommand.getMatcher(line, GameMenuCommand.BUILDING_DETAILS) != null)
+                getBuildingDetails();
             else
                 System.out.println("invalid format!");
         }
         System.out.println("Game ended.");
     }
 
+    private void getBuildingDetails() {
+        System.out.println(gameController.getBuildingDetails());
+    }
     private void showUnemployed(){
         System.out.println("number of unemployed is: "+gameController.getNumberOfPeasants());
     }

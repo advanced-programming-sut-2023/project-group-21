@@ -96,10 +96,11 @@ public class GameController {
         if (map[x - 1][y - 1].getExtra() != null) return GameMessage.OCCUPIED;
         if (map[x - 1][y - 1].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
-        if (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER))
+        if (buildingType != null && (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER) ||
+                buildingType.equals(BuildingsDetails.BuildingType.QUARRY)))
             if (!textureMatches(buildingsDetails, x, y)) return GameMessage.BAD_TEXTURE;
         if (getNumberOfPeasants() < buildingsDetails.getWorkersCount()) return GameMessage.NOT_ENOUGH_PEOPLE;
-        if (buildingType.equals(BuildingsDetails.BuildingType.OIL_SMELTER)) {
+        if (buildingType != null && buildingType.equals(BuildingsDetails.BuildingType.OIL_SMELTER)) {
             boolean hasEngineer = false;
             for (Worker worker: map[x-1][y-1].getPeople()) {
                 if (worker instanceof Engineer && !((Engineer) worker).hasOil() && !((Engineer) worker).hasMachine() &&
@@ -112,7 +113,7 @@ public class GameController {
         }
         if (buildingsDetails.getRequiredResource() != null) {
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
-                if (currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
+                if (currentGovernment.getResources().containsKey(entry.getKey()) && currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
                     return GameMessage.NOT_ENOUGH_RESOURCE;
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
                 currentGovernment.reduceResources(entry.getKey(), entry.getValue());
@@ -120,6 +121,7 @@ public class GameController {
         dropBuilding(x, y, buildingsDetails);
         return GameMessage.SUCCESS;
     }
+
     public String showDetails(int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!!";
         try {
@@ -137,6 +139,12 @@ public class GameController {
                 if (number-- == 0) break;
                 persons.add(person);
             }
+        }
+        if (buildingsDetails.equals(BuildingsDetails.CATHEDRAL) || buildingsDetails.equals(BuildingsDetails.CHURCH))
+            currentGovernment.setReligionRate(true);
+        if (buildingType == null) {
+            currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+            return;
         }
         switch (buildingType) {
             case PRODUCT_MAKER:
@@ -167,9 +175,14 @@ public class GameController {
                 break;
             case QUARRY:
                 currentGovernment.addBuilding(new Quarry(currentGovernment, map[x - 1][y - 1], persons));
+                break;
             case TOWER:
                 currentGovernment.addBuilding(new Tower(currentGovernment, map[x-1][y-1],
                         TowerDetails.getTowerDetailsByBuildingDetails(buildingsDetails), persons));
+                break;
+            case OX_TETHER:
+                currentGovernment.addBuilding(new OxTether(currentGovernment, buildingsDetails, map[x-1][y-1], persons));
+                break;
             default:
                 currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
         }
@@ -208,7 +221,7 @@ public class GameController {
             return GameMessage.MONEY_PROBLEM;
         if (europeanSoldiers != null) {
             for (Resource equipment : europeanSoldiers.getEquipments())
-                if (currentGovernment.getResources().get(equipment) < 1)
+                if (!currentGovernment.getResources().containsKey(equipment) || currentGovernment.getResources().get(equipment) < 1)
                     return GameMessage.NOT_ENOUGH_RESOURCE;
             for (Resource equipment : europeanSoldiers.getEquipments())
                 currentGovernment.reduceResources(equipment, 1);
@@ -396,7 +409,8 @@ public class GameController {
             return GameMessage.NOT_ENOUGH_ENGINEER;
         for (Engineer engineer : engineers)
             engineer.giveHimMachine(true);
-        currentGovernment.addBuilding(new Building(currentGovernment, BuildingsDetails.SIEGE_TENT, selectedWorker.getPosition(), null));
+        currentGovernment.addBuilding(new SiegeTent(currentGovernment, BuildingsDetails.SIEGE_TENT,
+                selectedWorker.getPosition(), machineDetail, engineers));
         return GameMessage.SUCCESS;
     }
 
@@ -538,6 +552,24 @@ public class GameController {
     }
 
     private void decodePath(int x2, int y2) {
+        Iterator iterator = closed.iterator();
+        while (iterator.hasNext()){
+            ((Cell)iterator.next()).refreshDirection();
+        }
+        Collection collection = opens.values();
+        Iterator iterator1 = collection.iterator();
+        Iterator iterator2 ;
+        while (iterator1.hasNext()){
+            Collection collection1 = ((TreeMap)iterator1.next()).values();
+            iterator2 = collection1.iterator();
+            while (iterator2.hasNext()){
+                ArrayList<Cell> veryTemp = opens.get(iterator1).get(iterator2);
+                for(int i1=0;i1<veryTemp.size();i1++)
+                    veryTemp.get(i1).refreshDirection();
+            }
+        }
+        closed = new HashSet<>();
+        opens = new TreeMap<>();
         path = new ArrayList<>();
         if (!checkValidity(y2, y2, x2, y2))
             return;
@@ -591,7 +623,8 @@ public class GameController {
             for (Machine machine: government.getMachines()) {
                 if (machine.getMachineDetails().equals(MachineDetails.SIEGE_TOWER) ||
                         machine.getMachineDetails().equals(MachineDetails.PORTABLE_SHIELD)) continue;
-                findBuilding(machine).getDamaged(machine.getDamage());
+                Building building = findBuilding(machine);
+                if (building != null) building.getDamaged(machine.getDamage());
             }
         }
     }
@@ -617,11 +650,21 @@ public class GameController {
         return selected;
     }
 
+    public String getBuildingDetails() {
+        return currentGovernment.getBuildingDetails();
+    }
+
     private void updateBuildings() {
+        ArrayList<Building> toRemove = new ArrayList<>();
         for (Government government: governments) {
             for (Building building: government.getBuildings()) {
-                if (building.getHitPoint() <= 0 && building.getHitPoint() > -900) removeBuilding(building);
-                if (building.getWorkers().size() < building.getRequiredWorkersCount()) {
+                if (building.getHitPoint() <= 0 && building.getHitPoint() > -900) {
+                    toRemove.add(building);
+                    if (building.getBuildingsDetails().equals(BuildingsDetails.CHURCH) ||
+                        building.getBuildingsDetails().equals(BuildingsDetails.CATHEDRAL))
+                        currentGovernment.setReligionRate(false);
+                }
+                if (building.getWorkers() != null && building.getWorkers().size() < building.getRequiredWorkersCount()) {
                     for (Person person: currentGovernment.getPeople()) {
                         if (!(person instanceof Worker) && person.getWorkPlace() == null) {
                             building.getWorkers().add(person);
@@ -631,6 +674,7 @@ public class GameController {
                 }
             }
         }
+        for (Building building: toRemove) removeBuilding(building);
     }
 
 
@@ -677,29 +721,28 @@ public class GameController {
         for (Government government : governments) {
             for (Building building : government.getBuildings()) {
                 if (building instanceof ProductMaker productMaker) {
+                    if (building instanceof WeaponProduction &&
+                            currentGovernment.getResources().containsKey(((WeaponProduction) building).getConsumingProduct())) {
+                        Resource create = ((WeaponProduction) building).getCurrentWeapon();
+                        currentGovernment.addToResource(create, Math.min(((WeaponProduction) building).getRate(),
+                                currentGovernment.leftStorage(create)));
+                    }
                     if (((ProductMaker) building).getConsumingProduct() != null) {
                         if (currentGovernment.getResources().containsKey(productMaker.getConsumingProduct()) &&
                             productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()) {
                             currentGovernment.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
-                            for (Resource resource: ((ProductMaker) building).getProducts())
+                            for (Resource resource: ((ProductMaker) building).getProducts()) {
                                 currentGovernment.addToResource(resource,
                                         Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                            }
                         }
                     }
-                    else if (productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()){
-                        for (Resource resource : ((ProductMaker) building).getProducts())
+                    else if (productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()) {
+                        for (Resource resource : ((ProductMaker) building).getProducts()) {
                             currentGovernment.addToResource(resource,
                                     Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                        }
                     }
-                    for (Resource resource : ((ProductMaker) building).getProducts())
-                        currentGovernment.addToResource(resource,
-                                Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
-                }
-                if (building instanceof WeaponProduction &&
-                        currentGovernment.getResources().containsKey(((WeaponProduction) building).getConsumingProduct())) {
-                    Resource create = ((WeaponProduction) building).getCurrentWeapon();
-                    currentGovernment.addToResource(create, Math.min(((WeaponProduction) building).getRate(),
-                            currentGovernment.leftStorage(create)));
                 }
                 if (building instanceof Quarry) ((Quarry) building).addToCapacity(3);
             }
@@ -719,9 +762,9 @@ public class GameController {
                 addition = Math.min(currentGovernment.leftStorage(Resource.STONE),
                         Math.min(((Quarry) building).getCapacity(), addStone));
                 addStone -= addition;
-                if (addStone == 0) break;
                 ((Quarry) building).addToCapacity(addition * -1);
                 currentGovernment.addToResource(Resource.STONE, addition);
+                if (addStone == 0) break;
             }
         }
     }
@@ -737,6 +780,7 @@ public class GameController {
                         worker.getPosition().getBuilding().getName().equals("pitch ditch"))
                     ((Trap) worker.getPosition().getBuilding()).setOnFire(true);
                 if (worker instanceof Engineer && worker.getPosition().equals(worker.getDestination()) &&
+                        worker.getPosition().getBuilding() != null &&
                         worker.getPosition().getBuilding().getName().equals("oil smelter"))
                     ((Engineer) worker).setHasOil(true);
                 if (worker instanceof Assassin && checkOtherTroop((Assassin) worker)) ((Assassin) worker).expose();
@@ -778,6 +822,9 @@ public class GameController {
                 machine.getDamaged(hitDamage - machine.getDefense());
             }
             int defenseRate= enemy.getDefense();
+            if (enemy.getName().equals("assassin")) {
+                System.out.println(hitDamage -defenseRate);
+            }
             enemy.getDamaged(Math.max(hitDamage-defenseRate, 0));
             if (worker.getState().equals("defensive")) worker.setDestination(enemy.getPosition());
         }
@@ -815,15 +862,17 @@ public class GameController {
         return distance <= ((Worker) person).getRange();
     }
     private void buildEquipments() {
+        ArrayList<Building> toRemove = new ArrayList<>();
         for (Building building: currentGovernment.getBuildings()) {
             if (building instanceof SiegeTent) {
                 currentGovernment.addMachine(new Machine(((SiegeTent) building).getMachineToMake(), currentGovernment,
                         building.getCell(), ((SiegeTent) building).getEngineers()));
                 for (Engineer engineer: ((SiegeTent) building).getEngineers())
                     engineer.setMachine(currentGovernment.getMachines().get(currentGovernment.getMachines().size()-1));
-                removeBuilding(building);
+                toRemove.add(building);
             }
         }
+        for (Building building: toRemove) removeBuilding(building);
     }
 
     public void pourOil(String direction, Engineer engineer) {
@@ -925,8 +974,6 @@ public class GameController {
             return GameMessage.UNABLE_TO_MOVE;
         Cell cell1;
         calculateDistance(x1 - 1,y1 - 1,x2 - 1,y2 - 1);
-        if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
-        if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         Machine machine = null;
         for(int i1=0;i1<map[x1][y1].getMachine().size();i1++){
             if(map[x1][y1].getMachine().get(i1).getSpeed()!=0) machine = map[x1][y1].getMachine().get(i1);
@@ -973,8 +1020,8 @@ public class GameController {
         return GameMessage.SUCCESS;
     }
 
-    public String getResourceName(String name){
-        if(name == null)
+    public String getResourceName(String name) {
+        if(name == null || name.trim().isEmpty())
             return currentGovernment.showStorage(null);
         BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(name);
         ContainerDetails containerDetails = ContainerDetails.getContainerByBuilding(buildingsDetails);

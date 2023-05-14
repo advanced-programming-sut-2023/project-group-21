@@ -7,7 +7,7 @@ import java.util.List;
 
 public enum EuropeanSoldiersDetails {
     ARCHER(WorkerDetails.ARCHER, Arrays.asList(Resource.BOW)),
-    CROSSBOWMAN(WorkerDetails.CROSSBOWMAN, Arrays.asList(Resource.BOW, Resource.LEATHER_ARMOR)),
+    CROSSBOWMAN(WorkerDetails.CROSSBOWMAN, Arrays.asList(Resource.CROSSBOW, Resource.LEATHER_ARMOR)),
     SPEARMAN(WorkerDetails.SPEARMAN, Arrays.asList(Resource.SPEAR)),
     PIKEMAN(WorkerDetails.PIKEMAN, Arrays.asList(Resource.PIKE, Resource.METAL_ARMOR)),
     MACEMAN(WorkerDetails.MACEMAN, Arrays.asList(Resource.MACE, Resource.LEATHER_ARMOR)),

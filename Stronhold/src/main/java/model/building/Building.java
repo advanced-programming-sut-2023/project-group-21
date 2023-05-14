@@ -53,7 +53,7 @@ public class Building {
     }
 
     public String getName() {
-        return getBuildingsDetails().name();
+        return getBuildingsDetails().getName();
     }
 
     public void repairHitPoint(){

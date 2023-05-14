@@ -12,7 +12,7 @@ public class Machine {
     private Government government;
     private Cell cell;
     int hitPoint = 0;
-    ArrayList<Engineer> engineers;
+    private ArrayList<Engineer> engineers;
 
     public Machine(MachineDetails machineDetails, Government government, Cell cell, ArrayList<Engineer> engineers) {
         this.machineDetails = machineDetails;
@@ -70,5 +70,9 @@ public class Machine {
 
     public MachineDetails getMachineDetails() {
         return machineDetails;
+    }
+
+    public String getName() {
+        return machineDetails.getName();
     }
 }

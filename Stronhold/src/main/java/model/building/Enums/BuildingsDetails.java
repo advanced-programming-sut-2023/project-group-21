@@ -23,7 +23,7 @@ public enum BuildingsDetails {
     MILL("mill", BuildingType.PRODUCT_MAKER, 15, Map.of(Resource.WOOD, 20), 3),
     IRON_MINE("iron mine", BuildingType.PRODUCT_MAKER, 20, Map.of(Resource.WOOD, 20), 2),
     MARKETPLACE("marketplace", null, 15, Map.of(Resource.WOOD, 5), 1),
-    OX_TETHER("ox tether", BuildingType.PRODUCT_MAKER, 10, Map.of(Resource.WOOD, 5), 1),
+    OX_TETHER("ox tether", BuildingType.OX_TETHER, 10, Map.of(Resource.WOOD, 5), 1),
     PITCH_RIG("pitch rig", BuildingType.PRODUCT_MAKER, 15, Map.of(Resource.WOOD, 20), 1),
     QUARRY("quarry", BuildingType.QUARRY, 20, Map.of(Resource.WOOD, 20), 3),
     STOCKPILE("stockpile", BuildingType.STORAGE, 10, null,0),
@@ -51,7 +51,7 @@ public enum BuildingsDetails {
     WALL("wall", null, 20, null,0),
     DITCH("ditch", null, -1000, null,0);
     public enum BuildingType {
-        PRODUCT_MAKER, GATE, STORAGE, TOWER, TROOP_TRAINER, QUARRY, SIEGE_TENT, STABLE, TRAP, WEAPON_PRODUCTION, OIL_SMELTER, CAGED_WAR_DOGS, RESIDENCY
+        PRODUCT_MAKER, GATE, STORAGE, TOWER, TROOP_TRAINER, QUARRY, SIEGE_TENT, STABLE, TRAP, WEAPON_PRODUCTION, OIL_SMELTER, CAGED_WAR_DOGS, RESIDENCY, OX_TETHER
     }
     private final String name;
     private final BuildingType buildingType;
