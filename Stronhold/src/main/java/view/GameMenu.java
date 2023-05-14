@@ -104,10 +104,16 @@ public class GameMenu {
                 showUnemployed();
             else if (GameMenuCommand.getMatcher(line, GameMenuCommand.BUILDING_DETAILS) != null)
                 getBuildingDetails();
+            else if (GameMenuCommand.getMatcher(line, GameMenuCommand.SET_DOGS_FREE) != null)
+                setDogsFree();
             else
                 System.out.println("invalid format!");
         }
         System.out.println("Game ended.");
+    }
+
+    private void setDogsFree() {
+        System.out.println(gameController.setDogsFree().toString());
     }
 
     private void getBuildingDetails() {

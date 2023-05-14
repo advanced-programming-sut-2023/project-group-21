@@ -122,7 +122,7 @@ public class Government {
     }
 
     public void setReligionRate(boolean check) {
-        religionRate += check ? 2 : -2;
+        popularityRate += check ? 2 : -2;
     }
 
     public Building getBuildingByName(String name) {
@@ -143,10 +143,13 @@ public class Government {
 
     public void addToResource(Resource resource, int amount) {
         if (amount == 0) return;
-        if (resources.containsKey(resource))
-            resources.replace(resource, resources.get(resource) + amount);
-        else
-            resources.put(resource, amount);
+        ArrayList<Resource> toRemove = new ArrayList<>();
+        String s = resources.containsKey(Resource.BREAD) + "" + resources.get(Resource.BREAD);
+        if (resources.containsKey(resource)) resources.put(resource, resources.get(resource) + amount);
+        else resources.put(resource, amount);
+        for (Map.Entry<Resource, Integer> entry: resources.entrySet())
+            if (entry.getValue() == 0) toRemove.add(entry.getKey());
+        for (Resource resource1: toRemove) resources.remove(resource1);
     }
 
     public int getLeftFood() {
@@ -342,8 +345,9 @@ public class Government {
     public String showStorage(BuildingsDetails buildingsDetails) {
         StringBuilder string = new StringBuilder();
         if (buildingsDetails == null) {
-            for (Map.Entry<Resource, Integer> entry: resources.entrySet())
+            for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
                 string.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
+            }
         } else {
             for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
                 if (entry.getKey().getResourceKeeper() != null && entry.getKey().getResourceKeeper().equals(buildingsDetails))

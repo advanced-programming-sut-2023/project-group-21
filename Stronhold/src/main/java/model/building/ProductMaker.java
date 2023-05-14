@@ -13,12 +13,10 @@ import java.util.List;
 
 public class ProductMaker extends Building {
     ProductMakerDetails productMakerDetails;
-    Resource currentProduction;
 
     public ProductMaker(Government government, Cell cell, ProductMakerDetails productMakerDetails, ArrayList<Person> workers) {
         super(government, productMakerDetails.getBuildingsDetails(), cell, workers);
         this.productMakerDetails = productMakerDetails;
-        currentProduction = productMakerDetails.getProducts().get(0);
     }
 
     public BuildingsDetails getBuildingsDetails() {

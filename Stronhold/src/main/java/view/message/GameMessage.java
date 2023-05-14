@@ -45,7 +45,8 @@ public enum GameMessage {
     NO_SUCH_UNIT("no such unit exists."),
     NOT_YOUR_BUILDING("this building is not yours"),
     NO_ENGINEERS("no engineers in this place"),
-    OCCUPIED("you can't place a building here.");
+    OCCUPIED("you can't place a building here."),
+    ENGINEER_OCCUPIED("this engineer is occupied");
     private final String message;
     GameMessage(String message){
         this.message = message;

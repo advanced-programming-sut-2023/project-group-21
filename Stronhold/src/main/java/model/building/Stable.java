@@ -17,4 +17,8 @@ public class Stable extends Building {
     public int getAvailableHorses() {
         return availableHorses;
     }
+
+    public void addHorse() {
+        if (availableHorses < 4) availableHorses++;
+    }
 }

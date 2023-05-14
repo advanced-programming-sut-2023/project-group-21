@@ -35,7 +35,8 @@ public enum GameMenuCommand {
     SET_FEAR_RATE("set fear rate -r (?<rate>-?\\d+)\\s*"),
     CHANGE_GATE("\\s*(?<state>\\S+)\\s+gate\\s*"),
     CALCULATE_UNEMPLOYMENT("\\s*show\\s+unemployment\\s*"),
-    BUILDING_DETAILS("\\s*show\\s+building\\s+details\\s*");
+    BUILDING_DETAILS("\\s*show\\s+building\\s+details\\s*"),
+    SET_DOGS_FREE("\\s*set\\s+dogs\\+free\\s*");
     private final String regex;
     GameMenuCommand(String regex){
         this.regex = regex;

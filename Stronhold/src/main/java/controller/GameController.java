@@ -36,7 +36,8 @@ public class GameController {
     private Government currentGovernment;
     private MapController mapController;
     private Map<Engineer, String> pouringOils = new HashMap<>();
-    private final List<WorkerDetails> ARCHERS = Arrays.asList(WorkerDetails.ARCHER, WorkerDetails.CROSSBOWMAN, WorkerDetails.ARABIAN_BOW);
+    private ArrayList<Cell> freeDogs = new ArrayList<>();
+    private Map<Cell, String> tunnels = new HashMap<>();
 
     public GameController(ArrayList<Government> governments, Cell[][] map) {
         this.governments = governments;
@@ -140,7 +141,8 @@ public class GameController {
                 persons.add(person);
             }
         }
-        if (buildingsDetails.equals(BuildingsDetails.CATHEDRAL) || buildingsDetails.equals(BuildingsDetails.CHURCH))
+        if (buildingsDetails.equals(BuildingsDetails.CATHEDRAL) || buildingsDetails.equals(BuildingsDetails.CHURCH) ||
+        buildingsDetails.equals(BuildingsDetails.INN))
             currentGovernment.setReligionRate(true);
         if (buildingType == null) {
             currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
@@ -221,10 +223,10 @@ public class GameController {
             return GameMessage.MONEY_PROBLEM;
         if (europeanSoldiers != null) {
             for (Resource equipment : europeanSoldiers.getEquipments())
-                if (!currentGovernment.getResources().containsKey(equipment) || currentGovernment.getResources().get(equipment) < 1)
+                if (!currentGovernment.getResources().containsKey(equipment) || currentGovernment.getResources().get(equipment) < count)
                     return GameMessage.NOT_ENOUGH_RESOURCE;
             for (Resource equipment : europeanSoldiers.getEquipments())
-                currentGovernment.reduceResources(equipment, 1);
+                currentGovernment.reduceResources(equipment, count);
         }
         for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(worker, map[x - 1][y - 1]);
         return GameMessage.SUCCESS;
@@ -265,6 +267,8 @@ public class GameController {
     public GameMessage moveUnit(int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedWorker == null) return GameMessage.NO_SELECTED_UNIT;
+        if (selectedWorker instanceof Engineer && (((Engineer) selectedWorker).getWorkplace() != null ||
+                ((Engineer) selectedWorker).getMachine() != null)) return GameMessage.ENGINEER_OCCUPIED;
         if (map[x - 1][y - 1].getBuilding() != null && !(map[x - 1][y -1].getBuilding() instanceof Tower))
             return null;
         int x1 = selectedWorker.getPosition().getxCoordinates();
@@ -359,7 +363,7 @@ public class GameController {
         if (direction.length() > 1) return GameMessage.INVALID_DIRECTION;
         if (!Game.directions.contains(direction)) return GameMessage.INVALID_DIRECTION;
         if (!checkTunnel(x, y, direction)) return GameMessage.CANT_TUNNEL;
-
+        tunnels.put(map[x - 1][y - 1], direction);
         return GameMessage.SUCCESS;
     }
 
@@ -382,9 +386,11 @@ public class GameController {
         for (int i = 0; i < 6; i++) {
             if (horizontal) cell = map[x + i * dir][y];
             else cell = map[x][y + i * dir];
-            if (cell.getBuilding().getBuildingsDetails().getBuildingType().equals(BuildingsDetails.BuildingType.TRAP) ||
-                    cell.getBuilding().getName().equals("ditch")) return false;
-            if (cell.getBuilding().getBuildingsDetails().getBuildingType().equals(BuildingsDetails.BuildingType.TOWER)) {
+            if (cell.getBuilding() != null &&
+                    (cell.getBuilding().getBuildingsDetails().getBuildingType().equals(BuildingsDetails.BuildingType.TRAP) ||
+                    cell.getBuilding().getName().equals("ditch"))) return false;
+            if (cell.getBuilding() != null &&
+                    cell.getBuilding().getBuildingsDetails().getBuildingType().equals(BuildingsDetails.BuildingType.TOWER)) {
                 String name = cell.getBuilding().getName();
                 if (name.equals("perimeter tower") || name.equals("square tower") || name.equals("round tower"))
                     return false;
@@ -400,7 +406,7 @@ public class GameController {
         if (machineDetail == null) return GameMessage.NO_SUCH_CAR_EXIST;
         if (numberOfEngineers() < machineDetail.getEngineersNeeded()) return GameMessage.NOT_ENOUGH_ENGINEER;
         for (Worker person : selectedWorker.getPosition().getPeople()) {
-            if(person instanceof Engineer&& !((Engineer) person).hasMachine())
+            if(person instanceof Engineer && !((Engineer) person).hasMachine() && person.getGovernment().equals(currentGovernment))
                 engineers.add((Engineer) person);
             if(engineers.size()>=machineDetail.getEngineersNeeded())
                 break;
@@ -602,6 +608,9 @@ public class GameController {
         updateStorage();
         startMove();
         for (Map.Entry<Engineer, String> entry: pouringOils.entrySet()) pourOil(entry.getValue(), entry.getKey());
+        for (Map.Entry<Cell, String> entry: tunnels.entrySet()) digTunnel(entry.getKey(), entry.getValue());
+        pouringOils.clear();
+        tunnels.clear();
         machineAttack();
         updateBuildings();
         updateTroops();
@@ -674,20 +683,27 @@ public class GameController {
                 }
             }
         }
+        for (Cell cell: freeDogs) {
+            dogAttack(cell);
+            toRemove.add(cell.getBuilding());
+        }
+        freeDogs.clear();
         for (Building building: toRemove) removeBuilding(building);
     }
 
 
     public void clearDeadSoldiers() {
+        ArrayList<Person> toRemove = new ArrayList<>();
         for (Government government : governments) {
             for (Person person : government.getPeople()) {
                 if (person.getHitPoint() <= 0) {
-                    person.delete();
+                    toRemove.add(person);
                     if (person.getWorkPlace() != null)
                         person.getWorkPlace().getWorkers().remove(person);
                 }
             }
         }
+        for (Person person: toRemove) person.delete();
     }
 
     public void doTheMove(Worker person, ArrayList<Cell> way) {//put ladder & remove ladder
@@ -722,31 +738,57 @@ public class GameController {
             for (Building building : government.getBuildings()) {
                 if (building instanceof ProductMaker productMaker) {
                     if (building instanceof WeaponProduction &&
-                            currentGovernment.getResources().containsKey(((WeaponProduction) building).getConsumingProduct())) {
+                            government.getResources().containsKey(((WeaponProduction) building).getConsumingProduct())) {
                         Resource create = ((WeaponProduction) building).getCurrentWeapon();
-                        currentGovernment.addToResource(create, Math.min(((WeaponProduction) building).getRate(),
-                                currentGovernment.leftStorage(create)));
+                        government.addToResource(create, Math.min(((WeaponProduction) building).getRate(),
+                                government.leftStorage(create)));
                     }
-                    if (((ProductMaker) building).getConsumingProduct() != null) {
-                        if (currentGovernment.getResources().containsKey(productMaker.getConsumingProduct()) &&
+                    else if (((ProductMaker) building).getConsumingProduct() != null) {
+                        if (government.getResources().containsKey(productMaker.getConsumingProduct()) &&
                             productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()) {
-                            currentGovernment.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
-                            for (Resource resource: ((ProductMaker) building).getProducts()) {
-                                currentGovernment.addToResource(resource,
-                                        Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                            government.reduceResources(((ProductMaker) building).getConsumingProduct(), 1);
+                            if (((ProductMaker) building).getProducts() != null) {
+                                for (Resource resource : ((ProductMaker) building).getProducts()) {
+                                    government.addToResource(resource,
+                                            Math.min(((ProductMaker) building).getRate(), government.leftStorage(resource)));
+                                }
                             }
                         }
                     }
                     else if (productMaker.getWorkers().size() == productMaker.getRequiredWorkersCount()) {
                         for (Resource resource : ((ProductMaker) building).getProducts()) {
-                            currentGovernment.addToResource(resource,
-                                    Math.min(((ProductMaker) building).getRate(), currentGovernment.leftStorage(resource)));
+                            government.addToResource(resource,
+                                    Math.min(((ProductMaker) building).getRate(), government.leftStorage(resource)));
                         }
                     }
                 }
                 if (building instanceof Quarry) ((Quarry) building).addToCapacity(3);
+                if (building instanceof Stable) {
+                    ((Stable) building).addHorse();
+                    government.getResources().put(Resource.HORSE, ((Stable) building).getAvailableHorses());
+                }
             }
             addStone();
+        }
+    }
+
+    public GameMessage setDogsFree() {
+        if (!selectedBuilding.getBuildingsDetails().equals(BuildingsDetails.CAGED_WAR_DOGS)) return GameMessage.BAD_BUILDING;
+        freeDogs.add(selectedBuilding.getCell());
+        return GameMessage.SUCCESS;
+    }
+
+    private void dogAttack(Cell cell) {
+        for (Government government: governments) {
+            if (government.equals(cell.getBuilding().getGovernment())) continue;
+            for (Person person: government.getPeople()) {
+                if (person instanceof Worker worker && !worker.isOnTower()) {
+                    int x = worker.getPosition().getxCoordinates();
+                    int y =worker.getPosition().getyCoordinates();
+                    if (calculateDistance(x, y, cell.getxCoordinates(), cell.getyCoordinates()) < 5)
+                        worker.getDamaged(10);
+                }
+            }
         }
     }
 
@@ -822,9 +864,6 @@ public class GameController {
                 machine.getDamaged(hitDamage - machine.getDefense());
             }
             int defenseRate= enemy.getDefense();
-            if (enemy.getName().equals("assassin")) {
-                System.out.println(hitDamage -defenseRate);
-            }
             enemy.getDamaged(Math.max(hitDamage-defenseRate, 0));
             if (worker.getState().equals("defensive")) worker.setDestination(enemy.getPosition());
         }
@@ -915,6 +954,10 @@ public class GameController {
             for (Person person: building.getWorkers())
                 person.setWorkPlace(null);
         }
+        if (building.getBuildingsDetails().equals(BuildingsDetails.CHURCH) ||
+                building.getBuildingsDetails().equals(BuildingsDetails.CATHEDRAL)||
+        building.getBuildingsDetails().equals(BuildingsDetails.INN))
+            currentGovernment.setReligionRate(false);
     }
     public ArrayList<Cell> getNeighbours(Cell cell) {
         if (cell == null)
@@ -1091,6 +1134,34 @@ public class GameController {
 
     public boolean checkWin() {
         return governments.size() <= 1;
+    }
+
+    private void digTunnel(Cell cell, String direction) {
+        int x = cell.getxCoordinates();
+        int y = cell.getyCoordinates();
+        switch (direction) {
+            case "n" -> {
+                int yMin = Math.max(0, y - 5);
+                for (int i = y; i > yMin; i--) damageCell(map[x][i]);
+            }
+            case "s" -> {
+                int yMax = Math.min(199, y + 5);
+                for (int i = y; i <= yMax; i++) damageCell(map[x][i]);
+            }
+            case "e" -> {
+                int xMax = Math.min(199, x + 5);
+                for (int i = x; i < xMax; i++) damageCell(map[i][y]);
+            }
+            case "w" -> {
+                int xMin = Math.max(0, x - 5);
+                for (int i = x; i > xMin; i--) damageCell(map[i][y]);
+            }
+        }
+    }
+
+    private void damageCell(Cell cell) {
+        if (cell.getBuilding() != null) cell.getBuilding().getDamaged(25);
+        for (Worker worker: cell.getPeople()) worker.getDamaged(70);
     }
 
 }

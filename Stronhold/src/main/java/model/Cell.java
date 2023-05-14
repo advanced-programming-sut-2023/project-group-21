@@ -153,7 +153,7 @@ public class Cell {
         hadCross = true;
     }
     public String toString() {
-        return "(" + xCoordinates + "," + yCoordinates + ") ";
+        return "(" + (xCoordinates + 1) + "," + (yCoordinates + 1) + ") ";
     }
 
     public boolean isCross() {

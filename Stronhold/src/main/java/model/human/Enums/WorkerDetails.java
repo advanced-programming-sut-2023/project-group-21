@@ -10,7 +10,7 @@ public enum WorkerDetails {
     MACEMAN("maceman", BuildingsDetails.BARRACKS, 30, 4, 3, 15, 0, 20),
     SWORDSMAN("swordsman", BuildingsDetails.BARRACKS, 40, 4, 1, 5, 0, 40),
     KNIGHT("knight", BuildingsDetails.BARRACKS, 30, 5, 4, 25, 1, 40),
-    TUNNELER("tunneler", BuildingsDetails.BARRACKS, 20, 2, 1, 20, 0, 30),
+    TUNNELER("tunneler", BuildingsDetails.TANNERS_GUILD, 20, 2, 1, 20, 0, 30),
     LADDERMAN("ladderman", BuildingsDetails.ENGINEERS_GUILD, 15, 0, 1, 20, 0, 4),
     ENGINEER("engineer", BuildingsDetails.ENGINEERS_GUILD, 15, 0, 1, 15, 0, 30),
     BLACK_MONK("black monk", BuildingsDetails.CATHEDRAL, 30, 3, 3, 10, 0, 10),
