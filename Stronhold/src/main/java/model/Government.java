@@ -17,18 +17,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.decrementExact;
 import static java.lang.Math.min;
 
 public class Government {
     private final User lord;
     private int foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0, foodVariety = 0;
     private ArrayList<Building> buildings = new ArrayList<>();
-    private ArrayList<Person> people = new ArrayList<>();
-    private ArrayList<Machine> machines = new ArrayList<>();
-    private HashMap<Resource, Integer> resources = new HashMap<>();
-    private Building hold;
-    private ArrayList<Trade> trades;
+    private final ArrayList<Person> people = new ArrayList<>();
+    private final ArrayList<Machine> machines = new ArrayList<>();
+    private final HashMap<Resource, Integer> resources = new HashMap<>();
+    private final Building hold;
+    private final ArrayList<Trade> trades = new ArrayList<>();
 
     public Government(User lord,Cell cell) {
         Worker myLord = new Worker(WorkerDetails.LORD,this,cell,cell);
@@ -123,6 +122,9 @@ public class Government {
 
     public void setReligionRate(boolean check) {
         popularityRate += check ? 2 : -2;
+    }
+    public void setBuildings(ArrayList<Building> buildings) {
+        this.buildings = buildings;
     }
 
     public Building getBuildingByName(String name) {
@@ -345,9 +347,8 @@ public class Government {
     public String showStorage(BuildingsDetails buildingsDetails) {
         StringBuilder string = new StringBuilder();
         if (buildingsDetails == null) {
-            for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
+            for (Map.Entry<Resource, Integer> entry: resources.entrySet())
                 string.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
-            }
         } else {
             for (Map.Entry<Resource, Integer> entry: resources.entrySet()) {
                 if (entry.getKey().getResourceKeeper() != null && entry.getKey().getResourceKeeper().equals(buildingsDetails))

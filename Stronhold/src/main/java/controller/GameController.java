@@ -1131,9 +1131,8 @@ public class GameController {
         yCoordinates += yChange;
         return showMap(xCoordinates, yCoordinates);
     }
-
-    public boolean checkWin() {
-        return governments.size() <= 1;
+    public boolean checkWin(){
+        return governments.size()<=1;
     }
 
     private void digTunnel(Cell cell, String direction) {

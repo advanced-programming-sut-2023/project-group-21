@@ -9,60 +9,63 @@ import java.util.Map;
 
 public class ShopController {
     Government currentGovernment;
-    Map<Resource,Integer> resources;
-    public ShopController(Government government){
+    Map<Resource, Integer> resources;
+
+    public ShopController(Government government) {
         this.currentGovernment = government;
-        resources=currentGovernment.getResources();
+        resources = currentGovernment.getResources();
     }
 
 
-    public ShopMessage buy(String name,int amount){
+    public ShopMessage buy(String name, int amount) {
         Resource resource = Resource.getResourceByName(name);
-        if(resource == null || resource == Resource.GOLD)
+        if (resource == null || resource == Resource.GOLD)
             return ShopMessage.NOT_A_RESOURCE;
-        if(amount<=0)
+        if (amount <= 0)
             return ShopMessage.INVALID_NUMBER;
-        if(amount>=currentGovernment.leftStorage(resource))
+        if (amount >= currentGovernment.leftStorage(resource))
             return ShopMessage.NO_CAPACITY;
-        if((amount*resource.getCostBuy())>resources.get(Resource.GOLD))
+        if ((amount * resource.getCostBuy()) > resources.get(Resource.GOLD))
             return ShopMessage.NOT_ENOUGH_MONEY;
-        if(resources.containsKey(resource))
-            resources.replace(resource,resources.get(resource) + amount);
+        if (resources.containsKey(resource))
+            resources.replace(resource, resources.get(resource) + amount);
         else
-            resources.put(resource,amount);
-        int coinChange = amount*resource.getCostBuy();
-        resources.replace(Resource.GOLD,resources.get(Resource.GOLD)-coinChange);
+            resources.put(resource, amount);
+        int coinChange = amount * resource.getCostBuy();
+        resources.replace(Resource.GOLD, resources.get(Resource.GOLD) - coinChange);
         return ShopMessage.SUCCESS;
     }
-    public ShopMessage sell(String name,int amount){
+
+    public ShopMessage sell(String name, int amount) {
         Resource resource = Resource.getResourceByName(name);
-        if(resource == null || resource == Resource.GOLD)
+        if (resource == null || resource == Resource.GOLD)
             return ShopMessage.NOT_A_RESOURCE;
-        if(amount<=0)
+        if (amount <= 0)
             return ShopMessage.INVALID_NUMBER;
-        if(amount>(resources.get(resource)))
+        if (amount > (resources.get(resource)))
             return ShopMessage.NOT_ENOUGH;
-        resources.replace(resource,resources.get(resource)-amount);
-        if(resources.get(resource)==0)
+        resources.replace(resource, resources.get(resource) - amount);
+        if (resources.get(resource) == 0)
             resources.remove(resource);
-        int coinChange = amount*resource.getCostSell();
-        resources.replace(Resource.GOLD,resources.get(Resource.GOLD)+coinChange);
+        int coinChange = amount * resource.getCostSell();
+        resources.replace(Resource.GOLD, resources.get(Resource.GOLD) + coinChange);
         // it needs repair
         return ShopMessage.SUCCESS;
     }
 
-    public String showDetails(){
+    public String showDetails() {
         String temp = "";
         Resource resource;
         Integer count;
         String name;
         int price;
         for (Map.Entry<Resource, Integer> entry : resources.entrySet()) {
-            resource= entry.getKey();
-            count= entry.getValue();
+            resource = entry.getKey();
+            count = entry.getValue();
             name = resource.getName();
             price = resource.getCostBuy();
-            temp += ("recourse name:"+name+" price(buy): "+price+" price(sell): "+(price - 1)+" inventory: "+count);
+            temp += ("recourse name:" + name + " price(buy): " + price + " price(sell): " + (price - 1)
+                    + " inventory: " + count + "\n");
         }
         return temp;
     }

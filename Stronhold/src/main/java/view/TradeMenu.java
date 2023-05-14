@@ -34,7 +34,7 @@ public class TradeMenu {
     }
 
     private void help() {
-        System.out.println("You are in the trade menu.You can sell, buy and check the history of trades");
+        System.out.println("You are in the trade menu.You can sell\nbuy and check the history of trades");
     }
 
     private void checkTrade(Matcher matcher,Government government){
@@ -55,7 +55,8 @@ public class TradeMenu {
     private void showTradeList(){
         String show="";
         for (Trade trade : Game.getTrades()) {
-            show = show + trade.getId() + " " + trade.getResource().getName() + " " + trade.getAmount() + " " + trade.getCost() + " " + trade.getComment() + "\n";
+            show = show + trade.getId() + " " + trade.getResource().getName() + " " + trade.getAmount() +
+                    " " + trade.getCost() + " " + trade.getComment() + "\n";
         }
         System.out.print(show);
     }
@@ -63,7 +64,8 @@ public class TradeMenu {
     private void showTradeHistory(Government government){
         String show="";
         for (Trade trade : government.getTrades()) {
-            show = show + trade.getId() + " " + trade.getResource().getName() + trade + " " + trade.getAmount() + " " + trade.getCost() + " " + trade.getComment() + "\n";
+            show = show + trade.getId() + " " + trade.getResource().getName() + trade + " " +
+                    trade.getAmount() + " " + trade.getCost() + " " + trade.getComment() + "\n";
         }
         System.out.print(show);
     }
