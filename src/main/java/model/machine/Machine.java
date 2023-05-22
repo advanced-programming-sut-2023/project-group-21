@@ -11,6 +11,16 @@ public class Machine {
     private MachineDetails machineDetails;
     private Government government;
     private Cell cell;
+
+    public Cell getDestination() {
+        return destination;
+    }
+
+    public void setDestination(Cell destination) {
+        this.destination = destination;
+    }
+
+    private Cell destination;
     int hitPoint = 0;
     private ArrayList<Engineer> engineers;
 

@@ -46,7 +46,8 @@ public enum GameMessage {
     NOT_YOUR_BUILDING("this building is not yours"),
     NO_ENGINEERS("no engineers in this place"),
     OCCUPIED("you can't place a building here."),
-    ENGINEER_OCCUPIED("this engineer is occupied");
+    ENGINEER_OCCUPIED("this engineer is occupied"),
+    NOT_BELONG_TO_YOU("it component does not belong to you!");
     private final String message;
     GameMessage(String message){
         this.message = message;
