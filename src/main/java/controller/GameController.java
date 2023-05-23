@@ -610,6 +610,7 @@ public class GameController {
         pouringOils.clear();
         tunnels.clear();
         machineAttack();
+        doTheMoveForMachines();
         updateBuildings();
         updateTroops();
         clearDeadSoldiers();

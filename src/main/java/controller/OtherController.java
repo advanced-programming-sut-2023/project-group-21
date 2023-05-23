@@ -5,6 +5,7 @@ import model.Cell;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 //make captcha && Delay && clear the screen
@@ -27,6 +28,7 @@ public class OtherController {
         }
         sleepTime += sleepRate;
     }
+
 
     public static void sleepNormal() {
         try {
