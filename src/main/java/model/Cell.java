@@ -15,28 +15,35 @@ import java.util.ArrayList;
 
 public class Cell {
     private GroundTexture groundTexture = GroundTexture.SOIL;
-    private int distanceOfStart=0;
-    private int distanceOfDestination=0;
-    private int totalDistance=0;
+    private int distanceOfStart = 0;
+    private int distanceOfDestination = 0;
+    private int totalDistance = 0;
     private Building building;
-    private ArrayList<Machine> machines = new ArrayList<>();
+    private final ArrayList<Machine> machines = new ArrayList<>();
     private Extras extra;
-    private ArrayList<Worker> people;
-    private int xCoordinates, yCoordinates;
-    private boolean hadCross = false,hasOil=false,hasHole=false;
+    private final ArrayList<Worker> people;
+    private final int xCoordinates;
+    private final int yCoordinates;
+    private boolean hadCross = false;
+    private final boolean hasOil = false;
+    private final boolean hasHole = false;
     private char direction = 'a';
     private boolean hasLadder = false;
+
     public Cell(int xCoordinates, int yCoordinates) {
         this.xCoordinates = xCoordinates;
         this.yCoordinates = yCoordinates;
         people = new ArrayList<>();
     }
-    public void setDistanceOfStart(int distanceOfStart){
+
+    public void setDistanceOfStart(int distanceOfStart) {
         this.distanceOfStart = distanceOfStart;
     }
-    public void refreshDirection(){
+
+    public void refreshDirection() {
         this.direction = 'a';
     }
+
     private void updateTotalDistance() {
         totalDistance = distanceOfStart + distanceOfDestination;
     }
@@ -69,7 +76,7 @@ public class Cell {
         return people;
     }
 
-    public String showDetails(){
+    public String showDetails() {
         StringBuilder details = new StringBuilder();
         details.append("Texture: ").append(getGroundTexture().getName()).append("\n");
         if (building != null)
@@ -90,16 +97,17 @@ public class Cell {
 //                for (int j = i + 1; j < people.size(); j++) if (people.get(j).getName().equals(people.get(i).getName())) number++;
 //                details.append(" ").append(number).append("\n");
 //            }
-            for (Worker person: people) {
+            for (Worker person : people) {
                 details.append(person.getName()).append(": ").append(person.getGovernment().getLord().getUserName());
                 details.append(" | ").append(person.getHitPoint());
-                if (person.getEnemy() != null) details.append(" | enemy: ").append(person.getEnemy().getPosition().toString());
+                if (person.getEnemy() != null)
+                    details.append(" | enemy: ").append(person.getEnemy().getPosition().toString());
                 details.append("\n");
             }
         }
         if (machines != null) {
             details.append("\n");
-            for (Machine machine: machines) {
+            for (Machine machine : machines) {
                 details.append(machine.getName()).append(": ").append(machine.getGovernment().getLord().getUserName());
                 details.append(" | ").append(machine.getHitPoint()).append("\n");
             }
@@ -111,6 +119,7 @@ public class Cell {
     public void setGroundTexture(GroundTexture groundTexture) {
         this.groundTexture = groundTexture;
     }
+
     public void setExtras(Extras extra) {
         this.extra = extra;
     }
@@ -138,9 +147,10 @@ public class Cell {
     public int getyCoordinates() {
         return yCoordinates;
     }
-    public String makeSaveCode(){
+
+    public String makeSaveCode() {
         String temp = "";
-        if(extra == null)
+        if (extra == null)
             temp += "!";
         else
             temp += extra.getSaveCode();
@@ -151,9 +161,11 @@ public class Cell {
     public int getTotal() {
         return totalDistance;
     }
+
     public void cross() {
         hadCross = true;
     }
+
     public String toString() {
         return "(" + (xCoordinates + 1) + "," + (yCoordinates + 1) + ") ";
     }
@@ -165,77 +177,75 @@ public class Cell {
     public char getDirection() {
         return direction;
     }
+
     public void setTotal(int total) {
         this.totalDistance = total;
     }
+
     public void changeDirection(char dir) {
         this.direction = dir;
     }
 
-    public boolean checkCross(char myDirection,Cell anotherCell,char state){
-        if(this.building==null){
+    public boolean checkCross(char myDirection, Cell anotherCell, char state) {
+        if (this.building == null) {
             return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
                     && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
                     groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
         }
         //repair
-        if(state == 'n') {
+        if (state == 'n') {
             if (groundTexture != GroundTexture.SOIL || extra != null)
                 return false;
             if (building != null) {
                 if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
                     return true;
-                if (building instanceof Gate && ((Gate) building).checkState())
-                    return true;
-                return false;
+                return building instanceof Gate && ((Gate) building).checkState();
             }
             return true;
         }
-        if(state == 'a') {
+        if (state == 'a') {
             if (groundTexture != GroundTexture.SOIL || extra != null)
                 return false;
             if (building != null) {
                 if (building.getBuildingsDetails() == BuildingsDetails.WALL)
                     return true;
-                if (building instanceof Gate && ((Gate) building).checkState())
-                    return true;
-                return false;
+                return building instanceof Gate && ((Gate) building).checkState();
             }
             if (groundTexture != GroundTexture.SOIL || extra != null)
                 return false;
-            if((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
+            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
                     building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
-            return true;
+                return true;
         }
         if (groundTexture != GroundTexture.SOIL || extra != null)
             return false;
-        if(building != null && building instanceof Tower
-                && (((Tower)building).getBuildingsDetails()==BuildingsDetails.SQUARE_TOWER ||
-                ((Tower)building).getBuildingsDetails() == BuildingsDetails.ROUND_TOWER))
-            return true;
-        return false;
+        return building != null && building instanceof Tower
+                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
+                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
     }
-    public void putLadder(){
+
+    public void putLadder() {
         hasLadder = true;
     }
 
-    public boolean checkHasLadder(){
+    public boolean checkHasLadder() {
         return hasLadder;
     }
 
-    public void removeLadder(){
+    public void removeLadder() {
         hasLadder = false;
     }
-    public void deletePerson(Person person){
+
+    public void deletePerson(Person person) {
         people.remove(person);
     }
 
-    public void addPerson(Person person){
+    public void addPerson(Person person) {
         people.add((Worker) person);
     }
 
     public void addMachine(Machine machine) {
-        machines.add(0,machine);
+        machines.add(0, machine);
     }
 
     public boolean doesHaveOil() {
@@ -246,14 +256,15 @@ public class Cell {
         return hasHole;
     }
 
-    public void deleteMachine(Machine machine){
+    public void deleteMachine(Machine machine) {
         machines.remove(machine);
     }
 
     public void addPeople(Worker worker) {
         people.add(worker);
     }
-    public String toString2(){
+
+    public String toString2() {
         return "(" + (xCoordinates + 1) + "," + (yCoordinates + 1) + ")";
     }
 }

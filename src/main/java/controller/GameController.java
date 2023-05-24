@@ -25,7 +25,7 @@ public class GameController {
     private ArrayList<Cell> path = new ArrayList<>();
     private HashSet<Cell> closed = new HashSet<>();
     private TreeMap<Integer, TreeMap<Integer, ArrayList<Cell>>> opens = new TreeMap<>();
-    private HashSet<Cell> openSet = new HashSet<>();
+    private final HashSet<Cell> openSet = new HashSet<>();
     private final Cell[][] map;
     private final ArrayList<Government> governments;
     private Building selectedBuilding;
@@ -47,14 +47,13 @@ public class GameController {
     }
 
     public String showPopularityFactors() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("1. Food Variety: ").append(currentGovernment.getFoodVariety()).append("\n");
-        stringBuilder.append("2. Food Rate: ").append(currentGovernment.getFoodRate());
-        stringBuilder.append(" | Food Count: ").append(currentGovernment.getLeftFood()).append("\n");
-        stringBuilder.append("3. Tax Rate: ").append(currentGovernment.getTaxRate()).append("\n");
-        stringBuilder.append("4. Fear Rate: ").append(currentGovernment.getFearRate()).append("\n\n");
-        stringBuilder.append("Popularity Rate: ").append(currentGovernment.getPopularityRate());
-        return stringBuilder.toString();
+        String stringBuilder = "1. Food Variety: " + currentGovernment.getFoodVariety() + "\n" +
+                "2. Food Rate: " + currentGovernment.getFoodRate() +
+                " | Food Count: " + currentGovernment.getLeftFood() + "\n" +
+                "3. Tax Rate: " + currentGovernment.getTaxRate() + "\n" +
+                "4. Fear Rate: " + currentGovernment.getFearRate() + "\n\n" +
+                "Popularity Rate: " + currentGovernment.getPopularityRate();
+        return stringBuilder;
     }
 
     public GameMessage setFoodRate(int newRate) {
@@ -62,7 +61,6 @@ public class GameController {
         currentGovernment.setFoodRate(newRate);
         return GameMessage.SUCCESS;
     }
-
 
 
     public GameMessage setTaxRate(int tax) {
@@ -255,16 +253,17 @@ public class GameController {
         return GameMessage.SUCCESS;
     }
 
-    private void updatePetrol(){
-        for(int i=0;i<governments.size();i++)
-            for (int j=0;j<governments.get(i).getPeople().size();j++){
+    private void updatePetrol() {
+        for (int i = 0; i < governments.size(); i++)
+            for (int j = 0; j < governments.get(i).getPeople().size(); j++) {
                 Worker tempWorker;
-                if(governments.get(i).getPeople().get(j) instanceof Worker) {
+                if (governments.get(i).getPeople().get(j) instanceof Worker) {
                     tempWorker = (Worker) governments.get(i).getPeople().get(j);
                     tempWorker.doPetrolCheck();//now
                 }
             }
     }
+
     public GameMessage selectUnit(int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (map[x - 1][y - 1].getPeople().isEmpty()) return GameMessage.NO_PEOPLE_TO_SELECT;
@@ -305,10 +304,9 @@ public class GameController {
     private void startMove() {
         for (int i1 = 0; i1 < governments.size(); i1++) {
             for (int i2 = 0; i2 < governments.get(i1).getPeople().size(); i2++) {
-                if (governments.get(i1).getPeople().get(i2) instanceof Worker &&
+                if (governments.get(i1).getPeople().get(i2) instanceof Worker tempWorker &&
                         ((Worker) governments.get(i1).getPeople().get(i2)).getDestination() !=
                                 ((Worker) governments.get(i1).getPeople().get(i2)).getPosition()) {
-                    Worker tempWorker = ((Worker) governments.get(i1).getPeople().get(i2));
                     callOtherFunction(tempWorker.getPosition().getxCoordinates(), tempWorker.getPosition().getyCoordinates(),
                             tempWorker.getDestination().getxCoordinates(), tempWorker.getDestination().getyCoordinates(), 'n');
                     doTheMove(tempWorker, path);
@@ -983,9 +981,7 @@ public class GameController {
     }
 
     public boolean checkEndGame() {
-        if (governments.isEmpty())
-            return false;
-        return true;
+        return !governments.isEmpty();
     }
 
     public GameMessage openOrCloseGate(String state) {
@@ -1005,18 +1001,20 @@ public class GameController {
         }
     }
 
-    public String checkStateOfSelectedBuilding(){
+    public String checkStateOfSelectedBuilding() {
         if (selectedBuilding == null)
             return "no selected building!";
-        return ("name: "+selectedBuilding.getName() + "\n" + "position: "+ selectedBuilding.getCell().toString2()
-                + "\n" + "government: "+selectedBuilding.getGovernment().getLord().getUserName());
+        return ("name: " + selectedBuilding.getName() + "\n" + "position: " + selectedBuilding.getCell().toString2()
+                + "\n" + "government: " + selectedBuilding.getGovernment().getLord().getUserName());
     }
-    public String checkStateOfSelectedUnit(){
+
+    public String checkStateOfSelectedUnit() {
         if (selectedWorker == null)
             return "no selected worker!";
-        return ("name: "+selectedWorker.getName()+ "\n" + "position" + selectedWorker.getPosition().toString2() +
+        return ("name: " + selectedWorker.getName() + "\n" + "position" + selectedWorker.getPosition().toString2() +
                 "\n" + "government: " + selectedWorker.getGovernment().getLord().getUserName());
     }
+
     public String getState() {
         if (selectedBuilding == null || (!(selectedBuilding instanceof WeaponProduction)))
             return "mistake in selecting building!";
@@ -1092,9 +1090,8 @@ public class GameController {
     public GameMessage switchProduct() {
         if (selectedBuilding == null)
             return GameMessage.NO_SELECTED_BUILDING;
-        if (!(selectedBuilding instanceof WeaponProduction))
+        if (!(selectedBuilding instanceof WeaponProduction productMaker))
             return GameMessage.NO_SUITABLE_BUILDING;
-        WeaponProduction productMaker = (WeaponProduction) selectedBuilding;
         if (selectedBuilding.getBuildingsDetails() != BuildingsDetails.POLETURNER &&
                 selectedBuilding.getBuildingsDetails() != BuildingsDetails.FLETCHER &&
                 selectedBuilding.getBuildingsDetails() != BuildingsDetails.BLACKSMITH)
