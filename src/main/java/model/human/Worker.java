@@ -76,8 +76,8 @@ public class Worker extends Person {
     public void doPetrolCheck(){//use before the move !
         if(position == secondCell)
             destination = firstCell;
-        if(destination == firstCell)
-            destination = secondCell;
+        if(position == firstCell)
+            destination = secondCell;//check state
     }
 
     public void setPatrolOn(boolean patrolOn) {
