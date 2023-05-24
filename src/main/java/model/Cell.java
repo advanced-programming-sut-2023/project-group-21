@@ -253,4 +253,7 @@ public class Cell {
     public void addPeople(Worker worker) {
         people.add(worker);
     }
+    public String toString2(){
+        return "(" + (xCoordinates + 1) + "," + (yCoordinates + 1) + ")";
+    }
 }

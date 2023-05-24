@@ -23,19 +23,18 @@ import static java.lang.Math.abs;
 
 public class GameController {
     private ArrayList<Cell> path = new ArrayList<>();
-    private int xCoordinates, yCoordinates;
     private HashSet<Cell> closed = new HashSet<>();
     private TreeMap<Integer, TreeMap<Integer, ArrayList<Cell>>> opens = new TreeMap<>();
     private HashSet<Cell> openSet = new HashSet<>();
-    private Cell[][] map;
-    private ArrayList<Government> governments;
+    private final Cell[][] map;
+    private final ArrayList<Government> governments;
     private Building selectedBuilding;
     private Worker selectedWorker;
     private Government currentGovernment;
     private MapController mapController;
-    private Map<Engineer, String> pouringOils = new HashMap<>();
-    private ArrayList<Cell> freeDogs = new ArrayList<>();
-    private Map<Cell, String> tunnels = new HashMap<>();
+    private final Map<Engineer, String> pouringOils = new HashMap<>();
+    private final ArrayList<Cell> freeDogs = new ArrayList<>();
+    private final Map<Cell, String> tunnels = new HashMap<>();
 
     public GameController(ArrayList<Government> governments, Cell[][] map) {
         this.governments = governments;
@@ -64,9 +63,7 @@ public class GameController {
         return GameMessage.SUCCESS;
     }
 
-    public void setMapController(MapController mapController) {
-        this.mapController = mapController;
-    }
+
 
     public GameMessage setTaxRate(int tax) {
         if (tax > 8 || tax < -3) return GameMessage.INVALID_TEX_RATE;
@@ -258,9 +255,19 @@ public class GameController {
         return GameMessage.SUCCESS;
     }
 
+    private void updatePetrol(){
+        for(int i=0;i<governments.size();i++)
+            for (int j=0;j<governments.get(i).getPeople().size();j++){
+                Worker tempWorker;
+                if(governments.get(i).getPeople().get(j) instanceof Worker) {
+                    tempWorker = (Worker) governments.get(i).getPeople().get(j);
+                    tempWorker.doPetrolCheck();//now
+                }
+            }
+    }
     public GameMessage selectUnit(int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
-        if (map[x - 1][y - 1].getPeople().size() == 0) return GameMessage.NO_PEOPLE_TO_SELECT;
+        if (map[x - 1][y - 1].getPeople().isEmpty()) return GameMessage.NO_PEOPLE_TO_SELECT;
         selectedWorker = map[x - 1][y - 1].getPeople().get(0);
         return GameMessage.SUCCESS;
     }
@@ -272,8 +279,6 @@ public class GameController {
                 ((Engineer) selectedWorker).getMachine() != null)) return GameMessage.ENGINEER_OCCUPIED;
         if (map[x - 1][y - 1].getBuilding() != null && !(map[x - 1][y - 1].getBuilding() instanceof Tower))
             return null;
-        int x1 = selectedWorker.getPosition().getxCoordinates();
-        int y1 = selectedWorker.getPosition().getyCoordinates();
         if (Game.UNPASSABLE.contains(map[x - 1][y - 1].getGroundTexture()) || map[x - 1][y - 1].getExtra() != null)
             return GameMessage.UNREACHABLE_CELL;
         if (selectedWorker.isOnTower()) selectedWorker.setOnTower(false);
@@ -285,7 +290,7 @@ public class GameController {
         if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedWorker == null) return GameMessage.NO_SELECTED_UNIT;
-        selectedWorker.setPatrolMovement(x1 - 1, y1 - 1, x2 - 1, y2 - 1);
+        selectedWorker.setPatrolMovement(map[x1 - 1][y1 - 1], map[x2 - 1][y2 - 1]);
         return GameMessage.SUCCESS;
     }
 
@@ -408,7 +413,8 @@ public class GameController {
         if (machineDetail == null) return GameMessage.NO_SUCH_CAR_EXIST;
         if (numberOfEngineers() < machineDetail.getEngineersNeeded()) return GameMessage.NOT_ENOUGH_ENGINEER;
         for (Worker person : selectedWorker.getPosition().getPeople()) {
-            if (person instanceof Engineer && !((Engineer) person).hasMachine() && person.getGovernment().equals(currentGovernment))
+            if (person instanceof Engineer && !((Engineer) person).hasMachine() &&
+                    person.getGovernment().equals(currentGovernment))
                 engineers.add((Engineer) person);
             if (engineers.size() >= machineDetail.getEngineersNeeded())
                 break;
@@ -450,10 +456,8 @@ public class GameController {
 
 
     private boolean checkValidity(int x1, int y1, int x2, int y2) {
-        if (x1 >= map.length || x1 < 0 || x2 >= map.length || x2 < 0 || y1 >= map.length || y1 < 0 || y2 >= map.length
-                || y2 < 0)
-            return false;
-        return true;
+        return x1 < map.length && x1 >= 0 && x2 < map.length && x2 >= 0 && y1 < map.length && y1 >= 0 && y2 < map.length
+                && y2 >= 0;
     }
 
     private void checkCell(int x1, int y1, int distanceOfStart, int distanceOfDestination, char dir) {
@@ -482,8 +486,8 @@ public class GameController {
         if (x1 >= map.length || x1 < 0 || x2 >= map.length || x2 < 0 || y1 >= map.length || y1 < 0 || y2 >= map.length
                 || y2 < 0)
             return;
-        int lastCellX = 0;
-        int lastCellY = 0;
+        int lastCellX;
+        int lastCellY;
         switch (map[x1][y1].getDirection()) {
             case 'n':
                 lastCellY = y1 + 1;
@@ -530,7 +534,7 @@ public class GameController {
         opens = new TreeMap<>();
         closed = new HashSet<>();
         checkCell(x1, y1, 0, abs(x1 - x) + abs(y1 - y), 'a');
-        while (opens.size() != 0 && map[x][y].getDirection() == 'a') {
+        while (!opens.isEmpty() && map[x][y].getDirection() == 'a') {
             Integer i = opens.firstKey();
             if (i == null)
                 return;
@@ -538,19 +542,19 @@ public class GameController {
             if (treeMap == null)
                 return;
             Integer i2 = null;
-            if (treeMap.size() != 0)
+            if (!treeMap.isEmpty())
                 i2 = treeMap.firstKey();
             if (i2 == null)
                 return;
             ArrayList<Cell> myCells = treeMap.get(i2);
-            if (!(myCells == null || myCells.size() == 0)) {
+            if (!(myCells == null || myCells.isEmpty())) {
                 Cell cell = myCells.get(0);
                 find2Path(cell.getxCoordinates(), cell.getyCoordinates(), x, y, cell.getDistanceOfStart(), state);
-                if (myCells.size() != 0)
+                if (!myCells.isEmpty())
                     myCells.remove(0);
-                if (treeMap.size() == 0)
+                if (treeMap.isEmpty())
                     opens.remove(i);
-                if (myCells.size() == 0)
+                if (myCells.isEmpty())
                     treeMap.remove(i2);
             } else {
                 treeMap.remove(myCells);
@@ -565,7 +569,6 @@ public class GameController {
             (iterator.next()).refreshDirection();
         }
         for (Map.Entry<Integer, TreeMap<Integer, ArrayList<Cell>>> entry : opens.entrySet()) {
-            TreeMap<Integer, ArrayList<Cell>> value = entry.getValue();
             for (Map.Entry<Integer, ArrayList<Cell>> entry2 : entry.getValue().entrySet()) {
                 for (int i1 = 0; i1 < entry2.getValue().size(); i1++) {
                     entry2.getValue().get(i1).refreshDirection();
@@ -604,6 +607,7 @@ public class GameController {
     public void nextTurn() {
         buildEquipments();
         updateStorage();
+        updatePetrol();
         startMove();
         for (Map.Entry<Engineer, String> entry : pouringOils.entrySet()) pourOil(entry.getValue(), entry.getKey());
         for (Map.Entry<Cell, String> entry : tunnels.entrySet()) digTunnel(entry.getKey(), entry.getValue());
@@ -722,12 +726,12 @@ public class GameController {
                 tempCell = cell;
             }
             way.remove(length - i);
-            //check if goes well..{the changes in the cell and the hitpoint of the person
+            //check the move again
         }
         if (person.getWorkerDetails() == WorkerDetails.LADDERMAN) {
             ArrayList<Cell> neighbours = this.getNeighbours(cell);
-            for (int i1 = 0; i1 < neighbours.size(); i1++)
-                if (neighbours.get(i1).getBuilding().getBuildingsDetails() == BuildingsDetails.WALL)
+            for (Cell neighbour : neighbours)
+                if (neighbour.getBuilding().getBuildingsDetails() == BuildingsDetails.WALL)
                     cell.putLadder();
         }
         if (person.getWorkerDetails() == WorkerDetails.SPEARMAN || person.getWorkerDetails() == WorkerDetails.MACEMAN) {
@@ -979,7 +983,7 @@ public class GameController {
     }
 
     public boolean checkEndGame() {
-        if (governments.size() == 0)
+        if (governments.isEmpty())
             return false;
         return true;
     }
@@ -1001,7 +1005,18 @@ public class GameController {
         }
     }
 
-
+    public String checkStateOfSelectedBuilding(){
+        if (selectedBuilding == null)
+            return "no selected building!";
+        return ("name: "+selectedBuilding.getName() + "\n" + "position: "+ selectedBuilding.getCell().toString2()
+                + "\n" + "government: "+selectedBuilding.getGovernment().getLord().getUserName());
+    }
+    public String checkStateOfSelectedUnit(){
+        if (selectedWorker == null)
+            return "no selected worker!";
+        return ("name: "+selectedWorker.getName()+ "\n" + "position" + selectedWorker.getPosition().toString2() +
+                "\n" + "government: " + selectedWorker.getGovernment().getLord().getUserName());
+    }
     public String getState() {
         if (selectedBuilding == null || (!(selectedBuilding instanceof WeaponProduction)))
             return "mistake in selecting building!";
@@ -1035,7 +1050,8 @@ public class GameController {
     private void moveMyEquipmentsAtTheEndOfTurn(Machine machine) {//path at the end of the turn
         Cell cell2;
         Cell cell1 = null;
-        if (machine == null || machine.getCell() == machine.getDestination() || machine.getSpeed() == 0)
+        if (machine == null || machine.getDestination() == null ||
+                machine.getCell() == machine.getDestination() || machine.getSpeed() == 0)
             return;
         callOtherFunction(machine.getCell().getxCoordinates(), machine.getCell().getyCoordinates()
                 , machine.getDestination().getxCoordinates(), machine.getDestination().getyCoordinates(), 'a');
@@ -1068,9 +1084,9 @@ public class GameController {
     }
 
     private void doTheMoveForMachines() {
-        for (int i = 0; i < governments.size(); i++)
-            for (int j = 0; j < governments.get(i).getMachines().size(); j++)
-                moveMyEquipmentsAtTheEndOfTurn(governments.get(i).getMachines().get(j));//iterate all machines from all governments
+        for (Government government : governments)
+            for (int j = 0; j < government.getMachines().size(); j++)
+                moveMyEquipmentsAtTheEndOfTurn(government.getMachines().get(j));//iterate all machines from all governments
     }
 
     public GameMessage switchProduct() {

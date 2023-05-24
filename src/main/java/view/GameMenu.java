@@ -11,13 +11,12 @@ import view.commands.MapCommand;
 import view.message.GameMessage;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
 public class GameMenu {
     private final User user;
-    private Government government;
+    private final Government government;
     private final GameController gameController;
     private final ArrayList<Government> governments;
     private MapMenu mapMenu;
@@ -32,7 +31,7 @@ public class GameMenu {
     public void run(Scanner scanner) {
         String line;
         Matcher matcher;
-        System.out.println("you are in game menu!");
+        System.out.println("game started!\nyou are in game menu!");
         while (gameController.checkEndGame()) {
             line = scanner.nextLine();
             if (line.equals("back") || gameController.checkWin())
@@ -111,10 +110,17 @@ public class GameMenu {
                 setDogsFree();
             else if(line.equals("help"))
                 System.out.println("you are playing!");
+            else if (GameMenuCommand.getMatcher(line,GameMenuCommand.CHECK_STATE) != null)
+                System.out.println(gameController.getState());
+            else if(GameMenuCommand.getMatcher(line,GameMenuCommand.CHECK_SELECTED_BUILDING) != null)
+                System.out.println(gameController.checkStateOfSelectedBuilding());
+            else if(GameMenuCommand.getMatcher(line,GameMenuCommand.CHECK_SELECTED) != null)
+                System.out.println(gameController.checkStateOfSelectedUnit());
             else
                 System.out.println("invalid format!");
         }
         System.out.println("game ended!");
+        System.out.println("you are in player menu!");
     }
 
     private void setDogsFree() {

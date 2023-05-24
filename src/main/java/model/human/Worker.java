@@ -9,6 +9,7 @@ public class Worker extends Person {
     private final WorkerDetails workerDetails;
     private Cell position;
     private Cell destination;
+    private Cell firstCell,secondCell;
     private boolean isPatrolOn = false, isOnTower = false;
     private int patrolX1, patrolY1, patrolX2, patrolY2;
     private Worker enemy;
@@ -65,12 +66,18 @@ public class Worker extends Person {
         this.state = state;
     }
 
-    public void setPatrolMovement(int x1, int y1, int x2, int y2) {
-        patrolX1 = x1;
-        patrolX2 = x2;
-        patrolY1 = y1;
-        patrolY2 = y2;
+    public void setPatrolMovement(Cell firstCell, Cell secondCell) {
+        this.firstCell = firstCell;
+        this.secondCell = secondCell;
+        this.destination = secondCell;
         isPatrolOn = true;
+    }
+
+    public void doPetrolCheck(){//use before the move !
+        if(position == secondCell)
+            destination = firstCell;
+        if(destination == firstCell)
+            destination = secondCell;
     }
 
     public void setPatrolOn(boolean patrolOn) {
@@ -117,7 +124,6 @@ public class Worker extends Person {
 
     public void transport(Cell cell){
         position.getPeople().remove(this);
-        System.out.println("HHH");;
         this.position = cell;
          if(!cell.getPeople().contains(this))
              cell.addPeople(this);

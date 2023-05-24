@@ -28,6 +28,7 @@ public class Machine {
         this.machineDetails = machineDetails;
         this.government = government;
         this.cell = cell;
+        this.destination = cell;
         cell.addMachine(this);
         this.engineers = engineers;
         for (Engineer engineer: engineers)

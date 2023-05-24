@@ -29,7 +29,7 @@ public enum GameMenuCommand {
     NEXT_TURN("\\s*next\\s+turn\\s*"),
     SELECT_MACHINE("move\\s+machine\\s+-x"),//repair!
     GO_TO_TRADE("\\s*go\\s+to\\s+trade\\s*"),
-    PATROL("\\s*patrol\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\d+)\\s+(?<y2>\\d+)\\s*"),
+    PATROL("\\s*patrol\\s+-x1\\s+(?<x1>\\d+)\\s+-y1\\s+(?<y1>\\d+)\\s+-x2\\s+(?<x2>\\d+)\\s+-y2\\s+(?<y2>\\d+)\\s*"),
     MOVE_EQUIPMENT("move equipment -x1 (?<x1>\\d+) -y1 (?<y1>\\d+) -x2 (?<x2>\\d+) -y2 (?<y2>\\d+)"),
     MAKE__("make equipment (?<name>(\\S+|\"[^\"]*\"))"),
     SWITCH("\\s*switch\\s*"),
@@ -38,7 +38,10 @@ public enum GameMenuCommand {
     CHANGE_GATE("\\s*(?<state>\\S+)\\s+gate\\s*"),
     CALCULATE_UNEMPLOYMENT("\\s*show\\s+unemployment\\s*"),
     BUILDING_DETAILS("\\s*show\\s+building\\s+details\\s*"),
-    SET_DOGS_FREE("\\s*set\\s+dogs\\+free\\s*");
+    SET_DOGS_FREE("\\s*set\\s+dogs\\+free\\s*"),
+    CHECK_STATE("\\s*check\\s+state\\s+"),
+    CHECK_SELECTED("\\s*check\\s+selected\\s+unit\\s*"),
+    CHECK_SELECTED_BUILDING("\\s*check\\s+selected\\s+building\\s*");
     private final String regex;
     GameMenuCommand(String regex){
         this.regex = regex;
