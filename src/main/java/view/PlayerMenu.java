@@ -39,7 +39,8 @@ public class PlayerMenu {
     }
 
     private void help() {
-        System.out.println("you are in player menu!\nYou can go to profile, map or game menu. Also you can logout by inputting so");
+        System.out.println("you are in player menu!\nYou can go to profile, map\nyou can also start the game " +
+                "\nAlso you can logout by inputting so");
     }
 
 
@@ -51,12 +52,14 @@ public class PlayerMenu {
                 System.out.println("you are in profile menu");
                 ProfileMenu profileMenu = new ProfileMenu(user);
                 profileMenu.run(scanner);
+                System.out.println("you are in player menu!");
             }
             case "map" -> {
                 System.out.println("you are in map menu");
                 mapMenu = new MapMenu(user);
                 mapMenu.run(scanner);
                 myMap = mapMenu.getMyMap();
+                System.out.println("you are in player menu!");
             }
             case "game" -> {
                 if(mapMenu==null){
@@ -99,7 +102,6 @@ public class PlayerMenu {
                     System.out.println("please enter a number not String :)");
                 }
             }
-
         }
     }
 

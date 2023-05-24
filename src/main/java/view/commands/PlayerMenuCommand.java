@@ -8,7 +8,6 @@ public enum PlayerMenuCommand {
     START_GAME_WITH("\\s*start\\s+game\\s+with\\s+[(\\S+)]*\\s*");
 
 
-
     private String regex;
     PlayerMenuCommand(String regex){
         this.regex = regex;

@@ -41,7 +41,8 @@ public class ProfileMenu {
     }
 
     private void help() {
-        System.out.println("You are in the profile menu\nYou can change your profile's fields or see your profile details");
+        System.out.println("You are in the profile menu\n" +
+                "You can change your profile's fields or see your profile details");
     }
 
 
@@ -71,7 +72,8 @@ public class ProfileMenu {
             System.out.println("field " + option + " cannot contain space");
             return;
         }
-        if ((option.equals("email") && !CheckValidion.check(newOption, CheckValidion.CHECK_EMAIL)) || (option.equals("username") && !CheckValidion.check(newOption, CheckValidion.CHECK_USERNAME))) {
+        if ((option.equals("email") && !CheckValidion.check(newOption, CheckValidion.CHECK_EMAIL)) ||
+                (option.equals("username") && !CheckValidion.check(newOption, CheckValidion.CHECK_USERNAME))) {
             System.out.println("invalid format for " + option);
             return;
         }
