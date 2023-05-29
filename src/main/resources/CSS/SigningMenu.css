@@ -1,0 +1,39 @@
+root{
+    -fx-background-image: url("../images/mainback.jpg");
+    -fx-background-size: cover;
+}
+
+Button{
+    /*-fx-background-color: #AAA5A4;*/
+    -fx-background-image: url("../images/TextFieldBack.jpg");
+    -fx-min-height: 22;
+    -fx-max-height: 22;
+    -fx-min-width: 50;
+    -fx-max-width: 50;
+    -fx-text-fill: #010;
+    -fx-font-size: 12;
+}
+
+
+.text-field{
+    /*-fx-background-color: #917A72;*/
+    -fx-background-image: url("../images/TextFieldBack.jpg");
+    -fx-min-width: 200;
+    -fx-font-family: "Times New Roman";
+    -fx-cursor: Hand;
+}
+
+
+
+.label{
+    -fx-text-fill: #010;
+    -fx-font-size: 18;
+    -fx-font-family: "Courier New";
+}
+
+.Background{
+    -fx-background-image: url("../images/SignUpBack.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: stretch;
+}
