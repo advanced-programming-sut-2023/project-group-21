@@ -19,26 +19,31 @@ public enum GroundTexture {
     SEA("sea", ColorCode.INTENSE_BLUE,"z");
 
     public enum ColorCode {
-        WHITE("\033[47m"),
-        INTENSE_WHITE("\033[0;107m"),
-        CYAN("\033[46m"),
-        INTENSE_CYAN("\033[0;106m"),
-        PURPLE("\033[45m"),
-        INTENSE_PURPLE("\033[0;105m"),
-        BLUE("\033[44m"),
-        INTENSE_BLUE("\033[0;104m"),
-        YELLOW("\033[43m"),
-        INTENSE_YELLOW("\033[0;103m"),
-        GREEN("\033[42m"),
-        INTENSE_GREEN("\033[0;102m"),
-        RED("\033[41m"),
-        INTENSE_RED("\033[0;101m"),
-        BLACK("\033[40m"),
-        INTENSE_BLACK("\033[0;100m");
+        WHITE("\033[47m","#ffffff"),
+        INTENSE_WHITE("\033[0;107m","#aaaaaa"),
+        CYAN("\033[46m","#0D98BA"),
+        INTENSE_CYAN("\033[0;106m","#5D98BA"),
+        PURPLE("\033[45m","#a020f0"),
+        INTENSE_PURPLE("\033[0;105m","#d020f0"),
+        BLUE("\033[44m","#0000ff"),
+        INTENSE_BLUE("\033[0;104m","#2200ff"),
+        YELLOW("\033[43m","#ffff00"),
+        INTENSE_YELLOW("\033[0;103m","#ffbb00"),
+        GREEN("\033[42m","#00ff00"),
+        INTENSE_GREEN("\033[0;102m0","#11cc00"),
+        RED("\033[41m","#ff1111"),
+        INTENSE_RED("\033[0;101m","#dd1122"),
+        BLACK("\033[40m","#000000"),
+        INTENSE_BLACK("\033[0;100m","#333333");
 
         String code;
-        ColorCode(String code) {
+        String RGBCode;
+        ColorCode(String code,String RGBCode) {
             this.code = code;
+            this.RGBCode = RGBCode;
+        }
+        public String getRGBCode(){
+            return RGBCode;
         }
     }
     String name;
@@ -75,5 +80,8 @@ public enum GroundTexture {
 
     public String getSaveCode(){
         return this.saveCode;
+    }
+    public String getRGB(){
+        return colorCode.RGBCode;
     }
 }

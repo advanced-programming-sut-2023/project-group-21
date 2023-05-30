@@ -16,11 +16,11 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class Game {
+    private static final int mapSizeSmall = 8;
     private static final ArrayList<User> users = new ArrayList<>();
     public static final String directions = "nwesr";
-    private static int xCoordinates=10,yCoordinates=10;
-    public static final Map<Integer, Double> foodConsumption = Map.of(-2, (double) 0, -1, 0.5, 0, (double) 1, 1, 1.5, 2, (double) 2);
-    public static final List<String> SLOGANS=Arrays.asList("Peace Through Strength",
+    private static int xCoordinates = 10, yCoordinates = 10;
+    public static final List<String> SLOGANS = Arrays.asList("Peace Through Strength",
             "Better to die than to be a coward",
             "Whatever It Takes",
             "Deeds, Not Words",
@@ -31,11 +31,11 @@ public class Game {
             "An Army of One",
             "The harder the conflict, the more glorious the triumph",
             "The only easy day was yesterday"
-            );
-    private static ArrayList<Trade> trades = new ArrayList<>();
+    );
+    private static final ArrayList<Trade> trades = new ArrayList<>();
 
-    public static final String[] SECURITY_QUESTION = { "what is your favorite food ?", "what is your father s name ?",
-            "what is your oldest sibling's first name?" };
+    public static final String[] SECURITY_QUESTION = {"what is your favorite food ?", "what is your father s name ?",
+            "what is your oldest sibling's first name?"};
     public static final List<GroundTexture> UNPASSABLE = Arrays.asList(GroundTexture.ROCK, GroundTexture.RIVER,
             GroundTexture.SMALL_LAKE, GroundTexture.BIG_LAKE, GroundTexture.SEA);
 
@@ -45,7 +45,7 @@ public class Game {
 
     public static Trade getTradeById(int id) {
         for (Trade trade : trades) {
-            if(trade.getId()==id)
+            if (trade.getId() == id)
                 return trade;
         }
         return null;
@@ -68,8 +68,10 @@ public class Game {
         J(6, 1.6, -16),
         K(7, 1.8, -20),
         L(8, 2, -24);
-        int number, popularityRate;
-        double tax;
+        final int number;
+        final int popularityRate;
+        final double tax;
+
         TaxDetails(int number, double tax, int popularityRate) {
             this.number = number;
             this.tax = tax;
@@ -77,42 +79,43 @@ public class Game {
         }
 
         public static double getTax(int number) {
-            for (TaxDetails taxDetail: TaxDetails.values()) if (taxDetail.number == number) return taxDetail.tax;
+            for (TaxDetails taxDetail : TaxDetails.values()) if (taxDetail.number == number) return taxDetail.tax;
             return 20;
         }
 
         public static int getPopularity(int number) {
-            for (TaxDetails taxDetail: TaxDetails.values()) if (taxDetail.number == number) return taxDetail.popularityRate;
+            for (TaxDetails taxDetail : TaxDetails.values())
+                if (taxDetail.number == number) return taxDetail.popularityRate;
             return 20;
         }
     }
 
     public static enum FoodRate {
-        A(-2,0,-8),
-        B(-1,0.5,-4),
-        C(0,1,0),
-        D(1,1.5,4),
-        E(2,2,8);
-        int number,popularityRate;
-        double foodRate;
-        FoodRate(int number, double foodRate, int popularityRate){
+        A(-2, 0, -8),
+        B(-1, 0.5, -4),
+        C(0, 1, 0),
+        D(1, 1.5, 4),
+        E(2, 2, 8);
+        final int number;
+        final int popularityRate;
+        final double foodRate;
+
+        FoodRate(int number, double foodRate, int popularityRate) {
             this.number = number;
             this.popularityRate = popularityRate;
             this.foodRate = foodRate;
         }
 
         public static double getFoodRate(int number) {
-            for (FoodRate foodRate1: FoodRate.values()) if (foodRate1.number == number) return foodRate1.foodRate;
+            for (FoodRate foodRate1 : FoodRate.values()) if (foodRate1.number == number) return foodRate1.foodRate;
             return 0;
         }
-        public static int getPopularity(int number) {
-            for (FoodRate foodRate1: FoodRate.values()) if (foodRate1.number == number) return foodRate1.popularityRate;
-            return 0;
-        }
-    }
 
-    public static ArrayList<User> getUsers() {
-        return users;
+        public static int getPopularity(int number) {
+            for (FoodRate foodRate1 : FoodRate.values())
+                if (foodRate1.number == number) return foodRate1.popularityRate;
+            return 0;
+        }
     }
 
     public static void addUser(User user) {
@@ -120,7 +123,7 @@ public class Game {
     }
 
     public static User getUserByUsername(String username) {
-        for (User user: users) if (user.getUserName().equals(username)) return user;
+        for (User user : users) if (user.getUserName().equals(username)) return user;
         return null;
     }
 
@@ -128,7 +131,7 @@ public class Game {
         return trades;
     }
 
-    public static String showMap(int x, int y,Cell[][] map) {
+    public static String showMap(int x, int y, Cell[][] map) {
         xCoordinates = x;
         yCoordinates = y;
         if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!";
@@ -161,7 +164,45 @@ public class Game {
         return output.toString();
     }
 
-    public static String moveMap(String changes,Cell[][] map) {
+    public static Cell[][] showMapForGui(int x, int y, Cell[][] map) {
+        xCoordinates = x;
+        yCoordinates = y;
+        if (map == null || x > map.length || x < 1 || y > map.length || y < 1)
+            return null;
+        if (x > map.length - mapSizeSmall)
+            x = map.length - mapSizeSmall;
+        if (y > map.length - mapSizeSmall)
+            y = map.length - mapSizeSmall;
+        x--;y--;
+        Cell[][] result = new Cell[mapSizeSmall][mapSizeSmall];
+        for (int i1 = x, j1 = 0; i1 < mapSizeSmall + x; i1++, j1++)
+            for (int i2 = y, j2 = 0; i2 < mapSizeSmall + y; i2++, j2++)
+                result[j1][j2] = map[i1][i2];
+        return result;
+    }
+
+    public static Cell[][] moveMapForGui(String direction,Cell[][] map){
+        switch (direction){
+            case "u":
+                if(yCoordinates+1<=map.length-mapSizeSmall)
+                    yCoordinates++;
+                break;
+            case "d":
+                if(yCoordinates-1>=1)
+                    yCoordinates--;
+                break;
+            case "r":
+                if(xCoordinates+1<=map.length)
+                    xCoordinates++;
+                break;
+            case "l":
+                if(xCoordinates-1>=1)
+                    yCoordinates--;
+        }
+        return showMapForGui(xCoordinates,yCoordinates,map);
+    }
+
+    public static String moveMap(String changes, Cell[][] map) {
         int xChange = 0, yChange = 0, number;
         String direction;
         Matcher matcher = Pattern.compile("\\S+[ \\d+]*").matcher(changes);
@@ -184,10 +225,10 @@ public class Game {
             return "";
         xCoordinates += xChange;
         yCoordinates += yChange;
-        return showMap(xCoordinates, yCoordinates,map);
+        return showMap(xCoordinates, yCoordinates, map);
     }
 
-    public String showDetails(int x, int y,Cell[][] map) {
+    public String showDetails(int x, int y, Cell[][] map) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!!";
         try {
             return map[x - 1][y - 1].showDetails();

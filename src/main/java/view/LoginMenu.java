@@ -47,7 +47,7 @@ public class LoginMenu {
         if(state)
             FileController.modifyInfo("stayed-logged-in",username,"t");
         OtherController.sleepShort();
-        System.out.println(OtherController.generateCaptcha());
+//        System.out.println(OtherController.generateCaptcha());
         String solve = scanner.nextLine();
         OtherController.sleepShort();
         if (!OtherController.checkCaptcha(solve.trim())) {
@@ -80,7 +80,7 @@ public class LoginMenu {
         String username = OtherController.myTrim(matcher.group("username"));
         OtherController.sleepNormal();
         System.out.println("please enter the captcha!");
-        System.out.println(OtherController.generateCaptcha());
+//        System.out.println(OtherController.generateCaptcha());
         String input = scanner.nextLine();
         OtherController.sleepNormal();
         if (!OtherController.checkCaptcha(input)) {
@@ -108,9 +108,7 @@ public class LoginMenu {
             if (password.equals(confirm)) {
                 if (CheckValidion.check(password, CheckValidion.CHECK_PASSWORD)) {
                     System.out.println("password changed successfully!");
-                    if (matcher.group("last") != null)
-                        FileController.changeStayed(username);
-                    FileController.modifyInfo("password", username, password);
+                    FileController.modifyInfo("password", username, FileController.encode(password));
                 } else
                     System.out.println("weak password!");
             } else

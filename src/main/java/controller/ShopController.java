@@ -42,7 +42,7 @@ public class ShopController {
             return ShopMessage.NOT_A_RESOURCE;
         if (amount <= 0)
             return ShopMessage.INVALID_NUMBER;
-        if (amount > (resources.get(resource)))
+        if (!resources.containsKey(resource) || amount > (resources.get(resource)))
             return ShopMessage.NOT_ENOUGH;
         resources.replace(resource, resources.get(resource) - amount);
         if (resources.get(resource) == 0)

@@ -47,8 +47,12 @@ public class FileController {
         JSONObject temp;
         for (Object allUser : allUsers) {
             temp = (JSONObject) allUser;
-            if (temp.get("username").equals(username))
-                return ((Long) temp.get("number")).intValue();
+            if (temp.get("username").equals(username)) {
+                if(temp.get("number") instanceof Integer)
+                    return (Integer) temp.get("number");
+                if (temp.get("number") instanceof  Long)
+                    return ((Long)temp.get("number")).intValue();
+            }
         }
         return 0;
     }

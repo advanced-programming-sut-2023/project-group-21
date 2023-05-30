@@ -9,7 +9,7 @@ public enum TradeCommand {
     SHOW_LIST("\\s*trade\\s+list\\s*"),
     ACCEPT_TRADE("accept\\s+trade\\s+-i\\s+(?<id>\\d+)\\s+-m\\s+(?<message>.+)"),
     BACK("\\s*back\\s*"),
-    TRADE_HISTORY("show\\s+history\\s+");
+    TRADE_HISTORY("show\\s+history\\s*");
     private final String regex;
 
     TradeCommand(String regex) {

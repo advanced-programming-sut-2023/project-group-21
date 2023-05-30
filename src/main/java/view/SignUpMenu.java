@@ -53,7 +53,7 @@ public class SignUpMenu {
         }
         String strNumber = matcher.group("number");
         try {
-            questionNumber = Integer.parseInt(strNumber);
+            questionNumber = Integer.parseInt(strNumber) - 1;
         } catch (NumberFormatException e) {
             System.out.println("enter an integer not string or float");
         }
@@ -69,7 +69,7 @@ public class SignUpMenu {
                 slogan = signUpController.giveRandomSlogan();
                 System.out.println("your slogan is: " + slogan);
             }
-            System.out.println(OtherController.generateCaptcha());
+//            System.out.println(OtherController.generateCaptcha());
             String solve = scanner.nextLine().trim();
             if(OtherController.checkCaptcha(solve)) {
                 OtherController.resetSleepTime();

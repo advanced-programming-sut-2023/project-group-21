@@ -14,7 +14,9 @@ public class Worker extends Person {
     private int patrolX1, patrolY1, patrolX2, patrolY2;
     private Worker enemy;
     private boolean hasLadder = false;
-
+    public boolean getPatrol(){
+        return this.isPatrolOn;
+    }
     public Worker(WorkerDetails workerDetails, Government government, Cell position, Cell destination) {
         super(government);
         this.workerDetails = workerDetails;
@@ -60,6 +62,7 @@ public class Worker extends Person {
 
     public void setDestination(Cell destination) {
         this.destination = destination;
+        isPatrolOn = false;
     }
 
     public void setState(String state) {
@@ -74,6 +77,8 @@ public class Worker extends Person {
     }
 
     public void doPetrolCheck(){//use before the move !
+        if(!isPatrolOn)
+            return;
         if(position == secondCell)
             destination = firstCell;
         if(position == firstCell)

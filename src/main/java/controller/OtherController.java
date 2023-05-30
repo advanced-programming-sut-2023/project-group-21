@@ -2,8 +2,8 @@ package controller;
 
 import model.Cell;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+//import java.awt.*;
+//import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -46,34 +46,34 @@ public class OtherController {
         }
     }
 
-    public static String generateCaptcha() {
-        int width = 100;
-        int height = 20;
-        ArrayList<Integer> random;
-        StringBuilder captcha = new StringBuilder();
-        String[] fonts = {Font.DIALOG_INPUT, Font.DIALOG, Font.SANS_SERIF, Font.SERIF};
-        Random randomize = new Random();
-
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = bufferedImage.getGraphics();
-        graphics.setFont(new Font(fonts[Math.abs(randomize.nextInt() % 4)], Font.BOLD, 10));
-        Graphics2D graphics2D = (Graphics2D) graphics;
-        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        graphics2D.drawString(generateCaptchaString(), 10, 20);
-
-        for (int y = 0; y < height; y++) {
-            StringBuilder sb = new StringBuilder();
-            random = randomNoise();
-            for (int x = 0; x < width; x++) {
-                if (bufferedImage.getRGB(x, y) != -16777216) sb.append("%");
-                else sb.append(" ");
-            }
-            if (sb.toString().trim().isEmpty()) continue;
-            for (int rand : random) sb.replace(rand, rand + 1, "#");
-            captcha.append(sb).append("\n");
-        }
-        return captcha.toString();
-    }
+//    public static String generateCaptcha() {
+//        int width = 100;
+//        int height = 20;
+//        ArrayList<Integer> random;
+//        StringBuilder captcha = new StringBuilder();
+//        String[] fonts = {Font.DIALOG_INPUT, Font.DIALOG, Font.SANS_SERIF, Font.SERIF};
+//        Random randomize = new Random();
+//
+//        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//        Graphics graphics = bufferedImage.getGraphics();
+//        graphics.setFont(new Font(fonts[Math.abs(randomize.nextInt() % 4)], Font.BOLD, 10));
+//        Graphics2D graphics2D = (Graphics2D) graphics;
+//        graphics2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//        graphics2D.drawString(generateCaptchaString(), 10, 20);
+//
+//        for (int y = 0; y < height; y++) {
+//            StringBuilder sb = new StringBuilder();
+//            random = randomNoise();
+//            for (int x = 0; x < width; x++) {
+//                if (bufferedImage.getRGB(x, y) != -16777216) sb.append("%");
+//                else sb.append(" ");
+//            }
+//            if (sb.toString().trim().isEmpty()) continue;
+//            for (int rand : random) sb.replace(rand, rand + 1, "#");
+//            captcha.append(sb).append("\n");
+//        }
+//        return captcha.toString();
+//    }
 
     private static String generateCaptchaString() {
         int n = 9;

@@ -39,7 +39,7 @@ public class SignUpController {
 
 
     public SignUpMessages pickQuestion(int number, String answer, String confirm) {
-        if (number > 3 || number < 1)
+        if (number > 2 || number < 0)
             return SignUpMessages.OUT_OF_RANGE;
         if (!answer.equals(confirm))
             return SignUpMessages.BAD_REPEAT;

@@ -62,6 +62,17 @@ public class MapController {
        return Game.showMap(x,y,map);
     }
 
+    public Cell[][] showMapForGui(int x,int y){
+        return Game.showMapForGui(x,y,map);
+    }
+    public Cell[][] showMapGui(int x,int y){
+        return Game.showMapForGui(x,y,map);
+    }
+
+    public Cell[][] moveMapGui(String direction){
+        return Game.moveMapForGui(direction,map);
+    }
+
     public String moveMap(String changes) {
         return Game.moveMap(changes,map);
     }

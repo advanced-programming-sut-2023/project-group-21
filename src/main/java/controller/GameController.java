@@ -107,7 +107,8 @@ public class GameController {
         }
         if (buildingsDetails.getRequiredResource() != null) {
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
-                if (currentGovernment.getResources().containsKey(entry.getKey()) && currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
+                if (currentGovernment.getResources().containsKey(entry.getKey()) &&
+                        currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
                     return GameMessage.NOT_ENOUGH_RESOURCE;
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
                 currentGovernment.reduceResources(entry.getKey(), entry.getValue());
@@ -605,7 +606,6 @@ public class GameController {
     public void nextTurn() {
         buildEquipments();
         updateStorage();
-        updatePetrol();
         startMove();
         for (Map.Entry<Engineer, String> entry : pouringOils.entrySet()) pourOil(entry.getValue(), entry.getKey());
         for (Map.Entry<Cell, String> entry : tunnels.entrySet()) digTunnel(entry.getKey(), entry.getValue());
@@ -616,6 +616,7 @@ public class GameController {
         updateBuildings();
         updateTroops();
         clearDeadSoldiers();
+        updatePetrol();
         int index = governments.indexOf(currentGovernment);
         if (currentGovernment.checkDefeat()) {
             int score = currentGovernment.calculateScore();
@@ -1012,7 +1013,8 @@ public class GameController {
         if (selectedWorker == null)
             return "no selected worker!";
         return ("name: " + selectedWorker.getName() + "\n" + "position" + selectedWorker.getPosition().toString2() +
-                "\n" + "government: " + selectedWorker.getGovernment().getLord().getUserName());
+                "\n" + "government: " + selectedWorker.getGovernment().getLord().getUserName()+"\n"+
+                selectedWorker.getDestination());
     }
 
     public String getState() {
@@ -1022,6 +1024,7 @@ public class GameController {
     }
 
     public GameMessage checkMoveEquipments(int x1, int y1, int x2, int y2) {
+        System.out.println("salam");
         if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         Machine myMachine = null;

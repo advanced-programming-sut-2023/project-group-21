@@ -1,6 +1,16 @@
 package model;
 
 import controller.GameController;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.building.Gate;
@@ -187,41 +197,42 @@ public class Cell {
     }
 
     public boolean checkCross(char myDirection, Cell anotherCell, char state) {
-        if (this.building == null) {
-            return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
-                    && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
-                    groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
-        }
-        //repair
-        if (state == 'n') {
-            if (groundTexture != GroundTexture.SOIL || extra != null)
-                return false;
-            if (building != null) {
-                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
-                    return true;
-                return building instanceof Gate && ((Gate) building).checkState();
-            }
-            return true;
-        }
-        if (state == 'a') {
-            if (groundTexture != GroundTexture.SOIL || extra != null)
-                return false;
-            if (building != null) {
-                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
-                    return true;
-                return building instanceof Gate && ((Gate) building).checkState();
-            }
-            if (groundTexture != GroundTexture.SOIL || extra != null)
-                return false;
-            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
-                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
-                return true;
-        }
-        if (groundTexture != GroundTexture.SOIL || extra != null)
-            return false;
-        return building != null && building instanceof Tower
-                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
-                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
+        return true;
+//        if (this.building == null) {
+//            return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
+//                    && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
+//                    groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
+//        }
+//        //repair
+//        if (state == 'n') {
+//            if (groundTexture != GroundTexture.SOIL || extra != null)
+//                return false;
+//            if (building != null) {
+//                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
+//                    return true;
+//                return building instanceof Gate && ((Gate) building).checkState();
+//            }
+//            return true;
+//        }
+//        if (state == 'a') {
+//            if (groundTexture != GroundTexture.SOIL || extra != null)
+//                return false;
+//            if (building != null) {
+//                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
+//                    return true;
+//                return building instanceof Gate && ((Gate) building).checkState();
+//            }
+//            if (groundTexture != GroundTexture.SOIL || extra != null)
+//                return false;
+//            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
+//                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
+//                return true;
+//        }
+//        if (groundTexture != GroundTexture.SOIL || extra != null)
+//            return false;
+//        return building != null && building instanceof Tower
+//                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
+//                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
     }
 
     public void putLadder() {
@@ -260,11 +271,52 @@ public class Cell {
         machines.remove(machine);
     }
 
+    private double normal(String input) {
+        if (input.length() != 2)
+            return 0;
+        double result = 0;
+        if (Character.isDigit(input.charAt(0)))
+            result = Integer.parseInt(String.valueOf(input.charAt(0))) * 16;
+        else
+            result = (input.charAt(0) - 'a' + 10) * 16;
+        if (Character.isDigit(input.charAt(1)))
+            result += (Integer.parseInt(String.valueOf(input.charAt(1))));
+        else
+            result += (input.charAt(0) - 'a' + 10);
+        return result / 256.1;
+    }
+
     public void addPeople(Worker worker) {
         people.add(worker);
     }
 
     public String toString2() {
         return "(" + (xCoordinates + 1) + "," + (yCoordinates + 1) + ")";
+    }
+
+    public Label toLabel(int xShow, int yShow) {
+        String rgb = groundTexture.getRGB();
+        Paint BLACK = new Color(1,0.0,0.0,0.0);
+        double red = normal(rgb.substring(1,3));
+        double blue = normal(rgb.substring(3,5));
+        double green = normal(rgb.substring(5));
+//        System.out.println("b"+blue+"r"+red+"g"+green);
+        Paint paint = new Color(0.99,red,green,blue);
+        Label label = getLabel(xShow, yShow, BLACK);
+        return label;
+    }
+
+    private static Label getLabel(int xShow, int yShow, Paint BLACK) {
+        Label label = new Label("s");
+        Background background = new Background(new BackgroundFill(BLACK,null,null));
+        label.setBackground(background);
+        label.setTextFill(new Color(1,1,1,1));
+        label.setPrefWidth(100);
+        label.setPrefHeight(100);
+        label.setLayoutX(xShow);
+        label.setLayoutY(yShow);
+        label.setAlignment(Pos.CENTER);
+        System.out.println(BLACK);
+        return label;
     }
 }
