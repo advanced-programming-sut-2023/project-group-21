@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
@@ -21,10 +22,14 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MapViewGui extends Application implements Initializable {
-    private final int CELL_SIZE = 75;
+    private double startDragX = 0, startDragY = 0;
+    private int CELL_SIZE = 75;
     @FXML
     private Pane cellPane;
+    private Cell[][] showingMap;
+    private int currentX = 5, currentY = 5;
     public MapController mapController = new MapController();
+
 
     public static void main(String[] args) {
         launch(args);
@@ -42,12 +47,13 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
-    private void showMap(Cell[][] myMap) {
+    private void showMap(Cell[][] myMap, int size) {
+        showingMap = myMap;
         if (cellPane.getChildren().size() > 1)
-            cellPane.getChildren().remove(0, cellPane.getChildren().size() - 1);
-        for (int i1 = 0; i1 < myMap.length; i1++)
-            for (int i2 = 0; i2 < myMap.length; i2++) {
-                Label label = myMap[i1][i2].toLabel(CELL_SIZE * i1, CELL_SIZE * i2);
+            cellPane.getChildren().remove(0, cellPane.getChildren().size());
+        for (int i1 = 0; i1 < myMap.length && i1 <= 600 / CELL_SIZE; i1++)
+            for (int i2 = 0; i2 < myMap.length && i2 <= 600 / CELL_SIZE; i2++) {
+                Label label = myMap[i1][i2].toLabel(CELL_SIZE * i1, CELL_SIZE * i2, CELL_SIZE);
                 int finalI = i1;
                 int finalI1 = i2;
                 label.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -81,20 +87,48 @@ public class MapViewGui extends Application implements Initializable {
             cellPane.getChildren().remove(0, cellPane.getChildren().size() - 1);
     }
 
-    public void goLeft() {
-
+    public void goRight() {
+        if (currentX < mapController.getMap().length - 8)
+            currentX++;
+        else
+            return;
+        showMap(mapController.showMapGui(currentX, currentY), 10);
     }
 
-    public void goRight() {
+    public void goLeft() {
+        if (currentX > 1)
+            currentX--;
+        else
+            return;
+        showMap(mapController.showMapGui(currentX, currentY), 10);
+    }
 
+    public void zoomIn() {
+        if (CELL_SIZE <= 95)
+            CELL_SIZE += 5;
+        showMap(showingMap, 100);
+    }
+
+    public void zoomOut() {
+        if (CELL_SIZE >= 80)
+            CELL_SIZE -= 5;
+        showMap(showingMap, 100);
     }
 
     public void goDown() {
-
+        if (currentY > 1)
+            currentY--;
+        else
+            return;
+        showMap(mapController.showMapGui(currentX, currentY), 10);
     }
 
     public void goUp() {
-
+        if (currentY < mapController.getMap().length - 8)
+            currentY++;
+        else
+            return;
+        showMap(mapController.showMapGui(currentX, currentY), 10);
     }
 
     public void refreshMap() {
@@ -107,17 +141,20 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        cellPane.setStyle("-fx-background-color: black;");
         mapController.initializeMap(400, true);
-        showMap(mapController.showMapGui(5, 5));
+        showMap(mapController.showMapGui(currentX, currentY), 75);
         cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                startDragX = mouseEvent.getX();
                 int xShow = (int) (mouseEvent.getX() / CELL_SIZE);
                 int yShow = (int) (mouseEvent.getY() / CELL_SIZE);
                 System.out.println(xShow);
                 System.out.println(yShow);
             }
         });
+
         cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -128,13 +165,13 @@ public class MapViewGui extends Application implements Initializable {
         });
     }
 
-    public void gotoXY(){
+    public void gotoXY() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("go to Cell");
         alert.setHeaderText(null);
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getChildren().remove(0);
-        TextInputDialog  textField = new TextInputDialog();
+        TextInputDialog textField = new TextInputDialog();
         TextField textField1 = new TextField();
         textField1.setLayoutX(15);
         textField1.setLayoutY(15);
