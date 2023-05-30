@@ -5,12 +5,15 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.FileInputStream;
@@ -29,6 +32,7 @@ public class StartingMenu extends Application {
         mainStage=stage;
 
         addButtons(mainPane);
+        addOtherGraphics(mainPane);
 
         Scene scene=new Scene(mainPane);
         stage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
@@ -67,4 +71,24 @@ public class StartingMenu extends Application {
 
         pane.getChildren().addAll(signUpButton,loginButton,quitButton);
     }
+
+    private void addOtherGraphics(Pane mainPane) {
+        Line upperLine=new Line(10,10,1070,10);
+        Line rightLine=new Line(1070,10,1070,170);
+        Line leftLine=new Line(10,10,10,680);
+        Line upperLine2=new Line(15,15,1065,15);
+        Line rightLine2=new Line(1065,15,1065,170);
+        Line leftLine2=new Line(15,15,15,680);
+        Line downLine1=new Line(10,680,15,680);
+        Line downLine2=new Line(1065,170,1070,170);
+        Label label=new Label("GROUP 21 - 2023 SPRING");
+        label.setFont(Font.font(12));
+        label.setRotate(90);
+        label.relocate(-40,600);
+
+        mainPane.getChildren().addAll(upperLine,leftLine,rightLine,label,
+                upperLine2,rightLine2,leftLine2,downLine1,downLine2);
+    }
+
+
 }
