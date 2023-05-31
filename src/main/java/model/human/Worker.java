@@ -11,7 +11,6 @@ public class Worker extends Person {
     private Cell destination;
     private Cell firstCell,secondCell;
     private boolean isPatrolOn = false, isOnTower = false;
-    private int patrolX1, patrolY1, patrolX2, patrolY2;
     private Worker enemy;
     private boolean hasLadder = false;
     public boolean getPatrol(){

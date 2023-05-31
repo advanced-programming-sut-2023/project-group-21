@@ -682,6 +682,7 @@ public class GameController {
                         }
                     }
                 }
+                building.reduceFireTurn();
             }
         }
         for (Cell cell : freeDogs) {
@@ -823,9 +824,11 @@ public class GameController {
                 worker.setOnTower(worker.getPosition().equals(worker.getDestination()) &&
                         worker.getPosition().getBuilding() instanceof Tower);
                 if (worker.getName().equals("slave") && worker.getPosition().equals(worker.getDestination()) &&
-                        worker.getPosition().getBuilding() != null &&
-                        worker.getPosition().getBuilding().getName().equals("pitch ditch"))
-                    ((Trap) worker.getPosition().getBuilding()).setOnFire(true);
+                        worker.getPosition().getBuilding() != null) {
+                    if (worker.getPosition().getBuilding().getName().equals("pitch ditch"))
+                        ((Trap) worker.getPosition().getBuilding()).flame(true);
+                    else worker.getPosition().getBuilding().setOnFire();
+                }
                 if (worker instanceof Engineer && worker.getPosition().equals(worker.getDestination()) &&
                         worker.getPosition().getBuilding() != null &&
                         worker.getPosition().getBuilding().getName().equals("oil smelter"))
