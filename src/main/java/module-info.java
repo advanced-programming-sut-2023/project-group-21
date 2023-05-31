@@ -3,6 +3,7 @@ module StrongHold2 {
     requires javafx.fxml;
     requires passay;
     requires json.simple;
+    requires java.desktop;
 
     opens view to javafx.fxml;
     exports view;
