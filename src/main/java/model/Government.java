@@ -123,6 +123,9 @@ public class Government {
     public void setReligionRate(boolean check) {
         popularityRate += check ? 2 : -2;
     }
+    public void setDiseaseElement(boolean check) {
+        popularityRate += check? -2 : 2;
+    }
     public void setBuildings(ArrayList<Building> buildings) {
         this.buildings = buildings;
     }
