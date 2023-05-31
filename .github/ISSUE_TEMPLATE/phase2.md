@@ -10,16 +10,16 @@ assignees: Arman17Babaei
 <div dir="rtl" align='right'>
 
 # فاز 1
-**نام و نام خانوادگی راهنما:**
+**نام و نام خانوادگی راهنما: امیرحسین حاجی محمدرضایی**
 
 ## کارهایی که باید در فاز 2 انجام دهید
 
 <details>
   <summary>چک پوینت 1</summary>
 
-- پیاده‌سازی منوهای خارج بازی
-- پیاده‌سازی کلیات نمای بازی
-- پیاده‌سازی کلیات نقشه
+
+
+
 
   <div dir="ltr" align='right'>
 
@@ -44,9 +44,9 @@ assignees: Arman17Babaei
 
 ## تسک‌های نفر اول
 
-  **نام و نام خانوادگی:**
+  **نام و نام خانوادگی: شایان بقایی نژاد**
 <details>
-  <summary>تسک مربوطه</summary>
+  <summary>- پیاده‌سازی کلیات نمای بازی</summary>
 
   <div dir="ltr" align='right'>
 
@@ -58,9 +58,9 @@ assignees: Arman17Babaei
 
 ## تسک‌های نفر دوم
 
-  **نام و نام خانوادگی:**
+  **نام و نام خانوادگی: مرتضی نقوی مقدم**
 <details>
-  <summary>تسک مربوطه</summary>
+  <summary>- پیاده‌سازی کلیات نقشه</summary>
 
   <div dir="ltr" align='right'>
 
@@ -72,9 +72,9 @@ assignees: Arman17Babaei
 
 ## تسک‌های نفر سوم
 
-  **نام و نام خانوادگی:**
+  **نام و نام خانوادگی: سبحان لطفی**
 <details>
-  <summary>تسک مربوطه</summary>
+  <summary>- پیاده‌سازی منوهای خارج بازی</summary>
 
   <div dir="ltr" align='right'>
 
