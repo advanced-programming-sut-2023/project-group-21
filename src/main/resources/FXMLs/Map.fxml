@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.MapViewGui">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<AnchorPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.MapViewGui" fx:id="mainPane">
 
    <children>
       <Pane fx:id="cellPane" layoutX="290.0" layoutY="60.0" maxHeight="600.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" />
@@ -16,5 +20,10 @@
       <Button layoutX="378.0" layoutY="2.0" mnemonicParsing="false" onAction="#zoomIn" text="zoom-in" />
       <Button layoutX="478.0" layoutY="2.0" mnemonicParsing="false" onAction="#zoomOut" text="zoom-out" />
       <Button mnemonicParsing="false" onAction="#goRight" text="right" />
+      <ScrollPane layoutX="980.0" layoutY="360.0" prefHeight="200.0" prefWidth="100.0" fx:id="scrollPane">
+         <content>
+          <VBox minHeight="0.0" minWidth="0.0"  prefWidth="100.0" fx:id="objectBox"/>
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

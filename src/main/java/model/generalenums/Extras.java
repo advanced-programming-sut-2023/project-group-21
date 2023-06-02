@@ -1,21 +1,23 @@
 package model.generalenums;
 
 public enum Extras {
-    SHRUB("shrub","a"),
-    CHERRY_TREE("cherry","b"),
-    OLIVE_TREE("olive","c"),
-    COCONUT_TREE("coconut","d"),
-    PALM_TREE("palm","d"),
-    NORTH_ROCK("n","e"),
-    SOUTH_ROCK("s","f"),
-    WEST_ROCK("w","g"),
-    EAST_ROCK("e","h"),
-    HOLD("hold","#");
+    SHRUB("shrub","a","shrub.jpeg"),
+    CHERRY_TREE("cherry","b","shrub.jpeg"),
+    OLIVE_TREE("olive","c","shrub.jpeg"),
+    COCONUT_TREE("coconut","d","shrub.jpeg"),
+    PALM_TREE("palm","d","shrub.jpeg"),
+    NORTH_ROCK("n","e","shrub.jpeg"),
+    SOUTH_ROCK("s","f","shrub.jpeg"),
+    WEST_ROCK("w","g","shrub.jpeg"),
+    EAST_ROCK("e","h","shrub.jpeg"),
+    HOLD("hold","#","shrub.jpeg");
     private final String name;
     private final String saveCode;
-    Extras(String name,String saveCode) {
+    private final String imagePath;
+    Extras(String name,String saveCode,String imagePath) {
         this.name = name;
         this.saveCode = saveCode;
+        this.imagePath = imagePath;
     }
 
     public static Extras getExtrasByName(String name) {
@@ -30,6 +32,10 @@ public enum Extras {
             if (extras.saveCode.equals(saveCode)) return extras;
         }
         return null;
+    }
+
+    public String getImagePath(){
+        return imagePath;//new option!
     }
 
     public String getName() {

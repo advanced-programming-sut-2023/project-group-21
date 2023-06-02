@@ -41,7 +41,7 @@ public class Cell {
     private boolean hasLadder = false;
 
     public Cell(int xCoordinates, int yCoordinates) {
-        if (xCoordinates%6==0)
+        if (xCoordinates%5==0)
             groundTexture = GroundTexture.DENSE_MEADOW;
         this.xCoordinates = xCoordinates;
         this.yCoordinates = yCoordinates;
@@ -303,15 +303,24 @@ public class Cell {
         double blue = normal(rgb.substring(3, 5));
         double green = normal(rgb.substring(5));
         Paint paint = new Color(0.99, red, green, blue);
-        Label label = getLabel(xShow, yShow);
+        Label label = getLabel(xShow, yShow,size);
         return label;
     }
-
-    private Label getLabel(int xShow, int yShow) {
+    public Label toLabel(int xShow,int yShow,int sizeX,int sizeY){//for some corner tile
+        Label label = new Label();
+        label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";");
+        label.setPrefWidth(sizeX);
+        label.setPrefHeight(sizeY);
+        label.setLayoutX(xShow);
+        label.setLayoutY(yShow);
+        label.setAlignment(Pos.CENTER);
+        return label;
+    }
+    private Label getLabel(int xShow, int yShow,int size) {
         Label label = new Label(xCoordinates+"   "+yCoordinates);
         label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";");
-        label.setPrefWidth(100);
-        label.setPrefHeight(100);
+        label.setPrefWidth(size);
+        label.setPrefHeight(size);
         label.setLayoutX(xShow);
         label.setLayoutY(yShow);
         label.setAlignment(Pos.CENTER);
