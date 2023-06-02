@@ -14,8 +14,8 @@ public class Building {
     private final BuildingsDetails buildingsDetails;
     private int hitPoint;
     private final Cell cell;
-
-    private ArrayList<Person> workers;
+    private int fireTurn = 0;
+    private final ArrayList<Person> workers;
     public Building(Government government, BuildingsDetails buildingsDetails, Cell cell, ArrayList<Person> workers) {
         this.government = government;
         this.buildingsDetails = buildingsDetails;
@@ -70,5 +70,16 @@ public class Building {
 
     public void getDamaged(int damage) {
         hitPoint -= damage;
+    }
+
+    public void setOnFire() {
+        fireTurn = 3;
+    }
+
+    public void reduceFireTurn() {
+        if (fireTurn > 0) {
+            getDamaged(5);
+            fireTurn--;
+        }
     }
 }

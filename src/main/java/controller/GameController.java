@@ -31,7 +31,9 @@ public class GameController {
     private Building selectedBuilding;
     private Worker selectedWorker;
     private Government currentGovernment;
-    private MapController mapController;
+    private final ArrayList<Cell> diseasedCells = new ArrayList<>();
+    private int diseaseProductionTurn = 0;
+    private final Random random = new Random();
     private final Map<Engineer, String> pouringOils = new HashMap<>();
     private final ArrayList<Cell> freeDogs = new ArrayList<>();
     private final Map<Cell, String> tunnels = new HashMap<>();
@@ -47,13 +49,12 @@ public class GameController {
     }
 
     public String showPopularityFactors() {
-        String stringBuilder = "1. Food Variety: " + currentGovernment.getFoodVariety() + "\n" +
+        return "1. Food Variety: " + currentGovernment.getFoodVariety() + "\n" +
                 "2. Food Rate: " + currentGovernment.getFoodRate() +
                 " | Food Count: " + currentGovernment.getLeftFood() + "\n" +
                 "3. Tax Rate: " + currentGovernment.getTaxRate() + "\n" +
                 "4. Fear Rate: " + currentGovernment.getFearRate() + "\n\n" +
                 "Popularity Rate: " + currentGovernment.getPopularityRate();
-        return stringBuilder;
     }
 
     public GameMessage setFoodRate(int newRate) {
@@ -144,44 +145,28 @@ public class GameController {
             return;
         }
         switch (buildingType) {
-            case PRODUCT_MAKER:
-                currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x - 1][y - 1],
-                        ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
-                break;
-            case STORAGE:
-                currentGovernment.addBuilding(new Storage(currentGovernment, map[x - 1][y - 1],
-                        ContainerDetails.getContainerByBuilding(buildingsDetails), persons));
-                break;
-            case GATE:
-                currentGovernment.addBuilding(new Gate(currentGovernment, map[x - 1][y - 1],
-                        ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons, true, false));
-                break;
-            case RESIDENCY:
-                currentGovernment.addBuilding(new Residency(currentGovernment, map[x - 1][y - 1],
-                        ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons));
-                break;
-            case WEAPON_PRODUCTION:
-                currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x - 1][y - 1],
-                        ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
-                break;
-            case STABLE:
-                currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x - 1][y - 1], persons));
-                break;
-            case TRAP:
-                currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
-                break;
-            case QUARRY:
-                currentGovernment.addBuilding(new Quarry(currentGovernment, map[x - 1][y - 1], persons));
-                break;
-            case TOWER:
-                currentGovernment.addBuilding(new Tower(currentGovernment, map[x - 1][y - 1],
-                        TowerDetails.getTowerDetailsByBuildingDetails(buildingsDetails), persons));
-                break;
-            case OX_TETHER:
-                currentGovernment.addBuilding(new OxTether(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
-                break;
-            default:
-                currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+            case PRODUCT_MAKER -> currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x - 1][y - 1],
+                    Objects.requireNonNull(ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails)), persons));
+            case STORAGE -> currentGovernment.addBuilding(new Storage(currentGovernment, map[x - 1][y - 1],
+                    Objects.requireNonNull(ContainerDetails.getContainerByBuilding(buildingsDetails)), persons));
+            case GATE -> currentGovernment.addBuilding(new Gate(currentGovernment, map[x - 1][y - 1],
+                    ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons, true, false));
+            case RESIDENCY -> currentGovernment.addBuilding(new Residency(currentGovernment, map[x - 1][y - 1],
+                    Objects.requireNonNull(ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails)), persons));
+            case WEAPON_PRODUCTION ->
+                    currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x - 1][y - 1],
+                            ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
+            case STABLE ->
+                    currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x - 1][y - 1], persons));
+            case TRAP ->
+                    currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+            case QUARRY -> currentGovernment.addBuilding(new Quarry(currentGovernment, map[x - 1][y - 1], persons));
+            case TOWER -> currentGovernment.addBuilding(new Tower(currentGovernment, map[x - 1][y - 1],
+                    Objects.requireNonNull(TowerDetails.getTowerDetailsByBuildingDetails(buildingsDetails)), persons));
+            case OX_TETHER ->
+                    currentGovernment.addBuilding(new OxTether(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+            default ->
+                    currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
         }
 
     }
@@ -255,11 +240,11 @@ public class GameController {
     }
 
     private void updatePetrol() {
-        for (int i = 0; i < governments.size(); i++)
-            for (int j = 0; j < governments.get(i).getPeople().size(); j++) {
+        for (Government government : governments)
+            for (int j = 0; j < government.getPeople().size(); j++) {
                 Worker tempWorker;
-                if (governments.get(i).getPeople().get(j) instanceof Worker) {
-                    tempWorker = (Worker) governments.get(i).getPeople().get(j);
+                if (government.getPeople().get(j) instanceof Worker) {
+                    tempWorker = (Worker) government.getPeople().get(j);
                     tempWorker.doPetrolCheck();//now
                 }
             }
@@ -303,11 +288,11 @@ public class GameController {
     }
 
     private void startMove() {
-        for (int i1 = 0; i1 < governments.size(); i1++) {
-            for (int i2 = 0; i2 < governments.get(i1).getPeople().size(); i2++) {
-                if (governments.get(i1).getPeople().get(i2) instanceof Worker tempWorker &&
-                        ((Worker) governments.get(i1).getPeople().get(i2)).getDestination() !=
-                                ((Worker) governments.get(i1).getPeople().get(i2)).getPosition()) {
+        for (Government government : governments) {
+            for (int i2 = 0; i2 < government.getPeople().size(); i2++) {
+                if (government.getPeople().get(i2) instanceof Worker tempWorker &&
+                        ((Worker) government.getPeople().get(i2)).getDestination() !=
+                                ((Worker) government.getPeople().get(i2)).getPosition()) {
                     callOtherFunction(tempWorker.getPosition().getxCoordinates(), tempWorker.getPosition().getyCoordinates(),
                             tempWorker.getDestination().getxCoordinates(), tempWorker.getDestination().getyCoordinates(), 'n');
                     doTheMove(tempWorker, path);
@@ -320,9 +305,9 @@ public class GameController {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedWorker == null || selectedWorker instanceof Engineer) return GameMessage.NO_SELECTED_UNIT;
         Worker enemy = null;
-        for (Person person : map[x - 1][y - 1].getPeople()) {
-            if (person instanceof Worker && !person.getGovernment().equals(selectedWorker.getGovernment()))
-                enemy = (Worker) person;
+        for (Worker person : map[x - 1][y - 1].getPeople()) {
+            if (!person.getGovernment().equals(selectedWorker.getGovernment()))
+                enemy = person;
         }
         if (enemy == null) return GameMessage.NO_ENEMY_TO_FIGHT;
         selectedWorker.setEnemy(enemy);
@@ -337,9 +322,9 @@ public class GameController {
             return GameMessage.NO_SUITABLE;
         if (getDistance(x, y) > selectedWorker.getRange()) return GameMessage.OUT_OF_RANGE;
         Worker enemy = null;
-        for (Person person : map[x - 1][y - 1].getPeople()) {
-            if (person instanceof Worker && !person.getGovernment().equals(selectedWorker.getGovernment()))
-                enemy = (Worker) person;
+        for (Worker person : map[x - 1][y - 1].getPeople()) {
+            if (!person.getGovernment().equals(selectedWorker.getGovernment()))
+                enemy = person;
         }
         if (enemy == null) return GameMessage.NO_ENEMY_TO_FIGHT;
         selectedWorker.setEnemy(enemy);
@@ -617,6 +602,8 @@ public class GameController {
         updateTroops();
         clearDeadSoldiers();
         updatePetrol();
+        removeHealedCells();
+        setNewDiseasedCell();
         int index = governments.indexOf(currentGovernment);
         if (currentGovernment.checkDefeat()) {
             int score = currentGovernment.calculateScore();
@@ -626,6 +613,44 @@ public class GameController {
             currentGovernment = governments.get(index % governments.size());
         } else currentGovernment = governments.get((index + 1) % governments.size());
         currentGovernment.doActionInTurnFirst();
+    }
+
+    private void removeHealedCells() {
+        ArrayList<Cell> toRemove = new ArrayList<>();
+        for (Cell diseasedCell: diseasedCells) {
+            for (Worker worker: diseasedCell.getPeople()) {
+                if (worker instanceof Engineer engineer &&
+                        engineer.getGovernment().equals(getDiseaseOwner(diseasedCell)) &&
+                        engineer.getPosition().equals(engineer.getDestination())) {
+                    toRemove.add(diseasedCell);
+                    engineer.getGovernment().setDiseaseElement(false);
+                }
+            }
+        }
+        for (Cell healedCell: toRemove) diseasedCells.remove(healedCell);
+    }
+
+    private Government getDiseaseOwner(Cell cell) {
+        if (cell.getBuilding() != null) return cell.getBuilding().getGovernment();
+        int distance = 1000;
+        Government selected = null;
+        for (Government government : governments) {
+            if (calculateDistance(government.getHold().getCell().getxCoordinates(),
+                    government.getHold().getCell().getyCoordinates(),
+                    cell.getxCoordinates(), cell.getyCoordinates()) < distance)
+                selected = government;
+        }
+        return selected;
+    }
+
+    private void setNewDiseasedCell() {
+        if (diseaseProductionTurn > 0) diseaseProductionTurn--;
+        else {
+            diseaseProductionTurn = Math.abs(random.nextInt()) % 5 + 1;
+            int x = Math.abs(random.nextInt()) % 200, y = Math.abs(random.nextInt()) % 200;
+            diseasedCells.add(map[x][y]);
+            getDiseaseOwner(map[x][y]).setDiseaseElement(true);
+        }
     }
 
     private void machineAttack() {
@@ -682,6 +707,7 @@ public class GameController {
                         }
                     }
                 }
+                building.reduceFireTurn();
             }
         }
         for (Cell cell : freeDogs) {
@@ -823,9 +849,11 @@ public class GameController {
                 worker.setOnTower(worker.getPosition().equals(worker.getDestination()) &&
                         worker.getPosition().getBuilding() instanceof Tower);
                 if (worker.getName().equals("slave") && worker.getPosition().equals(worker.getDestination()) &&
-                        worker.getPosition().getBuilding() != null &&
-                        worker.getPosition().getBuilding().getName().equals("pitch ditch"))
-                    ((Trap) worker.getPosition().getBuilding()).setOnFire(true);
+                        worker.getPosition().getBuilding() != null) {
+                    if (worker.getPosition().getBuilding().getName().equals("pitch ditch"))
+                        ((Trap) worker.getPosition().getBuilding()).flame(true);
+                    else worker.getPosition().getBuilding().setOnFire();
+                }
                 if (worker instanceof Engineer && worker.getPosition().equals(worker.getDestination()) &&
                         worker.getPosition().getBuilding() != null &&
                         worker.getPosition().getBuilding().getName().equals("oil smelter"))

@@ -16,7 +16,7 @@ public class Trap extends Building {
         isLit = false;
     }
 
-    public void setOnFire(boolean lit) {
+    public void flame(boolean lit) {
         isLit = lit;
     }
 }
