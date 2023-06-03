@@ -55,10 +55,22 @@ Button:hover{
 }
 
 .Background{
-    -fx-background-image: url("../images/SignUpBack.jpg");
+    -fx-background-image: url("../images/LoginBack.jpg");
     -fx-background-size: cover;
     -fx-background-position: center center;
     -fx-background-repeat: stretch;
+}
+
+Hyperlink{
+    -fx-text-fill: white;
+}
+
+Hyperlink:hover{
+    -fx-border-color: white;
+}
+
+Hyperlink:focused{
+    -fx-border-color: white;
 }
 
 TextField{

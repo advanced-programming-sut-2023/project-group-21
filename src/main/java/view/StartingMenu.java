@@ -1,5 +1,6 @@
 package view;
 
+import controller.FileController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -64,9 +65,22 @@ public class StartingMenu extends Application {
             }
         });
 
+        loginButton.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.getButton()==MouseButton.PRIMARY){
+                LoggingMenu loggingMenu=new LoggingMenu();
+                try {
+                    loggingMenu.start(mainStage);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         quitButton.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.getButton()== MouseButton.PRIMARY)
+            if(mouseEvent.getButton()== MouseButton.PRIMARY) {
+                FileController.finish();
                 Platform.exit();
+            }
         });
 
         pane.getChildren().addAll(signUpButton,loginButton,quitButton);

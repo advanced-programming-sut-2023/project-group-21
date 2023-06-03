@@ -10,6 +10,8 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 
+import javax.xml.catalog.CatalogManager;
+
 
 public class SignUpController {
     private String  slogan;
@@ -51,7 +53,7 @@ public class SignUpController {
     }
 
     public String giveRandomSlogan() {
-        slogan = Game.SLOGANS.get((int) (Math.random() % 10));
+        slogan = Game.SLOGANS.get((int) (Math.random() * 10));
         return slogan;
     }
 

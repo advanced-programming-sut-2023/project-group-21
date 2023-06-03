@@ -13,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -49,7 +48,7 @@ public class MapViewGui extends Application implements Initializable {
     @Override
     public void start(Stage stage) {
         try {
-            Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXMLs/Map.fxml"));
+            Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
             Scene mapScene = new Scene(parent1);
             stage.setScene(mapScene);
             stage.show();
