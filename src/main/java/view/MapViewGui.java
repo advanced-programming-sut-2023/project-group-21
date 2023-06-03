@@ -52,7 +52,7 @@ public class MapViewGui extends Application implements Initializable {
     @Override
     public void start(Stage stage) {
         try {
-            Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXMLs/Map.fxml"));
+            Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
             Scene mapScene = new Scene(parent1);
             stage.setScene(mapScene);
             stage.show();

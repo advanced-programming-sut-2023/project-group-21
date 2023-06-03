@@ -75,7 +75,7 @@ public class OtherController {
 //        return captcha.toString();
 //    }
 
-    private static String generateCaptchaString() {
+    public static String generateCaptchaString() {
         int n = 9;
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String captcha = "";
