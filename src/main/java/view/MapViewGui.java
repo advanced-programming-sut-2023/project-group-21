@@ -261,7 +261,6 @@ public class MapViewGui extends Application implements Initializable {
         ImageView imageView = new ImageView();
         Image image;
         String basePath = new File("").getAbsolutePath();
-        System.out.println(basePath);
         for (int i = 0; i < Extras.values().length; i++) {
             image = new Image("file:" + basePath + "/src/main/resources/ExtraImage/" + Extras.values()[i].getImagePath());
             imageView = new ImageView(image);

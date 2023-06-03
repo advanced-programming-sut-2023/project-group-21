@@ -2,15 +2,15 @@ package model.generalenums;
 
 public enum Extras {
     SHRUB("shrub","a","shrub.jpeg"),
-    CHERRY_TREE("cherry","b","shrub.jpeg"),
-    OLIVE_TREE("olive","c","shrub.jpeg"),
-    COCONUT_TREE("coconut","d","shrub.jpeg"),
-    PALM_TREE("palm","d","shrub.jpeg"),
+    CHERRY_TREE("cherry","b","cherry.png"),
+    OLIVE_TREE("olive","c","olive.png"),
+    COCONUT_TREE("coconut","d","coconut.png"),
+    PALM_TREE("palm","d","palm.png"),
     NORTH_ROCK("n","e","shrub.jpeg"),
     SOUTH_ROCK("s","f","shrub.jpeg"),
     WEST_ROCK("w","g","shrub.jpeg"),
     EAST_ROCK("e","h","shrub.jpeg"),
-    HOLD("hold","#","shrub.jpeg");
+    HOLD("hold","#","hold.png");
     private final String name;
     private final String saveCode;
     private final String imagePath;

@@ -6,9 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import model.building.Building;
@@ -312,7 +310,7 @@ public class Cell {
     }
     private Label getLabel(int xShow, int yShow,int size) {
         Label label = new Label(xCoordinates+"   "+yCoordinates);
-        label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";");
+        label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";-fx-border-color: black;");
         label.setPrefWidth(size);
         label.setPrefHeight(size);
         label.setLayoutX(xShow);
