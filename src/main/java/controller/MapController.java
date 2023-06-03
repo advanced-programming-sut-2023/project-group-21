@@ -135,6 +135,17 @@ public class MapController {
         }
     }
 
+    public MapMessages setExtra(int x,int y,Extras extras){
+        if(x>=map.length||x<0||y>= map.length||y<0)
+            return MapMessages.OUT_OF_INDEX;
+        if(extras == null)
+            return MapMessages.NO_TEXTURE;
+        if(map[x][y].getExtra()!=null)
+            return MapMessages.UNABLE_TO_PUT_EXTRA;
+        map[x][y].setExtras(extras);
+        return MapMessages.SUCCESS;
+    }
+
     public void saveMap(String username) {
         String temp = "";
         for (int i1 = 0; i1 < map.length; i1++) {

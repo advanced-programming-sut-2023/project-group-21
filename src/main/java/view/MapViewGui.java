@@ -13,12 +13,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Cell;
 import model.generalenums.Extras;
+import view.message.MapMessages;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +41,9 @@ public class MapViewGui extends Application implements Initializable {
     @FXML
     private VBox objectBox;
     private int selectedX1 = -1, selectedX2 = -1, selectedY1 = -1, selectedY2 = -1;//-1 means there is no selected cell!
+    private boolean isDraggedExtra = false;
+    private Extras selectedExtra;
+//    Alert alert = new Alert(Alert.AlertType.ERROR);
 
     public static void main(String[] args) {
         launch(args);
@@ -162,9 +165,6 @@ public class MapViewGui extends Application implements Initializable {
 
     }
 
-    public void selectUnit() {
-
-    }
 
 
     @Override
@@ -172,14 +172,14 @@ public class MapViewGui extends Application implements Initializable {
         initExtra();
         mainPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
-            public void handle(KeyEvent keyEvent) {
-                if(keyEvent.getCode() == KeyCode.S)
+            public void handle(KeyEvent keyEvent) {// for handling shortcuts!
+                if (keyEvent.getCode() == KeyCode.S)
                     save();
-                else if(keyEvent.getCode() == KeyCode.Q)
+                else if (keyEvent.getCode() == KeyCode.Q)
                     back();
-                else if(keyEvent.getCode() == KeyCode.N)
+                else if (keyEvent.getCode() == KeyCode.N)
                     System.out.println("next turn!");//for going to next turn
-                else if(keyEvent.getCode() == KeyCode.G)
+                else if (keyEvent.getCode() == KeyCode.G)
                     gotoXY();
                 else if (keyEvent.getCode() == KeyCode.L)
                     goLeft();
@@ -187,7 +187,7 @@ public class MapViewGui extends Application implements Initializable {
                     goRight();
                 else if (keyEvent.getCode() == KeyCode.U)
                     goUp();
-                else if(keyEvent.getCode() == KeyCode.D)
+                else if (keyEvent.getCode() == KeyCode.D)
                     goDown();
             }
         });
@@ -218,13 +218,22 @@ public class MapViewGui extends Application implements Initializable {
         cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                if (isDraggedExtra) {
+                    isDraggedExtra = false;
+                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE),
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE), selectedExtra);
+                    if(messages != MapMessages.SUCCESS) {
+//                        alert.setTitle("unable to set extra");
+//                        alert.setHeaderText(null);
+//                        alert.setContentText(messages.toString());//print message for us
+                    }
+                    return;
+                }
                 if (!isStartDrag) {
                     selectCell(mouseEvent.getX(), mouseEvent.getY(), mouseEvent.getX(), mouseEvent.getY());
                     return;
                 }
                 selectCell(startDragX, startDragY, mouseEvent.getX(), mouseEvent.getY());
-                System.out.println(mouseEvent.getX() + " jjj");
-                System.out.println(mouseEvent.getY() + " jjj");
                 isStartDrag = false;
             }
         });
@@ -251,14 +260,23 @@ public class MapViewGui extends Application implements Initializable {
         objectBox.getChildren().remove(0, objectBox.getChildren().size());
         ImageView imageView = new ImageView();
         Image image;
-        imageView.setFitWidth(80);
-        imageView.setFitHeight(80);//modify
+        String basePath = new File("").getAbsolutePath();
+        System.out.println(basePath);
         for (int i = 0; i < Extras.values().length; i++) {
-            File file = new File(Extras.values()[i].getImagePath());
-            image = new Image("file:"+"/home/morteza/Desktop/program_ap/FinalProject/StrongHold2/src/main/java/view/shrub.jpeg");
+            image = new Image("file:" + basePath + "/src/main/resources/ExtraImage/" + Extras.values()[i].getImagePath());
             imageView = new ImageView(image);
+            imageView.setFitWidth(90);
+            imageView.setFitHeight(50);
+            int finalI = i;
+            imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    System.out.println(finalI);
+                    selectedExtra = Extras.values()[finalI];
+                    isDraggedExtra = true;
+                }
+            });
             objectBox.getChildren().add(imageView);
         }
-        System.out.println(objectBox.getChildren());
     }
 }

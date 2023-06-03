@@ -297,12 +297,6 @@ public class Cell {
     }
 
     public Label toLabel(int xShow, int yShow,int size) {
-        String rgb = groundTexture.getRGB();
-        Color BLACK = new Color(1, 0.0, 0.0, 0.0);
-        double red = normal(rgb.substring(1, 3));
-        double blue = normal(rgb.substring(3, 5));
-        double green = normal(rgb.substring(5));
-        Paint paint = new Color(0.99, red, green, blue);
         Label label = getLabel(xShow, yShow,size);
         return label;
     }

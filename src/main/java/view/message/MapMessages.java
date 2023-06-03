@@ -10,7 +10,8 @@ public enum MapMessages {
     INVALID_NUMBER("invalid number (X2 and y2 should be greater than x1 and y1)"),
     OUT_OF_INDEX("out of index"),
     UNABLE_TO_PUT_HOLD("unable to put hold!"),
-    TOO_MANY_HOLD("there is too many hold in the map!")
+    TOO_MANY_HOLD("there is too many hold in the map!"),
+    UNABLE_TO_PUT_EXTRA("there is already ")
     ;
 
     private final String message;
