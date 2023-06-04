@@ -230,6 +230,7 @@ public class MapViewGui extends Application implements Initializable {
 //                        alert.setHeaderText(null);
 //                        alert.setContentText(messages.toString());//print message for us
                     }
+                    showMap(showingMap,8);
                     return;
                 }
                 if (!isStartDrag) {
