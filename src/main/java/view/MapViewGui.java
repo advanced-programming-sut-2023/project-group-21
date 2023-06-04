@@ -136,12 +136,16 @@ public class MapViewGui extends Application implements Initializable {
     public void zoomIn() {
         if (CELL_SIZE <= 95)
             CELL_SIZE += 5;
+        if(CELL_SIZE == 85)
+            CELL_SIZE = 90;
         showMap(showingMap, 100);
     }
 
     public void zoomOut() {
         if (CELL_SIZE >= 80)
             CELL_SIZE -= 5;
+        if(CELL_SIZE == 85)
+            CELL_SIZE = 80;
         showMap(showingMap, 100);
     }
 
@@ -192,7 +196,6 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        cellPane.setStyle("-fx-background-color: black;");
         mapController.initializeMap(400, true);
         showMap(mapController.showMapGui(currentX, currentY), 75);
 
@@ -220,8 +223,8 @@ public class MapViewGui extends Application implements Initializable {
             public void handle(MouseEvent mouseEvent) {
                 if (isDraggedExtra) {
                     isDraggedExtra = false;
-                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE),
-                            currentY + (int) (mouseEvent.getY() / CELL_SIZE), selectedExtra);
+                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) -1,
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) -1 , selectedExtra);
                     if(messages != MapMessages.SUCCESS) {
 //                        alert.setTitle("unable to set extra");
 //                        alert.setHeaderText(null);
@@ -240,34 +243,38 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void gotoXY() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("go to Cell");
-        alert.setHeaderText(null);
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getChildren().remove(0);
-        TextInputDialog textField = new TextInputDialog();
-        TextField textField1 = new TextField();
-        textField1.setLayoutX(15);
-        textField1.setLayoutY(15);
-        textField1.setVisible(true);
-        textField1.setPromptText("ali");
-        alert.getDialogPane().getChildren().add(textField1);
-        alert.showAndWait();
+//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//        alert.setTitle("go to Cell");
+//        alert.setHeaderText(null);
+//        DialogPane dialogPane = alert.getDialogPane();
+//        dialogPane.getChildren().remove(0);
+//        TextInputDialog textField = new TextInputDialog();
+//        TextField textField1 = new TextField();
+//        textField1.setLayoutX(15);
+//        textField1.setLayoutY(15);
+//        textField1.setVisible(true);
+//        textField1.setPromptText("ali");
+//        alert.getDialogPane().getChildren().add(textField1);
+//        alert.showAndWait();
+        System.out.println("gotoXY is called!");
     }
 
 
     public void initExtra() {
         objectBox.getChildren().remove(0, objectBox.getChildren().size());
-        ImageView imageView = new ImageView();
+        ImageView imageView;
         Image image;
+        Label label;
         String basePath = new File("").getAbsolutePath();
         for (int i = 0; i < Extras.values().length; i++) {
             image = new Image("file:" + basePath + "/src/main/resources/ExtraImage/" + Extras.values()[i].getImagePath());
             imageView = new ImageView(image);
             imageView.setFitWidth(90);
-            imageView.setFitHeight(50);
+            imageView.setFitHeight(70);
             int finalI = i;
-            imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            label = new Label(null,imageView);
+            label.setStyle("-fx-border-color: black;");
+            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
                     System.out.println(finalI);
@@ -275,7 +282,7 @@ public class MapViewGui extends Application implements Initializable {
                     isDraggedExtra = true;
                 }
             });
-            objectBox.getChildren().add(imageView);
+            objectBox.getChildren().add(label);
         }
     }
 }

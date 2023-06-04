@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<AnchorPane prefHeight="720.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.MapViewGui" fx:id="mainPane">
+<AnchorPane fx:id="mainPane" prefHeight="720.0" prefWidth="1080.0" stylesheets="@../CSS/Map.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.MapViewGui">
 
    <children>
-      <Pane fx:id="cellPane" layoutX="290.0" layoutY="60.0" maxHeight="600.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" />
+      <Pane fx:id="cellPane" layoutX="256.0" layoutY="28.0" maxHeight="600.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" styleClass="mapPane" />
       <Button layoutX="58.0" layoutY="680.0" mnemonicParsing="false" onAction="#back" text="back" />
       <Button layoutY="680.0" mnemonicParsing="false" onAction="#save" text="save" />
-      <Button layoutX="238.0" layoutY="2.0" onAction="#gotoXY" text="go to" textAlignment="CENTER" />
+      <Button layoutX="16.0" layoutY="226.0" onAction="#gotoXY" text="go to" textAlignment="CENTER" />
       <Button layoutX="124.0" layoutY="680.0" mnemonicParsing="false" onAction="#goUp" text="up" />
-      <Button layoutX="80.0" layoutY="2.0" mnemonicParsing="false" onAction="#goDown" text="down" />
-      <Button layoutX="178.0" layoutY="2.0" mnemonicParsing="false" onAction="#goLeft" text="left" />
-      <Button layoutX="378.0" layoutY="2.0" mnemonicParsing="false" onAction="#zoomIn" text="zoom-in" />
-      <Button layoutX="478.0" layoutY="2.0" mnemonicParsing="false" onAction="#zoomOut" text="zoom-out" />
+      <Button layoutY="60.0" mnemonicParsing="false" onAction="#goDown" text="down" />
+      <Button layoutY="94.0" mnemonicParsing="false" onAction="#goLeft" text="left" />
+      <Button layoutX="7.0" layoutY="137.0" mnemonicParsing="false" onAction="#zoomIn" text="zoom-in" />
+      <Button layoutX="6.0" layoutY="185.0" mnemonicParsing="false" onAction="#zoomOut" text="zoom-out" />
       <Button mnemonicParsing="false" onAction="#goRight" text="right" />
-      <ScrollPane layoutX="980.0" layoutY="360.0" prefHeight="200.0" prefWidth="100.0" fx:id="scrollPane">
+      <ScrollPane fx:id="scrollPane" layoutX="943.0" layoutY="269.0" prefHeight="400.0" prefWidth="100.0">
          <content>
-          <VBox minHeight="0.0" minWidth="0.0"  prefWidth="100.0" fx:id="objectBox"/>
+          <VBox fx:id="objectBox" minHeight="0.0" minWidth="0.0" prefWidth="100.0" />
          </content>
       </ScrollPane>
    </children>

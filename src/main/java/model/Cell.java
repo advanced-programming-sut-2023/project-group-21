@@ -1,24 +1,16 @@
 package model;
 
-import controller.GameController;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.image.ImageView;
 import model.building.Building;
-import model.building.Enums.BuildingsDetails;
-import model.building.Gate;
-import model.building.Tower;
-import model.generalenums.GroundTexture;
 import model.generalenums.Extras;
+import model.generalenums.GroundTexture;
 import model.human.Person;
 import model.human.Worker;
 import model.machine.Machine;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class Cell {
@@ -37,10 +29,12 @@ public class Cell {
     private final boolean hasHole = false;
     private char direction = 'a';
     private boolean hasLadder = false;
+    private static final String MY_PATH_EXTRA = "file:" + (new File("").getAbsolutePath()) +
+            "/src/main/resources/ExtraImage/";
+    private static final String MY_PATH_BUILDING = "file:" + (new File("").getAbsolutePath()) +
+            "/src/main/resources/buildingImage/";
 
     public Cell(int xCoordinates, int yCoordinates) {
-        if (xCoordinates%5==0)
-            groundTexture = GroundTexture.DENSE_MEADOW;
         this.xCoordinates = xCoordinates;
         this.yCoordinates = yCoordinates;
         people = new ArrayList<>();
@@ -115,12 +109,10 @@ public class Cell {
                 details.append("\n");
             }
         }
-        if (machines != null) {
-            details.append("\n");
-            for (Machine machine : machines) {
-                details.append(machine.getName()).append(": ").append(machine.getGovernment().getLord().getUserName());
-                details.append(" | ").append(machine.getHitPoint()).append("\n");
-            }
+        details.append("\n");
+        for (Machine machine : machines) {
+            details.append(machine.getName()).append(": ").append(machine.getGovernment().getLord().getUserName());
+            details.append(" | ").append(machine.getHitPoint()).append("\n");
         }
         details.append("Number of all People: ").append(people.size());
         return details.toString();
@@ -271,20 +263,6 @@ public class Cell {
         machines.remove(machine);
     }
 
-    private double normal(String input) {
-        if (input.length() != 2)
-            return 0;
-        double result = 0;
-        if (Character.isDigit(input.charAt(0)))
-            result = Integer.parseInt(String.valueOf(input.charAt(0))) * 16;
-        else
-            result = (input.charAt(0) - 'a' + 10) * 16;
-        if (Character.isDigit(input.charAt(1)))
-            result += (Integer.parseInt(String.valueOf(input.charAt(1))));
-        else
-            result += (input.charAt(0) - 'a' + 10);
-        return result / 256.1;
-    }
 
     public void addPeople(Worker worker) {
         people.add(worker);
@@ -294,13 +272,13 @@ public class Cell {
         return "(" + (xCoordinates + 1) + "," + (yCoordinates + 1) + ")";
     }
 
-    public Label toLabel(int xShow, int yShow,int size) {
-        Label label = getLabel(xShow, yShow,size);
-        return label;
+    public Label toLabel(int xShow, int yShow, int size) {
+        return getLabel(xShow, yShow, size);
     }
-    public Label toLabel(int xShow,int yShow,int sizeX,int sizeY){//for some corner tile
+
+    public Label toLabel(int xShow, int yShow, int sizeX, int sizeY) {//for some corner tile
         Label label = new Label();
-        label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";");
+        label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";-fx-border-color: black;");
         label.setPrefWidth(sizeX);
         label.setPrefHeight(sizeY);
         label.setLayoutX(xShow);
@@ -308,8 +286,17 @@ public class Cell {
         label.setAlignment(Pos.CENTER);
         return label;
     }
-    private Label getLabel(int xShow, int yShow,int size) {
-        Label label = new Label(xCoordinates+"   "+yCoordinates);
+
+    private Label getLabel(int xShow, int yShow, int size) {
+        Label label;
+        if (extra != null) {
+            ImageView iv = new ImageView(MY_PATH_EXTRA + extra.getImagePath());
+            iv.setFitHeight((double) size / 2);
+            iv.setFitWidth((double) size / 2);
+            label = new Label(null, iv);
+        } else {
+            label = new Label();
+        }
         label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";-fx-border-color: black;");
         label.setPrefWidth(size);
         label.setPrefHeight(size);
