@@ -341,15 +341,15 @@ public class SigningMenu extends Application {
             if (mouseEvent1.getButton() == MouseButton.PRIMARY) {
                 if (selected != null && !answerTextField.getText().isEmpty()) {
                     if (selected.equals(radioButton1))
-                        selectedQuestionNumber[0] =1;
+                        selectedQuestionNumber[0] = 1;
                     if (selected.equals(radioButton2))
-                        selectedQuestionNumber[0] =2;
+                        selectedQuestionNumber[0] = 2;
                     if (selected.equals(radioButton3))
-                        selectedQuestionNumber[0] =3;
+                        selectedQuestionNumber[0] = 3;
                     if (pane.getChildren().contains(error))
                         pane.getChildren().remove(error);
 
-                    captchaScene(stage,selectedQuestionNumber[0],answerTextField.getText());
+                    captchaScene(stage, selectedQuestionNumber[0], answerTextField.getText());
                 } else {
                     if (!pane.getChildren().contains(error))
                         pane.getChildren().add(error);
@@ -362,21 +362,21 @@ public class SigningMenu extends Application {
         Pane pane = new Pane();
         TextArea area = new TextArea();
         //is the right method being called??
-        area.setText(OtherController.generateCaptchaString());
+        area.setText(OtherController.generateCaptcha());
         area.setPrefColumnCount(15);
         area.setPrefHeight(120);
         area.setPrefWidth(300);
         area.relocate(40, 20);
         Label answerLabel = new Label("answer:");
         TextField textField = new TextField();
-        Button changeButton=new Button("change");
+        Button changeButton = new Button("change");
         Button saveButton = new Button("save");
         answerLabel.relocate(40, 210);
         textField.relocate(40, 240);
         saveButton.relocate(40, 270);
-        changeButton.relocate(300,50);
+        changeButton.relocate(300, 50);
         changeButton.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.getButton()==MouseButton.PRIMARY){
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 area.setText(OtherController.generateCaptchaString());
             }
         });
@@ -384,21 +384,21 @@ public class SigningMenu extends Application {
         saveButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 FileController.addUserToFile(usernameTextField.getText(), passwordTextField.getText(),
-                    emailTextField.getText(), nicknameTextField.getText(), sloganTextField.getText(),
-                    number,answer);
+                        emailTextField.getText(), nicknameTextField.getText(), sloganTextField.getText(),
+                        number, answer);
                 stage.close();
-                //if (OtherController.checkCaptcha(textField.getText())) {
-                StartingMenu startingMenu = new StartingMenu();
-                try {
-                    startingMenu.start(StartingMenu.mainStage);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                if (OtherController.checkCaptcha(textField.getText())) {
+                    StartingMenu startingMenu = new StartingMenu();
+                    try {
+                        startingMenu.start(StartingMenu.mainStage);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-                //}
             }
         });
 
-        pane.getChildren().addAll(saveButton, answerLabel, textField, area,changeButton);
+        pane.getChildren().addAll(saveButton, answerLabel, textField, area, changeButton);
         stage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
         stage.setScene(new Scene(pane));
     }
