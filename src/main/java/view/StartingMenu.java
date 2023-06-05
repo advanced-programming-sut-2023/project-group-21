@@ -67,9 +67,9 @@ public class StartingMenu extends Application {
 
         loginButton.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getButton()==MouseButton.PRIMARY){
-//                LoggingMenu loggingMenu=new LoggingMenu();
+                LoggingMenu loggingMenu=new LoggingMenu();
                 try {
-//                    loggingMenu.start(mainStage);
+                    loggingMenu.start(mainStage);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

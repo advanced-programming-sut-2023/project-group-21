@@ -1,0 +1,27 @@
+
+Button{
+    -fx-background-color: #494848;
+    -fx-border-color: #010;
+    -fx-min-height: 40;
+    -fx-max-height: 40;
+    -fx-min-width: 130;
+    -fx-max-width: 130;
+    -fx-cursor: HAND;
+    -fx-font-family: "Times New Roman";
+    -fx-text-fill: #F3E9E9;
+    -fx-font-size: 20;
+}
+
+Button:hover{
+    -fx-background-color: #010;
+    -fx-border-width: 3;
+    -fx-border-color: #616161;
+}
+
+
+.Background{
+    -fx-background-image: url("../images/MainMenu.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: stretch;
+}
