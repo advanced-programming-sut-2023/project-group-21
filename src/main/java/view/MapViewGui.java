@@ -68,6 +68,12 @@ public class MapViewGui extends Application implements Initializable {
         for (int i1 = 0; i1 < myMap.length && i1 < (600 / CELL_SIZE); i1++)
             for (int i2 = 0; i2 < myMap.length && i2 < (600 / CELL_SIZE); i2++) {
                 Label label = myMap[i1][i2].toLabel(CELL_SIZE * i1, CELL_SIZE * i2, CELL_SIZE);
+                label.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                    @Override
+                    public void handle(ContextMenuEvent contextMenuEvent) {
+                        isDraggedExtra = false;
+                    }
+                });
                 cellPane.getChildren().add(label);
             }
         if (600 % CELL_SIZE != 0) {
@@ -90,14 +96,17 @@ public class MapViewGui extends Application implements Initializable {
         if (Math.abs(x - x2) < 0.5 && Math.abs(y - y2) < 0.5) {
             int xInt = (int) (x / CELL_SIZE);
             int yInt = (int) (x / CELL_SIZE);
-            selectedX1 = selectedX2 = (xInt + currentX);
-            selectedY1 = selectedY2 = (yInt + currentY);
+            selectedX1 = selectedX2 = (xInt + currentX -1);
+            selectedY1 = selectedY2 = (yInt + currentY -1);
             return;
         }
         selectedX1 = (int) ((x / CELL_SIZE) + currentX - 1);
         selectedX2 = (int) ((x2 / CELL_SIZE) + currentX - 1);
         selectedY1 = (int) (y / CELL_SIZE + currentY - 1);
         selectedY2 = (int) (y2 / CELL_SIZE + currentY - 1);
+        int maxX = Math.max(selectedX2,selectedX1);int minX = Math.min(selectedX2,selectedX1);
+        int maxY = Math.max(selectedY2,selectedY1);int minY = Math.min(selectedY1,selectedY2);
+        selectedX1 = minX; selectedY1 = minY;selectedX2 = maxX;selectedY2 = maxY;
     }
 
     private void moveMap(int x, int y) {
@@ -105,7 +114,7 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void save() {
-        System.out.println(selectedX1 + " " + selectedX2 + " " + selectedY1 + " " + selectedY2);
+        System.out.println(selectedX1 + " , " + selectedY1 + " @@@ " + selectedX2 + " , " + selectedY2);
     }
 
     public void back() {
@@ -136,7 +145,7 @@ public class MapViewGui extends Application implements Initializable {
     public void zoomIn() {
         if (CELL_SIZE <= 95)
             CELL_SIZE += 5;
-        if(CELL_SIZE == 85)
+        if (CELL_SIZE == 85)
             CELL_SIZE = 90;
         showMap(showingMap, 100);
     }
@@ -144,7 +153,7 @@ public class MapViewGui extends Application implements Initializable {
     public void zoomOut() {
         if (CELL_SIZE >= 80)
             CELL_SIZE -= 5;
-        if(CELL_SIZE == 85)
+        if (CELL_SIZE == 85)
             CELL_SIZE = 80;
         showMap(showingMap, 100);
     }
@@ -169,8 +178,13 @@ public class MapViewGui extends Application implements Initializable {
 
     }
 
-
-
+    private void raiseError(MapMessages messages){//raise error
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("error!");
+        alert.setContentText(null);
+        alert.setContentText(messages.toString());
+        alert.showAndWait();
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initExtra();
@@ -223,14 +237,12 @@ public class MapViewGui extends Application implements Initializable {
             public void handle(MouseEvent mouseEvent) {
                 if (isDraggedExtra) {
                     isDraggedExtra = false;
-                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) -1,
-                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) -1 , selectedExtra);
-                    if(messages != MapMessages.SUCCESS) {
-//                        alert.setTitle("unable to set extra");
-//                        alert.setHeaderText(null);
-//                        alert.setContentText(messages.toString());//print message for us
+                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
+                    if (messages != MapMessages.SUCCESS) {
+                       raiseError(messages);
                     }
-                    showMap(showingMap,8);
+                    showMap(showingMap, 8);
                     return;
                 }
                 if (!isStartDrag) {
@@ -238,6 +250,13 @@ public class MapViewGui extends Application implements Initializable {
                     return;
                 }
                 selectCell(startDragX, startDragY, mouseEvent.getX(), mouseEvent.getY());
+                isStartDrag = false;
+            }
+        });
+        mainPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                isDraggedExtra = false;
                 isStartDrag = false;
             }
         });
@@ -273,7 +292,7 @@ public class MapViewGui extends Application implements Initializable {
             imageView.setFitWidth(90);
             imageView.setFitHeight(70);
             int finalI = i;
-            label = new Label(null,imageView);
+            label = new Label(null, imageView);
             label.setStyle("-fx-border-color: black;");
             label.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override

@@ -3,7 +3,8 @@
 }
 
 Button{
-    -fx-background-color: white;
+    -fx-min-width: 70;
+    -fx-background-color: #d0b1f0;
     -fx-background-radius: 5;
     -fx-border-color: #010100;
     -fx-border-radius: 5;
