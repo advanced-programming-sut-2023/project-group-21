@@ -2,6 +2,7 @@ package model;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.building.Building;
 import model.generalenums.Extras;
@@ -294,7 +295,14 @@ public class Cell {
             iv.setFitHeight((double) size / 2);
             iv.setFitWidth((double) size / 2);
             label = new Label(null, iv);
-        } else {
+        } else if (building != null) {
+            ImageView buildingImage = new ImageView(
+                    new Image(Cell.class.getResource(building.getBuildingsDetails().getImagePath()).toExternalForm()));
+            buildingImage.setFitHeight((double) size / 2);
+            buildingImage.setFitWidth((double) size / 2);
+            label = new Label(null, buildingImage);
+        }
+        else {
             label = new Label();
         }
         label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";-fx-border-color: black;");
