@@ -34,7 +34,6 @@ public class MapViewGui extends Application implements Initializable {
     private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
             "/src/main/resources/CSS/Texture.css";
     private String[] textureItem;
-    private static User staticUser;
     private double startDragX = 0, startDragY = 0;
     private int CELL_SIZE = 75;
     @FXML
@@ -43,7 +42,8 @@ public class MapViewGui extends Application implements Initializable {
     private AnchorPane mainPane;
     private Cell[][] showingMap;
     private int currentX = 5, currentY = 5;
-    public MapController mapController = new MapController();
+    public MapController mapController;
+    public static MapController mapControllerStatic ;
     private boolean isStartDrag = false;
     private static MainMenu staticMainMenu;
     @FXML
@@ -56,17 +56,13 @@ public class MapViewGui extends Application implements Initializable {
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
-    private User user;
+
     ArrayList<Government> governments = new ArrayList<>();
 
     public void setGovernments(ArrayList<Government> governments) {
         this.governments = governments;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-        staticUser = user;
-    }
 
     public void setMainMenu(MainMenu mainMenu) {
         staticMainMenu = mainMenu;
@@ -79,6 +75,11 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void start(Stage stage) {
+        if (mapControllerStatic ==null){
+            mapController = new MapController();
+            mapControllerStatic = mapController;
+        }else
+            mapController = mapControllerStatic;
         this.mainStage = stage;
         try {
             Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
@@ -142,6 +143,7 @@ public class MapViewGui extends Application implements Initializable {
 
     public void setMapController(MapController mapController) {
         this.mapController = mapController;
+        mapControllerStatic = mapController;
     }
 
     private void selectCell(double x, double y, double x2, double y2) {
@@ -174,10 +176,7 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void save() {
-        if (user != null)
-            mapController.saveMap(user.getUserName());
-        else
-            mapController.saveMap("default");
+        mapController.saveMap();
     }
 
     public void back() {
@@ -185,10 +184,7 @@ public class MapViewGui extends Application implements Initializable {
             staticMainMenu.start(StartingMenu.mainStage);
         else {
             mainMenu = new MainMenu();
-            System.out.println(staticUser == null);
-            System.out.println(mapController == null);
-            mainMenu.setUser(staticUser);
-            mainMenu.setMapController(mapController);
+            mainMenu.setMapController(mapControllerStatic);
             mainMenu.start(StartingMenu.mainStage);
         }
     }
@@ -259,6 +255,16 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (mapControllerStatic ==null){
+            if (MainMenu.staticMapController != null)
+                mapController = MainMenu.staticMapController;
+            else {
+                MainMenu.staticMapController = new MapController();
+                mapController = MainMenu.staticMapController;
+            }
+            mapControllerStatic = mapController;
+        }else
+            mapController = mapControllerStatic;
         textureItem = new String[GroundTexture.values().length];
         for(int i = 0;i<textureItem.length;i++)
             textureItem[i] = GroundTexture.values()[i].getName();
