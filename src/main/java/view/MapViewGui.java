@@ -34,6 +34,7 @@ public class MapViewGui extends Application implements Initializable {
     private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
             "/src/main/resources/CSS/Texture.css";
     private String[] textureItem;
+    private static User staticUser;
     private double startDragX = 0, startDragY = 0;
     private int CELL_SIZE = 75;
     @FXML
@@ -63,9 +64,12 @@ public class MapViewGui extends Application implements Initializable {
 
     public void setUser(User user) {
         this.user = user;
+        staticUser = user;
     }
 
     public void setMainMenu(MainMenu mainMenu) {
+        System.out.println("changed!");
+        System.out.println(mainMenu==null);
         this.mainMenu = mainMenu;
     }
 
@@ -177,7 +181,15 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void back() {
-        mainMenu.start(mainStage);
+        if (mainMenu != null)
+            mainMenu.start(mainStage);
+        else {
+            mainMenu = new MainMenu();
+            System.out.println(staticUser == null);
+            mainMenu.setUser(staticUser);
+            mainMenu.setMapController(mapController);
+            mainMenu.start(StartingMenu.mainStage);
+        }
     }
 
     public void resetFields() {

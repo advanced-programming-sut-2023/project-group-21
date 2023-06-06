@@ -33,6 +33,10 @@ public class MainMenu extends Application {
     }
     private MapController mapController = new MapController();
 
+    public void setMapController(MapController mapController) {
+        this.mapController = mapController;
+    }
+
     private User user;
     private Pane mainPane;
     private LoggingMenu loggingMenu;
@@ -53,7 +57,8 @@ public class MainMenu extends Application {
 
     @Override
     public void start(Stage stage) {
-        mainStage = stage;
+        if (stage != null)
+            mainStage = stage;
         URL url = StartMenu.class.getResource("/FXML/MainMenu.fxml");
         try {
             mainPane = FXMLLoader.load(url);
@@ -66,7 +71,7 @@ public class MainMenu extends Application {
 
 
         Scene scene = new Scene(mainPane);
-        stage.setScene(scene);
+        mainStage.setScene(scene);
     }
 
     private void addNodes() {
@@ -93,9 +98,10 @@ public class MainMenu extends Application {
             initController();
             if (mouseEvent.getButton() == MouseButton.PRIMARY){
                 MapViewGui mapViewGui = new MapViewGui();
-                mapViewGui.setMainMenu(this);
                 mapViewGui.setUser(user);
                 mapViewGui.setMapController(mapController);
+                mapViewGui.start(mainStage);
+                mapViewGui.setMainMenu(this);
             }
         });
 

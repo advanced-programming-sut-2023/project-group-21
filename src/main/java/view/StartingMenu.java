@@ -19,6 +19,7 @@ import java.net.URL;
 public class StartingMenu extends Application {
     public static Stage mainStage;
     public static void main(String[] args) {
+        FileController.start();
         launch(args);
     }
 
