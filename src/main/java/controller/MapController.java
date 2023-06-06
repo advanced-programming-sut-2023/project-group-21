@@ -2,6 +2,7 @@ package controller;
 
 import model.Cell;
 import model.Game;
+import model.User;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
 import view.message.MapMessages;
@@ -9,8 +10,17 @@ import view.message.MapMessages;
 import java.util.ArrayList;
 
 public class MapController {
+    public MapController(){
+        System.out.println("new object!");
+    }
     private int size, xCoordinates, yCoordinates;
     private Cell[][] map;
+    private User user;
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     private int countHold = 0;
     private ArrayList<Cell> myHolds = new ArrayList<>();
     private boolean initState = false;
@@ -204,6 +214,12 @@ public class MapController {
 
     public Cell[][] getMap() {
         return map;
+    }
+    public void saveMap(){
+        if (user != null)
+            saveMap(user.getUserName());
+        else
+            saveMap("default");
     }
 
     public ArrayList<Cell> getMyHolds() {

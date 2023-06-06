@@ -31,10 +31,12 @@ public class MainMenu extends Application {
     public void setUser(User user) {
         this.user = user;
     }
-    private MapController mapController = new MapController();
+    private MapController mapController;
+    public static MapController staticMapController;
 
     public void setMapController(MapController mapController) {
         this.mapController = mapController;
+        staticMapController = mapController;
     }
 
     private User user;
@@ -44,6 +46,8 @@ public class MainMenu extends Application {
     private void initController(){
         if (mapController != null)
             return;
+        if (staticMapController != null)
+            mapController = staticMapController;
         if (FileController.checkExistenceOfMap(user.getUserName()))
             mapController.initializeMap(FileController.loadMap(user.getUserName()));
         else
@@ -57,8 +61,17 @@ public class MainMenu extends Application {
 
     @Override
     public void start(Stage stage) {
+        if (staticMapController == null){
+            mapController = new MapController();
+            mapController.setUser(user);
+            staticMapController = mapController;
+        }else {
+            mapController = staticMapController;
+        }
         if (stage != null)
             mainStage = stage;
+        else
+            mainStage = StartingMenu.mainStage;
         URL url = StartMenu.class.getResource("/FXML/MainMenu.fxml");
         try {
             mainPane = FXMLLoader.load(url);
@@ -71,7 +84,7 @@ public class MainMenu extends Application {
 
 
         Scene scene = new Scene(mainPane);
-        mainStage.setScene(scene);
+        StartingMenu.mainStage.setScene(scene);
     }
 
     private void addNodes() {
@@ -98,7 +111,6 @@ public class MainMenu extends Application {
             initController();
             if (mouseEvent.getButton() == MouseButton.PRIMARY){
                 MapViewGui mapViewGui = new MapViewGui();
-                mapViewGui.setUser(user);
                 mapViewGui.setMapController(mapController);
                 mapViewGui.start(mainStage);
                 mapViewGui.setMainMenu(this);

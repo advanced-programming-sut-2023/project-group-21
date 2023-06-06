@@ -174,7 +174,9 @@ public class FileController {
     }
 
     public static void saveMap(String username, String code) {
+        System.out.println(username);
         String address = maps + username + ".txt";
+        System.out.println(address);
         try {
             FileWriter fileWriter = new FileWriter(address, false);
             fileWriter.write(code);
