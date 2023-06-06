@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 
 public class FileController {
-    private static final String jsonAddress = "E:\\Game\\src\\main\\java\\controller\\users.json";//modify before use
-    private static final String maps = "/home/morteza/Desktop/program_ap/projectMaven6/Stronhold/src/main/java/controller/maps/";  // modify before use
+    private static final String jsonAddress = (new File("").getAbsolutePath()) +
+            "/src/main/resources/users/users.json";//repaired!
+    private static final String maps = (new File("").getAbsolutePath())+"/src/main/resources/maps/";
     private static JSONArray allUsers=new JSONArray();
 
     public static void start() {

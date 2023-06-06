@@ -13,8 +13,14 @@ public class MapController {
     private Cell[][] map;
     private int countHold = 0;
     private ArrayList<Cell> myHolds = new ArrayList<>();
+    private boolean initState = false;
+
+    public boolean isInitState() {
+        return initState;
+    }
 
     public MapMessages initializeMap(int size, boolean behave) {
+        initState = true;
         if (map != null && behave)
             return null;
         map = new Cell[size][size];
@@ -28,6 +34,7 @@ public class MapController {
 
 
     public MapMessages initializeMap(ArrayList<String> myMap) {
+        initState = true;
         myHolds = new ArrayList<>();
         int size = myMap.size();
         map = new Cell[size][size];

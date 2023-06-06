@@ -18,6 +18,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Cell;
+import model.Government;
 import model.User;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
@@ -26,6 +27,7 @@ import view.message.MapMessages;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class MapViewGui extends Application implements Initializable {
@@ -53,6 +55,11 @@ public class MapViewGui extends Application implements Initializable {
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
     private User user;
+    ArrayList<Government> governments = new ArrayList<>();
+
+    public void setGovernments(ArrayList<Government> governments) {
+        this.governments = governments;
+    }
 
     public void setUser(User user) {
         this.user = user;
@@ -125,13 +132,22 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
+    public MapController getMapController() {
+        return mapController;
+    }
+
+    public void setMapController(MapController mapController) {
+        this.mapController = mapController;
+    }
+
     private void selectCell(double x, double y, double x2, double y2) {
         if (Math.abs(x - x2) < 0.5 && Math.abs(y - y2) < 0.5) {
             int xInt = (int) (x / CELL_SIZE);
-            int yInt = (int) (x / CELL_SIZE);
+            int yInt = (int) (y / CELL_SIZE);
             selectedX1 = selectedX2 = (xInt + currentX - 1);
             selectedY1 = selectedY2 = (yInt + currentY - 1);
             showMap(showingMap, 10);
+            System.out.println("test!");
             return;
         }
         selectedX1 = (int) ((x / CELL_SIZE) + currentX - 1);
@@ -161,7 +177,7 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void back() {
-
+        mainMenu.start(mainStage);
     }
 
     public void resetFields() {
@@ -256,7 +272,8 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        mapController.initializeMap(400, true);
+        if(!mapController.isInitState())
+            mapController.initializeMap(400, true);
         showMap(mapController.showMapGui(currentX, currentY), 75);
 
 
@@ -266,10 +283,7 @@ public class MapViewGui extends Application implements Initializable {
                 isStartDrag = true;
                 startDragX = mouseEvent.getX();
                 startDragY = mouseEvent.getY();
-                int xShow = (int) (mouseEvent.getX() / CELL_SIZE);
-                int yShow = (int) (mouseEvent.getY() / CELL_SIZE);
-                System.out.println(xShow);
-                System.out.println(yShow);
+                System.out.println("i'm here");
             }
         });
 
