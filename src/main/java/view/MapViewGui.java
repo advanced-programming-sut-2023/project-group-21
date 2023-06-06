@@ -45,6 +45,7 @@ public class MapViewGui extends Application implements Initializable {
     private int currentX = 5, currentY = 5;
     public MapController mapController = new MapController();
     private boolean isStartDrag = false;
+    private static MainMenu staticMainMenu;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -68,8 +69,7 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void setMainMenu(MainMenu mainMenu) {
-        System.out.println("changed!");
-        System.out.println(mainMenu==null);
+        staticMainMenu = mainMenu;
         this.mainMenu = mainMenu;
     }
 
@@ -181,11 +181,12 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void back() {
-        if (mainMenu != null)
-            mainMenu.start(mainStage);
+        if (staticMainMenu != null)
+            staticMainMenu.start(StartingMenu.mainStage);
         else {
             mainMenu = new MainMenu();
             System.out.println(staticUser == null);
+            System.out.println(mapController == null);
             mainMenu.setUser(staticUser);
             mainMenu.setMapController(mapController);
             mainMenu.start(StartingMenu.mainStage);
