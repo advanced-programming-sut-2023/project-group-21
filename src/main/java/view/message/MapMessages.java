@@ -11,7 +11,8 @@ public enum MapMessages {
     OUT_OF_INDEX("out of index"),
     UNABLE_TO_PUT_HOLD("unable to put hold!"),
     TOO_MANY_HOLD("there is too many hold in the map!"),
-    UNABLE_TO_PUT_EXTRA("there is already ")
+    UNABLE_TO_PUT_EXTRA("there is already "),
+    UNABLE("unable to set texture!")
     ;
 
     private final String message;

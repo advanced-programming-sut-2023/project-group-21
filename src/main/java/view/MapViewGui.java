@@ -6,12 +6,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -19,10 +17,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import model.Cell;
 import model.User;
 import model.generalenums.Extras;
+import model.generalenums.GroundTexture;
 import view.message.MapMessages;
 
 import java.io.File;
@@ -33,6 +31,7 @@ import java.util.ResourceBundle;
 public class MapViewGui extends Application implements Initializable {
     private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
             "/src/main/resources/CSS/Texture.css";
+    private String[] textureItem;
     private double startDragX = 0, startDragY = 0;
     private int CELL_SIZE = 75;
     @FXML
@@ -97,13 +96,12 @@ public class MapViewGui extends Application implements Initializable {
                     @Override
                     public void handle(ContextMenuEvent contextMenuEvent) {
                         isDraggedExtra = false;
-                        System.out.println((currentX + finalI - 1));
                         if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
                                 (currentY + finalI1 - 1) <= selectedY2 && (currentY + finalI1 - 1) >= selectedY1)
                             setTexture(selectedX1, selectedY1, selectedX2, selectedY2);
                         else
                             setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
-                                    currentX + finalI + 1, currentY + finalI1 - 1);
+                                    currentX + finalI - 1, currentY + finalI1 - 1);
 
                     }
                 });
@@ -221,15 +219,20 @@ public class MapViewGui extends Application implements Initializable {
 
 
     private void raiseError(MapMessages messages) {//raise error
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("error!");
-        alert.setContentText(null);
-        alert.setContentText(messages.toString());
-        alert.showAndWait();
+        // need repair
+        System.out.println(messages.toString());
+//        Alert alert = new Alert(Alert.AlertType.ERROR);
+//        alert.setTitle("error!");
+//        alert.setContentText(null);
+//        alert.setContentText(messages.toString());
+//        alert.showAndWait();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        textureItem = new String[GroundTexture.values().length];
+        for(int i = 0;i<textureItem.length;i++)
+            textureItem[i] = GroundTexture.values()[i].getName();
         initExtra();
         mainPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -256,12 +259,7 @@ public class MapViewGui extends Application implements Initializable {
         mapController.initializeMap(400, true);
         showMap(mapController.showMapGui(currentX, currentY), 75);
 
-        cellPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                System.out.println(keyEvent.getCharacter());
-            }
-        });
+
         cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -351,6 +349,11 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     private void setTexture(int x1, int y1, int x2, int y2) {//use function this way: x1 <= x2 && y1 <= y2
+        Label label = new Label("");
+        ChoiceBox<String> textureBox = new ChoiceBox<>();
+        textureBox.getItems().addAll(textureItem);
+        textureBox.setValue(textureItem[0]);
+        textureBox.relocate(130,70);
         Stage stage = new Stage();
         stage.initOwner(mainStage);
         stage.setResizable(false);
@@ -359,16 +362,36 @@ public class MapViewGui extends Application implements Initializable {
         Scene myScene = new Scene(pane);
         myScene.getStylesheets().add(pathCssFile);
         stage.setScene(myScene);
-        Button button = new Button("clear");
-        button.relocate(200, 100);
-        pane.getChildren().add(button);
-        button.setOnMouseClicked(mouseEvent -> {
+        Button clearButton = new Button("clear");
+        clearButton.relocate(200, 100);
+        pane.getChildren().add(clearButton);
+        pane.getChildren().add(textureBox);
+        clearButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 for (int i1 = x1; i1 <= x2; i1++)
                     for (int i2 = y1; i2 <= y2; i2++)
                         mapController.clear(i1, i2);
                 showMap(showingMap, 10);
                 stage.close();
+            }
+        });
+        Button change = new Button("save");
+        change.relocate(100,100);
+        pane.getChildren().add(change);
+        change.setOnMouseClicked(mouseEvent -> {
+            MapMessages messages;
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                messages = mapController.setTexture(x1,x2,y1,y2,textureBox.getValue());
+                showMap(showingMap, 10);
+                if(messages == MapMessages.SUCCESS)
+                    stage.close();
+                else {
+                    label.setText(messages.toString());
+                    label.setAlignment(Pos.CENTER);
+                    label.setLayoutX(130);
+                    label.setLayoutY(10);
+                    pane.getChildren().add(label);
+                }
             }
         });
         stage.show();

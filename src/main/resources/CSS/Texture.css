@@ -16,3 +16,11 @@ Pane{
     -fx-min-height: 150;
     -fx-background-color: #bac1a5;
 }
+
+Label{
+    -fx-text-fill: black;
+     -fx-font-size: 11px;
+}
+
+ChoiceBox{
+}
