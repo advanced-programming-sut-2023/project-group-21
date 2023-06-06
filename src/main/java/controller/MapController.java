@@ -117,9 +117,9 @@ public class MapController {
     }
 
     public MapMessages clear(int x, int y) {
-        if (x > map.length || x < 1 || y > map.length || y < 1) return MapMessages.OUT_OF_INDEX;
+        if (x >= map.length || x < 0 || y >= map.length || y <= 1) return MapMessages.OUT_OF_INDEX;
         try {
-            map[x - 1][y - 1].clear();
+            map[x][y].clear();
             return MapMessages.SUCCESS;
         } catch (ArrayIndexOutOfBoundsException e) {
             return MapMessages.OUT_OF_INDEX;

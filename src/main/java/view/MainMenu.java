@@ -13,10 +13,22 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import javafx.scene.shape.Line;
+import model.User;
+
 import java.net.URL;
 
 public class MainMenu extends Application {
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    private User user;
     private Pane mainPane;
+    private LoggingMenu loggingMenu;
+
+    public void setLoggingMenu(LoggingMenu loggingMenu) {
+        this.loggingMenu = loggingMenu;
+    }
 
     @Override
     public void start(Stage stage) {
@@ -51,6 +63,14 @@ public class MainMenu extends Application {
             if(mouseEvent.getButton()== MouseButton.PRIMARY) {
                 FileController.finish();
                 Platform.exit();
+            }
+        });
+
+        mapButton.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY){
+                MapViewGui mapViewGui = new MapViewGui();
+                mapViewGui.setMainMenu(this);
+                mapViewGui.setUser(user);
             }
         });
 

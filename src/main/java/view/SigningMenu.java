@@ -17,14 +17,13 @@ import model.Game;
 import view.commands.CheckValidion;
 import view.message.SignUpMessages;
 
-import java.io.BufferedReader;
+
 import java.net.URL;
 import java.util.ArrayList;
 
 import static view.message.SignUpMessages.PRINT_NOTHING;
 
 public class SigningMenu extends Application {
-    Label usernameLabel = new Label("username");
     TextField usernameTextField;
     PasswordField passwordTextField;
     TextField passwordShow;
@@ -42,6 +41,11 @@ public class SigningMenu extends Application {
     private Button sloganRandom;
     private Button chooseSloganButton;
     private PasswordField passwordConfirmTextField;
+    private StartingMenu startingMenu;
+
+    public void setStartingMenu(StartingMenu startingMenu) {
+        this.startingMenu = startingMenu;
+    }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -260,7 +264,6 @@ public class SigningMenu extends Application {
 
         backButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                StartingMenu startingMenu = new StartingMenu();
                 try {
                     startingMenu.start(StartingMenu.mainStage);
                 } catch (Exception e) {
@@ -388,7 +391,9 @@ public class SigningMenu extends Application {
                         number, answer);
                 stage.close();
                 if (OtherController.checkCaptcha(textField.getText())) {
-                    StartingMenu startingMenu = new StartingMenu();
+                    if(startingMenu == null) {
+                        startingMenu = new StartingMenu();
+                    }
                     try {
                         startingMenu.start(StartingMenu.mainStage);
                     } catch (Exception e) {

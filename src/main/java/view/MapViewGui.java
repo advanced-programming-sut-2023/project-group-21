@@ -8,7 +8,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -16,7 +19,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import model.Cell;
+import model.User;
 import model.generalenums.Extras;
 import view.message.MapMessages;
 
@@ -26,6 +31,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MapViewGui extends Application implements Initializable {
+    private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
+            "/src/main/resources/CSS/Texture.css";
     private double startDragX = 0, startDragY = 0;
     private int CELL_SIZE = 75;
     @FXML
@@ -43,7 +50,18 @@ public class MapViewGui extends Application implements Initializable {
     private int selectedX1 = -1, selectedX2 = -1, selectedY1 = -1, selectedY2 = -1;//-1 means there is no selected cell!
     private boolean isDraggedExtra = false;
     private Extras selectedExtra;
-//    Alert alert = new Alert(Alert.AlertType.ERROR);
+    private Stage mainStage;
+    //    Alert alert = new Alert(Alert.AlertType.ERROR);
+    private MainMenu mainMenu;
+    private User user;
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setMainMenu(MainMenu mainMenu) {
+        this.mainMenu = mainMenu;
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -51,6 +69,7 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void start(Stage stage) {
+        this.mainStage = stage;
         try {
             Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
             Scene mapScene = new Scene(parent1);
@@ -68,10 +87,24 @@ public class MapViewGui extends Application implements Initializable {
         for (int i1 = 0; i1 < myMap.length && i1 < (600 / CELL_SIZE); i1++)
             for (int i2 = 0; i2 < myMap.length && i2 < (600 / CELL_SIZE); i2++) {
                 Label label = myMap[i1][i2].toLabel(CELL_SIZE * i1, CELL_SIZE * i2, CELL_SIZE);
+                int finalI = i1;
+                if ((currentX + i1 - 1) >= selectedX1 && (currentX + i1 - 1) <= selectedX2 &&
+                        (currentY + i2 - 1) >= selectedY1 && (currentY + i2 - 1) <= selectedY2) {
+                    label.setOpacity(0.4);
+                }
+                int finalI1 = i2;
                 label.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                     @Override
                     public void handle(ContextMenuEvent contextMenuEvent) {
                         isDraggedExtra = false;
+                        System.out.println((currentX + finalI - 1));
+                        if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
+                                (currentY + finalI1 - 1) <= selectedY2 && (currentY + finalI1 - 1) >= selectedY1)
+                            setTexture(selectedX1, selectedY1, selectedX2, selectedY2);
+                        else
+                            setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
+                                    currentX + finalI + 1, currentY + finalI1 - 1);
+
                     }
                 });
                 cellPane.getChildren().add(label);
@@ -79,11 +112,13 @@ public class MapViewGui extends Application implements Initializable {
         if (600 % CELL_SIZE != 0) {
             int thing = 600 / CELL_SIZE;
             for (int i = 0; i < thing && i < myMap.length; i++) {
-                Label label = myMap[thing][i].toLabel(thing * CELL_SIZE, i * CELL_SIZE, (600 - CELL_SIZE * (thing)), CELL_SIZE);
+                Label label = myMap[thing][i].toLabel(thing * CELL_SIZE, i * CELL_SIZE,
+                        (600 - CELL_SIZE * (thing)), CELL_SIZE);
                 cellPane.getChildren().add(label);
             }
             for (int i = 0; i < (600 / CELL_SIZE) && i < myMap.length; i++) {
-                Label label = myMap[i][thing].toLabel(i * CELL_SIZE, thing * CELL_SIZE, CELL_SIZE, 600 - CELL_SIZE * thing);
+                Label label = myMap[i][thing].toLabel(i * CELL_SIZE, thing * CELL_SIZE, CELL_SIZE,
+                        600 - CELL_SIZE * thing);
                 cellPane.getChildren().add(label);
             }
             Label label = myMap[thing][thing].toLabel(CELL_SIZE * thing,
@@ -96,17 +131,24 @@ public class MapViewGui extends Application implements Initializable {
         if (Math.abs(x - x2) < 0.5 && Math.abs(y - y2) < 0.5) {
             int xInt = (int) (x / CELL_SIZE);
             int yInt = (int) (x / CELL_SIZE);
-            selectedX1 = selectedX2 = (xInt + currentX -1);
-            selectedY1 = selectedY2 = (yInt + currentY -1);
+            selectedX1 = selectedX2 = (xInt + currentX - 1);
+            selectedY1 = selectedY2 = (yInt + currentY - 1);
+            showMap(showingMap, 10);
             return;
         }
         selectedX1 = (int) ((x / CELL_SIZE) + currentX - 1);
         selectedX2 = (int) ((x2 / CELL_SIZE) + currentX - 1);
         selectedY1 = (int) (y / CELL_SIZE + currentY - 1);
         selectedY2 = (int) (y2 / CELL_SIZE + currentY - 1);
-        int maxX = Math.max(selectedX2,selectedX1);int minX = Math.min(selectedX2,selectedX1);
-        int maxY = Math.max(selectedY2,selectedY1);int minY = Math.min(selectedY1,selectedY2);
-        selectedX1 = minX; selectedY1 = minY;selectedX2 = maxX;selectedY2 = maxY;
+        int maxX = Math.max(selectedX2, selectedX1);
+        int minX = Math.min(selectedX2, selectedX1);
+        int maxY = Math.max(selectedY2, selectedY1);
+        int minY = Math.min(selectedY1, selectedY2);
+        selectedX1 = minX;
+        selectedY1 = minY;
+        selectedX2 = maxX;
+        selectedY2 = maxY;
+        showMap(showingMap, 10);
     }
 
     private void moveMap(int x, int y) {
@@ -114,7 +156,10 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void save() {
-        System.out.println(selectedX1 + " , " + selectedY1 + " @@@ " + selectedX2 + " , " + selectedY2);
+        if (user != null)
+            mapController.saveMap(user.getUserName());
+        else
+            mapController.saveMap("default");
     }
 
     public void back() {
@@ -174,17 +219,15 @@ public class MapViewGui extends Application implements Initializable {
         showMap(mapController.showMapGui(currentX, currentY), 10);
     }
 
-    public void refreshMap() {
 
-    }
-
-    private void raiseError(MapMessages messages){//raise error
+    private void raiseError(MapMessages messages) {//raise error
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("error!");
         alert.setContentText(null);
         alert.setContentText(messages.toString());
         alert.showAndWait();
     }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initExtra();
@@ -240,7 +283,7 @@ public class MapViewGui extends Application implements Initializable {
                     MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
                     if (messages != MapMessages.SUCCESS) {
-                       raiseError(messages);
+                        raiseError(messages);
                     }
                     showMap(showingMap, 8);
                     return;
@@ -276,6 +319,7 @@ public class MapViewGui extends Application implements Initializable {
 //        textField1.setPromptText("ali");
 //        alert.getDialogPane().getChildren().add(textField1);
 //        alert.showAndWait();
+        Stage goStage = new Stage();
         System.out.println("gotoXY is called!");
     }
 
@@ -305,4 +349,36 @@ public class MapViewGui extends Application implements Initializable {
             objectBox.getChildren().add(label);
         }
     }
+
+    private void setTexture(int x1, int y1, int x2, int y2) {//use function this way: x1 <= x2 && y1 <= y2
+        Stage stage = new Stage();
+        stage.initOwner(mainStage);
+        stage.setResizable(false);
+        stage.setTitle("texture");
+        Pane pane = new Pane();
+        Scene myScene = new Scene(pane);
+        myScene.getStylesheets().add(pathCssFile);
+        stage.setScene(myScene);
+        Button button = new Button("clear");
+        button.relocate(200, 100);
+        pane.getChildren().add(button);
+        button.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                for (int i1 = x1; i1 <= x2; i1++)
+                    for (int i2 = y1; i2 <= y2; i2++)
+                        mapController.clear(i1, i2);
+                showMap(showingMap, 10);
+                stage.close();
+            }
+        });
+        stage.show();
+    }
+
+    public void clear() {
+        for (int i = selectedX1; i < selectedX2; i++)
+            for (int j = selectedY1; j < selectedY2; j++)
+                mapController.clear(i, j);
+        showMap(showingMap, 10);
+    }
+
 }

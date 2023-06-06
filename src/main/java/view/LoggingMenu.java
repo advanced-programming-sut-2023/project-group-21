@@ -12,9 +12,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import model.Game;
+import model.User;
 import view.commands.CheckValidion;
 
-import java.io.File;
 import java.net.URL;
 
 public class LoggingMenu extends Application {
@@ -26,6 +26,11 @@ public class LoggingMenu extends Application {
     private ToggleButton showButton = new ToggleButton("show/hide");
     private TextField passwordShow;
     private Hyperlink forgotPassword;
+    private StartingMenu startingMenu;
+
+    public void setStartingMenu(StartingMenu startingMenu) {
+        this.startingMenu = startingMenu;
+    }
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -74,8 +79,13 @@ public class LoggingMenu extends Application {
         saveButton.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getButton()==MouseButton.PRIMARY){
                 if(FileController.getUserByUsername(usernameField.getText())!=null){
-                    if(FileController.getUserByUsername(usernameField.getText()).getPassword().equals(passwordField.getText())){
+                    User user;
+                    user = FileController.getUserByUsername(usernameField.getText());
+                    if(user != null && FileController.getUserByUsername(usernameField.getText()).getPassword().
+                            equals(passwordField.getText())){
                         MainMenu mainMenu=new MainMenu();
+                        mainMenu.setUser(user);
+                        mainMenu.setLoggingMenu(this);
                         mainMenu.start(StartingMenu.mainStage);
                     }else{
                         errorLabel.setText("incorrect password");
@@ -96,7 +106,6 @@ public class LoggingMenu extends Application {
         });
         backButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                StartingMenu startingMenu = new StartingMenu();
                 try {
                     startingMenu.start(StartingMenu.mainStage);
                 } catch (Exception e) {

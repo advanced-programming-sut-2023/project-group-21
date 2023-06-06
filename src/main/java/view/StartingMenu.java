@@ -8,16 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
 import java.net.URL;
 
 public class StartingMenu extends Application {
@@ -57,6 +53,7 @@ public class StartingMenu extends Application {
         signUpButton.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getButton()==MouseButton.PRIMARY){
                 SigningMenu signingMenu=new SigningMenu();
+                signingMenu.setStartingMenu(this);
                 try {
                     signingMenu.start(mainStage);
                 } catch (Exception e) {
@@ -68,6 +65,7 @@ public class StartingMenu extends Application {
         loginButton.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getButton()==MouseButton.PRIMARY){
                 LoggingMenu loggingMenu=new LoggingMenu();
+                loggingMenu.setStartingMenu(this);
                 try {
                     loggingMenu.start(mainStage);
                 } catch (Exception e) {

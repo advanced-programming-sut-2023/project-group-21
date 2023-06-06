@@ -35,6 +35,8 @@ public class Cell {
             "/src/main/resources/buildingImage/";
 
     public Cell(int xCoordinates, int yCoordinates) {
+        if (xCoordinates%4 == 0)
+            this.extra = Extras.HOLD;
         this.xCoordinates = xCoordinates;
         this.yCoordinates = yCoordinates;
         people = new ArrayList<>();
