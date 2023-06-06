@@ -77,19 +77,19 @@ public class LoggingMenu extends Application {
 
         //behaviour
         saveButton.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.getButton()==MouseButton.PRIMARY){
-                if(FileController.getUserByUsername(usernameField.getText())!=null){
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                if (FileController.getUserByUsername(usernameField.getText()) != null) {
                     User user;
                     user = FileController.getUserByUsername(usernameField.getText());
-                    if(user != null && FileController.getUserByUsername(usernameField.getText()).getPassword().
-                            equals(passwordField.getText())){
-                        MainMenu mainMenu=new MainMenu();
+                    if (user != null && FileController.getUserByUsername(usernameField.getText()).getPassword().
+                            equals(passwordField.getText())) {
+                        MainMenu mainMenu = new MainMenu();
                         mainMenu.setUser(user);
                         mainMenu.setLoggingMenu(this);
                         mainMenu.start(StartingMenu.mainStage);
-                    }else{
+                    } else {
                         errorLabel.setText("incorrect password");
-                        if(!mainPane.getChildren().contains(errorLabel))
+                        if (!mainPane.getChildren().contains(errorLabel))
                             mainPane.getChildren().add(errorLabel);
                     }
                 }
@@ -127,14 +127,14 @@ public class LoggingMenu extends Application {
                 Button saveAnswer = new Button("save");
                 saveAnswer.relocate(230, 150);
                 answer.relocate(40, 150);
-                pane.getChildren().addAll(saveAnswer,answer);
+                pane.getChildren().addAll(saveAnswer, answer);
                 if (usernameField.getText().isEmpty()) {
                     if (!mainPane.getChildren().contains(errorLabel))
                         mainPane.getChildren().add(errorLabel);
                 } else {
                     Label question = new Label();
                     question.setText(Game.SECURITY_QUESTION[FileController.getSecurityQuestion(usernameField.getText())]);
-                    question.relocate(40,80);
+                    question.relocate(40, 80);
                     pane.getChildren().add(question);
                 }
                 saveAnswer.setOnMouseClicked(mouseEvent1 -> {
@@ -144,14 +144,14 @@ public class LoggingMenu extends Application {
                     }
                 });
             }
-    });
+        });
 
         mainPane.getChildren().
 
-    addAll(usernameLabel, usernameField, passwordLabel, passwordField,
-           backButton, saveButton, showButton, loginMenuLabel, forgotPassword);
+                addAll(usernameLabel, usernameField, passwordLabel, passwordField,
+                        backButton, saveButton, showButton, loginMenuLabel, forgotPassword);
 
-}
+    }
 
     private void newPasswordScene(Stage stage) {
         Pane pane = new Pane();
