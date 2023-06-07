@@ -11,7 +11,10 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -51,7 +54,6 @@ public class MapViewGui extends Application implements Initializable {
     public static MapController mapControllerStatic ;
     private boolean isStartDrag = false;
     private static MainMenu staticMainMenu;
-    private GameController gameController;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -63,13 +65,11 @@ public class MapViewGui extends Application implements Initializable {
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
+    private GameController gameController;
 
-    ArrayList<Government> governments = new ArrayList<>();
-
-    public void setGovernments(ArrayList<Government> governments) {
-        this.governments = governments;
+    public void setGameController(GameController gameController) {
+        this.gameController = gameController;
     }
-
 
     public void setMainMenu(MainMenu mainMenu) {
         staticMainMenu = mainMenu;
@@ -96,135 +96,6 @@ public class MapViewGui extends Application implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        textureItem = new String[GroundTexture.values().length];
-        for(int i = 0;i<textureItem.length;i++)
-            textureItem[i] = GroundTexture.values()[i].getName();
-        if (isInGame) initGame();
-        else initExtra();
-        mainPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent keyEvent) {// for handling shortcuts!
-                if (keyEvent.getCode() == KeyCode.S)
-                    save();
-                else if (keyEvent.getCode() == KeyCode.Q)
-                    back();
-                else if (keyEvent.getCode() == KeyCode.N)
-                    System.out.println("next turn!");//for going to next turn
-                else if (keyEvent.getCode() == KeyCode.G)
-                    gotoXY();
-                else if (keyEvent.getCode() == KeyCode.L)
-                    goLeft();
-                else if (keyEvent.getCode() == KeyCode.R)
-                    goRight();
-                else if (keyEvent.getCode() == KeyCode.U)
-                    goUp();
-                else if (keyEvent.getCode() == KeyCode.D)
-                    goDown();
-            }
-        });
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        mapController.initializeMap(400, true);
-        showMap(mapController.showMapGui(currentX, currentY));
-
-
-        cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                isStartDrag = true;
-                startDragX = mouseEvent.getX();
-                startDragY = mouseEvent.getY();
-                int xShow = (int) (mouseEvent.getX() / CELL_SIZE);
-                int yShow = (int) (mouseEvent.getY() / CELL_SIZE);
-                System.out.println(xShow);
-                System.out.println(yShow);
-            }
-        });
-
-        cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (selectedExtra != null) {
-                    isDraggedExtra = false;
-                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
-                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
-                    if (messages != MapMessages.SUCCESS) {
-                        raiseError(messages);
-                    }
-                    showMap(showingMap);
-                    return;
-                } else if (selectedBuildingDetails != null) {
-                    gameController.dropBuilding(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
-                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails);
-                    showMap(showingMap);
-                }
-                if (!isStartDrag) {
-                    selectCell(mouseEvent.getX(), mouseEvent.getY(), mouseEvent.getX(), mouseEvent.getY());
-                    return;
-                }
-                selectCell(startDragX, startDragY, mouseEvent.getX(), mouseEvent.getY());
-                isStartDrag = false;
-            }
-        });
-        mainPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                isDraggedExtra = false;
-                isStartDrag = false;
-            }
-        });
-    }
-
-    public void initExtra() {
-        objectBox.getChildren().remove(0, objectBox.getChildren().size());
-        ImageView imageView;
-        Image image;
-        Label label;
-        String basePath = new File("").getAbsolutePath();
-        for (int i = 0; i < Extras.values().length; i++) {
-            image = new Image("file:" + basePath + "/src/main/resources/ExtraImage/" + Extras.values()[i].getImagePath());
-            imageView = new ImageView(image);
-            imageView.setFitWidth(90);
-            imageView.setFitHeight(70);
-            int finalI = i;
-            label = new Label(null, imageView);
-            label.setStyle("-fx-border-color: black;");
-            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
-                    System.out.println(finalI);
-                    selectedExtra = Extras.values()[finalI];
-                    isDraggedExtra = true;
-                }
-            });
-            objectBox.getChildren().add(label);
-        }
-    }
-
-    public void initGame() {
-        objectBox.getChildren().remove(0, objectBox.getChildren().size());
-        ImageView imageView;
-        Image image;
-        Label label;
-        for (Map.Entry<String, BuildingsDetails> entry: VboxCreator.CASTLE_BUILDINGS.entrySet()) {
-            image = new Image(entry.getKey());
-            imageView = new ImageView(image);
-            imageView.setFitWidth(90);
-            imageView.setFitHeight(70);
-            label = new Label(null, imageView);
-            label.setStyle("-fx-border-color: black;");
-            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
-                    selectedBuildingDetails = entry.getValue();
-                }
-            });
-            objectBox.getChildren().add(label);
-        }
-        System.out.println(44);
     }
 
     private void showMap(Cell[][] myMap) {
@@ -273,10 +144,6 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
-    public MapController getMapController() {
-        return mapController;
-    }
-
     public void setMapController(MapController mapController) {
         this.mapController = mapController;
         mapControllerStatic = mapController;
@@ -288,7 +155,7 @@ public class MapViewGui extends Application implements Initializable {
             int yInt = (int) (y / CELL_SIZE);
             selectedX1 = selectedX2 = (xInt + currentX - 1);
             selectedY1 = selectedY2 = (yInt + currentY - 1);
-            showMap(showingMap, 10);
+            showMap(showingMap);
             System.out.println("test!");
             return;
         }
@@ -304,7 +171,7 @@ public class MapViewGui extends Application implements Initializable {
         selectedY1 = minY;
         selectedX2 = maxX;
         selectedY2 = maxY;
-        showMap(showingMap, 10);
+        showMap(showingMap);
     }
 
     private void moveMap(int x, int y) {
@@ -335,7 +202,7 @@ public class MapViewGui extends Application implements Initializable {
             currentX++;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
     public void goLeft() {
@@ -343,7 +210,7 @@ public class MapViewGui extends Application implements Initializable {
             currentX--;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
     public void zoomIn() {
@@ -351,7 +218,7 @@ public class MapViewGui extends Application implements Initializable {
             CELL_SIZE += 5;
         if (CELL_SIZE == 85)
             CELL_SIZE = 90;
-        showMap(showingMap, 100);
+        showMap(showingMap);
     }
 
     public void zoomOut() {
@@ -359,7 +226,7 @@ public class MapViewGui extends Application implements Initializable {
             CELL_SIZE -= 5;
         if (CELL_SIZE == 85)
             CELL_SIZE = 80;
-        showMap(showingMap, 100);
+        showMap(showingMap);
     }
 
     public void goDown() {
@@ -367,7 +234,7 @@ public class MapViewGui extends Application implements Initializable {
             currentY--;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
     public void goUp() {
@@ -375,7 +242,7 @@ public class MapViewGui extends Application implements Initializable {
             currentY++;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
 
@@ -428,8 +295,8 @@ public class MapViewGui extends Application implements Initializable {
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         if(!mapController.isInitState())
-            mapController.initializeMap(400, true);
-        showMap(mapController.showMapGui(currentX, currentY), 75);
+            mapController.loadMapNormal();
+        showMap(mapController.showMapGui(currentX, currentY));
 
 
         cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
@@ -452,7 +319,7 @@ public class MapViewGui extends Application implements Initializable {
                     if (messages != MapMessages.SUCCESS) {
                         raiseError(messages);
                     }
-                    showMap(showingMap, 8);
+                    showMap(showingMap);
                     return;
                 }
                 if (!isStartDrag) {
@@ -540,7 +407,7 @@ public class MapViewGui extends Application implements Initializable {
                 for (int i1 = x1; i1 <= x2; i1++)
                     for (int i2 = y1; i2 <= y2; i2++)
                         mapController.clear(i1, i2);
-                showMap(showingMap, 10);
+                showMap(showingMap);
                 stage.close();
             }
         });
@@ -551,7 +418,7 @@ public class MapViewGui extends Application implements Initializable {
             MapMessages messages;
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 messages = mapController.setTexture(x1,x2,y1,y2,textureBox.getValue());
-                showMap(showingMap, 10);
+                showMap(showingMap);
                 if(messages == MapMessages.SUCCESS)
                     stage.close();
                 else {
@@ -564,13 +431,6 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         stage.show();
-    }
-
-    public void clear() {
-        for (int i = selectedX1; i < selectedX2; i++)
-            for (int j = selectedY1; j < selectedY2; j++)
-                mapController.clear(i, j);
-        showMap(showingMap, 10);
     }
 
 }
