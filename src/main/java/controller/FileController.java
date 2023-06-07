@@ -122,7 +122,7 @@ public class FileController {
         }
         for (Object allUser : allUsers) {
             JSONObject jsonObject = (JSONObject) allUser;
-            if (jsonObject.get("username").equals(info))
+            if (jsonObject.get("email").equals(info))
                 return true;
         }
         return false;

@@ -1,0 +1,36 @@
+.Background{
+    -fx-background-image: url("../images/profile.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: stretch;
+}
+
+#title{
+    -fx-text-fill: #010;
+    -fx-font-size: 30;
+    -fx-border-color: #010;
+    -fx-border-radius: 3;
+    -fx-font-family: "Times New Roman";
+}
+
+.label{
+    -fx-text-fill: #010;
+    -fx-font-size: 20;
+    -fx-font-family: "Times New Roman";
+}
+
+Button{
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #010100;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 5 10;
+    -fx-cursor: Hand;
+}
+
+Button:hover{
+
+    -fx-background-color: #696666;
+    -fx-border-color: white;
+}
