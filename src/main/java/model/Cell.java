@@ -289,13 +289,14 @@ public class Cell {
     }
 
     private Label getLabel(int xShow, int yShow, int size) {
-        Label label;
+        Label label = new Label();
         if (extra != null) {
             ImageView iv = new ImageView(MY_PATH_EXTRA + extra.getImagePath());
             iv.setFitHeight((double) size / 2);
             iv.setFitWidth((double) size / 2);
             label = new Label(null, iv);
         } else if (building != null) {
+            System.out.println(building.getName());
             ImageView buildingImage = new ImageView(
                     new Image(Cell.class.getResource(building.getBuildingsDetails().getImagePath()).toExternalForm()));
             buildingImage.setFitHeight((double) size / 2);

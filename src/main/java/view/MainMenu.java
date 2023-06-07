@@ -28,8 +28,9 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MainMenu extends Application {
-    private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
-            "/src/main/resources/CSS/Texture.css";
+    private final static String pathCssFile = MainMenu.class.getResource("/CSS/Texture.css").toString();
+//            "file:" + (new File("").getAbsolutePath()) +
+//            "/src/main/resources/CSS/Texture.css";
     private Stage mainStage;
 
     public void setUser(User user) {
@@ -218,6 +219,7 @@ public class MainMenu extends Application {
         });
         startGame.setOnMouseClicked(mouseEvent -> {
             if (governments.size() >= 2) {
+                MapViewGui.isInGame = true;
                 MapViewGui mapViewGui = new MapViewGui();
                 mapViewGui.setMainMenu(this);
                 mapViewGui.setMapController(mapController);

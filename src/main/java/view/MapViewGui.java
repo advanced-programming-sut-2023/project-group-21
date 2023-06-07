@@ -53,7 +53,9 @@ public class MapViewGui extends Application implements Initializable {
     public MapController mapController;
     public static MapController mapControllerStatic ;
     private boolean isStartDrag = false;
+    public static boolean isInGame = false;
     private static MainMenu staticMainMenu;
+    private GameController gameController;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -65,7 +67,6 @@ public class MapViewGui extends Application implements Initializable {
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
-    private GameController gameController;
 
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
@@ -142,6 +143,29 @@ public class MapViewGui extends Application implements Initializable {
                     CELL_SIZE * thing, 600 - CELL_SIZE * thing, 600 - CELL_SIZE * thing);
             cellPane.getChildren().add(label);
         }
+    }
+    public void initGame() {
+        System.out.println("GAME");
+        objectBox.getChildren().remove(0, objectBox.getChildren().size());
+        ImageView imageView;
+        Image image;
+        Label label;
+        for (Map.Entry<String, BuildingsDetails> entry: VboxCreator.CASTLE_BUILDINGS.entrySet()) {
+            image = new Image(entry.getKey());
+            imageView = new ImageView(image);
+            imageView.setFitWidth(90);
+            imageView.setFitHeight(70);
+            label = new Label(null, imageView);
+            label.setStyle("-fx-border-color: black;");
+            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent mouseEvent) {
+                    selectedBuildingDetails = entry.getValue();
+                }
+            });
+            objectBox.getChildren().add(label);
+        }
+        System.out.println(44);
     }
 
     public void setMapController(MapController mapController) {
@@ -271,7 +295,8 @@ public class MapViewGui extends Application implements Initializable {
         textureItem = new String[GroundTexture.values().length];
         for(int i = 0;i<textureItem.length;i++)
             textureItem[i] = GroundTexture.values()[i].getName();
-        initExtra();
+        if (!isInGame) initExtra();
+        else initGame();
         mainPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {// for handling shortcuts!
@@ -312,7 +337,7 @@ public class MapViewGui extends Application implements Initializable {
         cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (isDraggedExtra) {
+                if (selectedExtra != null) {
                     isDraggedExtra = false;
                     MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
@@ -321,6 +346,12 @@ public class MapViewGui extends Application implements Initializable {
                     }
                     showMap(showingMap);
                     return;
+                }
+                if (selectedBuildingDetails != null) {
+                    System.out.println(gameController);
+//                    GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+//                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails.getName());
+//                    System.out.println(gameMessage);
                 }
                 if (!isStartDrag) {
                     selectCell(mouseEvent.getX(), mouseEvent.getY(), mouseEvent.getX(), mouseEvent.getY());
@@ -431,6 +462,13 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         stage.show();
+    }
+
+    public void clear() {
+        for (int i = selectedX1; i < selectedX2; i++)
+            for (int j = selectedY1; j < selectedY2; j++)
+                mapController.clear(i, j);
+        showMap(showingMap);
     }
 
 }

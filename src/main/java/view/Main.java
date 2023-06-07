@@ -19,5 +19,3 @@ public class Main {
         StartingMenu.main(args);
     }
 }
-
-// login -u shayaaaan -p n₨Oqm.U0Q19hb --stay-logged-in
