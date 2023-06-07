@@ -26,5 +26,10 @@ TextField{
     -fx-background-color: white;
 }
 
+Spinner{
+    -fx-background-color: white;
+    -fx-max-width: 50px;
+}
+
 ChoiceBox{
 }

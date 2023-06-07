@@ -10,10 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -340,21 +337,34 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void gotoXY() {
-//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//        alert.setTitle("go to Cell");
-//        alert.setHeaderText(null);
-//        DialogPane dialogPane = alert.getDialogPane();
-//        dialogPane.getChildren().remove(0);
-//        TextInputDialog textField = new TextInputDialog();
-//        TextField textField1 = new TextField();
-//        textField1.setLayoutX(15);
-//        textField1.setLayoutY(15);
-//        textField1.setVisible(true);
-//        textField1.setPromptText("ali");
-//        alert.getDialogPane().getChildren().add(textField1);
-//        alert.showAndWait();
         Stage goStage = new Stage();
-        System.out.println("gotoXY is called!");
+        Pane thisPane = new Pane();
+        Scene scene = new Scene(thisPane);
+        scene.getStylesheets().add(pathCssFile);
+        goStage.setScene(scene);
+        Spinner<Integer> xSpinner = new Spinner<>();
+        Spinner<Integer> ySpinner = new Spinner<>();
+        xSpinner.setEditable(false);ySpinner.setEditable(false);
+        SpinnerValueFactory<Integer> XFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                mapController.getMap().length,mapController.getMap().length/2);
+        SpinnerValueFactory<Integer> YFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                mapController.getMap().length,mapController.getMap()[0].length/2);
+        xSpinner.setValueFactory(XFactory);
+        ySpinner.setValueFactory(YFactory);
+        Button go = new Button("go");
+        go.relocate(100,120);
+        xSpinner.relocate(50,30);
+        ySpinner.relocate(200,30);
+        go.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                currentX = xSpinner.getValue() - 1 ;
+                currentY = ySpinner.getValue() - 1 ;
+                showMap(mapController.showMapGui(xSpinner.getValue()-1,ySpinner.getValue()-1));
+            }
+        });
+        thisPane.getChildren().addAll(go,xSpinner,ySpinner);
+        goStage.show();
     }
 
 
