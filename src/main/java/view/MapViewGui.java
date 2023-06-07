@@ -117,6 +117,13 @@ public class MapViewGui extends Application implements Initializable {
 
                     }
                 });
+                label.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        System.out.println("Hovering...");
+                    } else {
+                        System.out.println("Retreating...");
+                    }
+                });
                 cellPane.getChildren().add(label);
             }
         if (600 % CELL_SIZE != 0) {
@@ -375,6 +382,10 @@ public class MapViewGui extends Application implements Initializable {
             });
             objectBox.getChildren().add(label);
         }
+    }
+
+    private void showDetail(int x1,int y1,int x2){
+
     }
 
     private void setTexture(int x1, int y1, int x2, int y2) {//use function this way: x1 <= x2 && y1 <= y2

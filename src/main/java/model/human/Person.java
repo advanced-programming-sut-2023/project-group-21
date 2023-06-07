@@ -31,4 +31,6 @@ public class Person {
     public Building getWorkPlace() {
         return workPlace;
     }
+
+
 }

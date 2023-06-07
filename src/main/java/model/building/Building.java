@@ -82,4 +82,11 @@ public class Building {
             fireTurn--;
         }
     }
+
+    @Override
+    public String toString() {
+        String result = "";
+        result += "name: "+buildingsDetails.getName()+" government: "+government.getLord().getUserName();
+        return result;
+    }
 }
