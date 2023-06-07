@@ -214,8 +214,10 @@ public class SigningMenu extends Application {
                 Stage showRandomPasswordStage = new Stage();
                 showRandomPasswordStage.setScene(new Scene(passwordPane));
                 chooseButton.setOnMouseClicked(mouseEvent2 -> {
-                    if (mouseEvent2.getButton() == MouseButton.PRIMARY)
+                    if (mouseEvent2.getButton() == MouseButton.PRIMARY) {
+                        passwordShow.setText(newPassword);
                         passwordTextField.setText(newPassword);
+                    }
                 });
                 closeButton.setOnMouseClicked(mouseEvent1 -> {
                     if (mouseEvent1.getButton() == MouseButton.PRIMARY) {
@@ -228,8 +230,7 @@ public class SigningMenu extends Application {
         usernameTextField.textProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                //FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(),true)
-                if (!CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) || false) {
+                if (!CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) || FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
                     if (!mainPane.getChildren().contains(userNameError)) {
                         updateUsernameError(userNameError, usernameTextField.getText());
                         mainPane.getChildren().add(userNameError);
@@ -290,6 +291,8 @@ public class SigningMenu extends Application {
                     }
                     if (mainPane.getChildren().contains(sloganTextField) && sloganTextField.getText().isEmpty())
                         saveError.setText("slogan is empty");
+                    else if(FileController.checkExistenceOfUserOrEmail(emailTextField.getText(),false))
+                        saveError.setText("existed email");
                     else
                         createQuestionScene();
                 }
@@ -391,7 +394,7 @@ public class SigningMenu extends Application {
                         number, answer);
                 stage.close();
                 if (OtherController.checkCaptcha(textField.getText())) {
-                    if(startingMenu == null) {
+                    if (startingMenu == null) {
                         startingMenu = new StartingMenu();
                     }
                     try {
@@ -410,8 +413,7 @@ public class SigningMenu extends Application {
 
 
     private void updateUsernameError(Label label, String username) {
-        //FileController.checkExistenceOfUserOrEmail(username,true)
-        if (false)
+        if (FileController.checkExistenceOfUserOrEmail(username, true))
             label.setText("The username exists");
         else
             label.setText("Invalid username");

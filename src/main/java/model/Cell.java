@@ -86,7 +86,7 @@ public class Cell {
         details.append("Texture: ").append(getGroundTexture().getName()).append("\n");
         if (building != null)
             details.append("Building: ").append(building.getName()).append(" | hitpoint: ").append(building.getHitPoint()).append("\n");
-        if (people.size() != 0) {
+        if (!people.isEmpty()) {
 //            details.append("People: ").append("\n");
 //            for (int i = 0; i < people.size(); i++) {
 //                boolean isRepeated = false;
@@ -288,15 +288,28 @@ public class Cell {
         return label;
     }
 
+    public String detailForHover(){
+        StringBuilder result = new StringBuilder();
+        if (building != null)
+            result.append(building.toString()).append("\n");
+        for (Worker person : people)
+            if (person != null)
+                result.append(person.toString()).append("\n");
+        return result.toString();
+    }
+
+    public void setExtra(Extras extra) {
+        this.extra = extra;
+    }
+
     private Label getLabel(int xShow, int yShow, int size) {
-        Label label = new Label();
+        Label label ;
         if (extra != null) {
             ImageView iv = new ImageView(MY_PATH_EXTRA + extra.getImagePath());
             iv.setFitHeight((double) size / 2);
             iv.setFitWidth((double) size / 2);
             label = new Label(null, iv);
         } else if (building != null) {
-            System.out.println(building.getName());
             ImageView buildingImage = new ImageView(
                     new Image(Cell.class.getResource(building.getBuildingsDetails().getImagePath()).toExternalForm()));
             buildingImage.setFitHeight((double) size / 2);

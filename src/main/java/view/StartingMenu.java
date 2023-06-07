@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import model.User;
 
 import java.net.URL;
 
@@ -77,8 +78,15 @@ public class StartingMenu extends Application {
 
         quitButton.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getButton()== MouseButton.PRIMARY) {
-                FileController.finish();
-                Platform.exit();
+                Profile profile=new Profile();
+                profile.setUser(new User("sobhan","sO2@1aAD*","solo","sobhan@gmail.com","i am here!"));
+                try {
+                    profile.start(mainStage);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+//                FileController.finish();
+//                Platform.exit();
             }
         });
 

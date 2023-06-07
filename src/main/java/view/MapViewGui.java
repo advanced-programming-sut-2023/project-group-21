@@ -11,10 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -23,8 +20,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Cell;
-import model.Government;
-import model.User;
 import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
@@ -55,7 +50,6 @@ public class MapViewGui extends Application implements Initializable {
     private boolean isStartDrag = false;
     public static boolean isInGame = false;
     private static MainMenu staticMainMenu;
-    private GameController gameController;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -67,10 +61,18 @@ public class MapViewGui extends Application implements Initializable {
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
+    private GameController gameController;
+    private static GameController staticGameController;
 
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
+        staticGameController = gameController;
     }
+
+    public static void setStaticGameController(GameController gameController){
+        MapViewGui.staticGameController = gameController;
+    }
+
 
     public void setMainMenu(MainMenu mainMenu) {
         staticMainMenu = mainMenu;
@@ -88,6 +90,8 @@ public class MapViewGui extends Application implements Initializable {
             mapControllerStatic = mapController;
         }else
             mapController = mapControllerStatic;
+        if (gameController == null)
+            gameController = staticGameController;
         this.mainStage = stage;
         try {
             Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
@@ -123,6 +127,13 @@ public class MapViewGui extends Application implements Initializable {
                             setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
                                     currentX + finalI - 1, currentY + finalI1 - 1);
 
+                    }
+                });
+                label.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        System.out.println("Hovering...");
+                    } else {
+                        System.out.println("Retreating...");
                     }
                 });
                 cellPane.getChildren().add(label);
@@ -282,6 +293,8 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (gameController == null)
+            gameController = staticGameController;
         if (mapControllerStatic ==null){
             if (MainMenu.staticMapController != null)
                 mapController = MainMenu.staticMapController;
@@ -371,21 +384,34 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void gotoXY() {
-//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//        alert.setTitle("go to Cell");
-//        alert.setHeaderText(null);
-//        DialogPane dialogPane = alert.getDialogPane();
-//        dialogPane.getChildren().remove(0);
-//        TextInputDialog textField = new TextInputDialog();
-//        TextField textField1 = new TextField();
-//        textField1.setLayoutX(15);
-//        textField1.setLayoutY(15);
-//        textField1.setVisible(true);
-//        textField1.setPromptText("ali");
-//        alert.getDialogPane().getChildren().add(textField1);
-//        alert.showAndWait();
         Stage goStage = new Stage();
-        System.out.println("gotoXY is called!");
+        Pane thisPane = new Pane();
+        Scene scene = new Scene(thisPane);
+        scene.getStylesheets().add(pathCssFile);
+        goStage.setScene(scene);
+        Spinner<Integer> xSpinner = new Spinner<>();
+        Spinner<Integer> ySpinner = new Spinner<>();
+        xSpinner.setEditable(false);ySpinner.setEditable(false);
+        SpinnerValueFactory<Integer> XFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                mapController.getMap().length,mapController.getMap().length/2);
+        SpinnerValueFactory<Integer> YFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                mapController.getMap().length,mapController.getMap()[0].length/2);
+        xSpinner.setValueFactory(XFactory);
+        ySpinner.setValueFactory(YFactory);
+        Button go = new Button("go");
+        go.relocate(100,120);
+        xSpinner.relocate(50,30);
+        ySpinner.relocate(200,30);
+        go.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                currentX = xSpinner.getValue() - 1 ;
+                currentY = ySpinner.getValue() - 1 ;
+                showMap(mapController.showMapGui(xSpinner.getValue()-1,ySpinner.getValue()-1));
+            }
+        });
+        thisPane.getChildren().addAll(go,xSpinner,ySpinner);
+        goStage.show();
     }
 
 
@@ -413,6 +439,10 @@ public class MapViewGui extends Application implements Initializable {
             });
             objectBox.getChildren().add(label);
         }
+    }
+
+    private void showDetail(int x1,int y1,int x2){
+
     }
 
     private void setTexture(int x1, int y1, int x2, int y2) {//use function this way: x1 <= x2 && y1 <= y2

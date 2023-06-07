@@ -133,4 +133,8 @@ public class Worker extends Person {
              cell.addPeople(this);
     }
 
+    @Override
+    public String toString() {
+        return "name: "+workerDetails.getName()+" government: "+government.getLord().getUserName();
+    }
 }

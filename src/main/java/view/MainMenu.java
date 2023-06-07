@@ -219,14 +219,17 @@ public class MainMenu extends Application {
         });
         startGame.setOnMouseClicked(mouseEvent -> {
             if (governments.size() >= 2) {
-                MapViewGui.isInGame = true;
+                for (int i = 0; i<myHolds.size() ; i++)
+                    myHolds.get(i).setExtras(null);
+                GameController gameController = new GameController(governments,mapController.getMap());
+                MapViewGui.setStaticGameController(gameController);
                 MapViewGui mapViewGui = new MapViewGui();
                 mapViewGui.setMainMenu(this);
                 mapViewGui.setMapController(mapController);
-                GameController gameController = new GameController(governments,mapController.getMap());
                 mapViewGui.setGameController(gameController);
+                mapViewGui.start(StartingMenu.mainStage);//start the game ctl
                 stage.close();
-                mapViewGui.start(mainStage);
+
             }
         });
         pane.setStyle("-fx-max-height: 200;" + "-fx-min-height: 200;");
