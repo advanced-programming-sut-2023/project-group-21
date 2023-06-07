@@ -1,5 +1,6 @@
 package view;
 
+import controller.GameController;
 import controller.MapController;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -9,7 +10,10 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -18,8 +22,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Cell;
-import model.Government;
-import model.User;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
 import view.message.MapMessages;
@@ -56,13 +58,11 @@ public class MapViewGui extends Application implements Initializable {
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
+    private GameController gameController;
 
-    ArrayList<Government> governments = new ArrayList<>();
-
-    public void setGovernments(ArrayList<Government> governments) {
-        this.governments = governments;
+    public void setGameController(GameController gameController) {
+        this.gameController = gameController;
     }
-
 
     public void setMainMenu(MainMenu mainMenu) {
         staticMainMenu = mainMenu;
@@ -91,7 +91,7 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
-    private void showMap(Cell[][] myMap, int size) {
+    private void showMap(Cell[][] myMap) {
         showingMap = myMap;
         if (cellPane.getChildren().size() > 1)
             cellPane.getChildren().remove(0, cellPane.getChildren().size());
@@ -137,10 +137,6 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
-    public MapController getMapController() {
-        return mapController;
-    }
-
     public void setMapController(MapController mapController) {
         this.mapController = mapController;
         mapControllerStatic = mapController;
@@ -152,7 +148,7 @@ public class MapViewGui extends Application implements Initializable {
             int yInt = (int) (y / CELL_SIZE);
             selectedX1 = selectedX2 = (xInt + currentX - 1);
             selectedY1 = selectedY2 = (yInt + currentY - 1);
-            showMap(showingMap, 10);
+            showMap(showingMap);
             System.out.println("test!");
             return;
         }
@@ -168,7 +164,7 @@ public class MapViewGui extends Application implements Initializable {
         selectedY1 = minY;
         selectedX2 = maxX;
         selectedY2 = maxY;
-        showMap(showingMap, 10);
+        showMap(showingMap);
     }
 
     private void moveMap(int x, int y) {
@@ -199,7 +195,7 @@ public class MapViewGui extends Application implements Initializable {
             currentX++;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
     public void goLeft() {
@@ -207,7 +203,7 @@ public class MapViewGui extends Application implements Initializable {
             currentX--;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
     public void zoomIn() {
@@ -215,7 +211,7 @@ public class MapViewGui extends Application implements Initializable {
             CELL_SIZE += 5;
         if (CELL_SIZE == 85)
             CELL_SIZE = 90;
-        showMap(showingMap, 100);
+        showMap(showingMap);
     }
 
     public void zoomOut() {
@@ -223,7 +219,7 @@ public class MapViewGui extends Application implements Initializable {
             CELL_SIZE -= 5;
         if (CELL_SIZE == 85)
             CELL_SIZE = 80;
-        showMap(showingMap, 100);
+        showMap(showingMap);
     }
 
     public void goDown() {
@@ -231,7 +227,7 @@ public class MapViewGui extends Application implements Initializable {
             currentY--;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
     public void goUp() {
@@ -239,7 +235,7 @@ public class MapViewGui extends Application implements Initializable {
             currentY++;
         else
             return;
-        showMap(mapController.showMapGui(currentX, currentY), 10);
+        showMap(mapController.showMapGui(currentX, currentY));
     }
 
 
@@ -292,8 +288,8 @@ public class MapViewGui extends Application implements Initializable {
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         if(!mapController.isInitState())
-            mapController.initializeMap(400, true);
-        showMap(mapController.showMapGui(currentX, currentY), 75);
+            mapController.loadMapNormal();
+        showMap(mapController.showMapGui(currentX, currentY));
 
 
         cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
@@ -316,7 +312,7 @@ public class MapViewGui extends Application implements Initializable {
                     if (messages != MapMessages.SUCCESS) {
                         raiseError(messages);
                     }
-                    showMap(showingMap, 8);
+                    showMap(showingMap);
                     return;
                 }
                 if (!isStartDrag) {
@@ -404,7 +400,7 @@ public class MapViewGui extends Application implements Initializable {
                 for (int i1 = x1; i1 <= x2; i1++)
                     for (int i2 = y1; i2 <= y2; i2++)
                         mapController.clear(i1, i2);
-                showMap(showingMap, 10);
+                showMap(showingMap);
                 stage.close();
             }
         });
@@ -415,7 +411,7 @@ public class MapViewGui extends Application implements Initializable {
             MapMessages messages;
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 messages = mapController.setTexture(x1,x2,y1,y2,textureBox.getValue());
-                showMap(showingMap, 10);
+                showMap(showingMap);
                 if(messages == MapMessages.SUCCESS)
                     stage.close();
                 else {
@@ -428,13 +424,6 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         stage.show();
-    }
-
-    public void clear() {
-        for (int i = selectedX1; i < selectedX2; i++)
-            for (int j = selectedY1; j < selectedY2; j++)
-                mapController.clear(i, j);
-        showMap(showingMap, 10);
     }
 
 }

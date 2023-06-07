@@ -10,9 +10,10 @@ import view.message.MapMessages;
 import java.util.ArrayList;
 
 public class MapController {
-    public MapController(){
+    public MapController() {
         System.out.println("new object!");
     }
+
     private int size, xCoordinates, yCoordinates;
     private Cell[][] map;
     private User user;
@@ -130,7 +131,7 @@ public class MapController {
         if (x2 >= map.length || y2 > map.length) return MapMessages.OUT_OF_INDEX;
         GroundTexture texture = GroundTexture.getTextureByName(type);
         if (texture == null) return MapMessages.NO_TEXTURE;
-        for (int i = x1 ; i <= x2; i++) {
+        for (int i = x1; i <= x2; i++) {
             for (int j = y1; j <= y2; j++) {
                 map[i][j].setExtras(null);
                 map[i][j].setGroundTexture(texture);
@@ -142,6 +143,7 @@ public class MapController {
     public MapMessages clear(int x, int y) {
         if (x >= map.length || x < 0 || y >= map.length || y <= 1) return MapMessages.OUT_OF_INDEX;
         try {
+            myHolds.remove(map[x][y]);
             map[x][y].clear();
             return MapMessages.SUCCESS;
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -163,10 +165,12 @@ public class MapController {
             return MapMessages.OUT_OF_INDEX;
         if (extras == null)
             return MapMessages.NO_TEXTURE;
-        if(map[x][y].getGroundTexture() != GroundTexture.SOIL) return MapMessages.UNABLE;
+        if (map[x][y].getGroundTexture() != GroundTexture.SOIL) return MapMessages.UNABLE;
         if (map[x][y].getExtra() != null)
             return MapMessages.UNABLE_TO_PUT_EXTRA;
         map[x][y].setExtras(extras);
+        if (extras == Extras.HOLD)
+            myHolds.add(map[x][y]);
         return MapMessages.SUCCESS;
     }
 
@@ -215,7 +219,8 @@ public class MapController {
     public Cell[][] getMap() {
         return map;
     }
-    public void saveMap(){
+
+    public void saveMap() {
         if (user != null)
             saveMap(user.getUserName());
         else
@@ -224,5 +229,14 @@ public class MapController {
 
     public ArrayList<Cell> getMyHolds() {
         return myHolds;
+    }
+
+    public void loadMapNormal() {
+        if (map != null)
+            return;
+        if (user != null && FileController.checkExistenceOfMap(user.getUserName()))
+            initializeMap(FileController.loadMap(user.getUserName()));
+        else
+            initializeMap(400,true);
     }
 }
