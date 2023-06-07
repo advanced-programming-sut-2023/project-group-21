@@ -20,8 +20,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Cell;
-import model.Government;
-import model.User;
 import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
@@ -63,10 +61,17 @@ public class MapViewGui extends Application implements Initializable {
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
     private GameController gameController;
+    private static GameController staticGameController;
 
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
+        staticGameController = gameController;
     }
+
+    public static void setStaticGameController(GameController gameController){
+        MapViewGui.staticGameController = gameController;
+    }
+
 
     public void setMainMenu(MainMenu mainMenu) {
         staticMainMenu = mainMenu;
@@ -84,6 +89,8 @@ public class MapViewGui extends Application implements Initializable {
             mapControllerStatic = mapController;
         }else
             mapController = mapControllerStatic;
+        if (gameController == null)
+            gameController = staticGameController;
         this.mainStage = stage;
         try {
             Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
@@ -262,6 +269,8 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        if (gameController == null)
+            gameController = staticGameController;
         if (mapControllerStatic ==null){
             if (MainMenu.staticMapController != null)
                 mapController = MainMenu.staticMapController;

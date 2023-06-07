@@ -298,8 +298,12 @@ public class Cell {
         return result.toString();
     }
 
+    public void setExtra(Extras extra) {
+        this.extra = extra;
+    }
+
     private Label getLabel(int xShow, int yShow, int size) {
-        Label label;
+        Label label ;
         if (extra != null) {
             ImageView iv = new ImageView(MY_PATH_EXTRA + extra.getImagePath());
             iv.setFitHeight((double) size / 2);
