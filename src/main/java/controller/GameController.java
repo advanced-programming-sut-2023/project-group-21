@@ -127,7 +127,7 @@ public class GameController {
         }
     }
 
-    private void dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
+    public void dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         ArrayList<Person> persons = new ArrayList<>();
         int number = buildingsDetails.getWorkersCount();
