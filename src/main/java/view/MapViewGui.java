@@ -2,6 +2,7 @@ package view;
 
 import controller.GameController;
 import controller.MapController;
+import controller.VboxCreator;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -19,13 +20,18 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Cell;
+import model.Government;
+import model.User;
+import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
+import view.message.GameMessage;
 import view.message.MapMessages;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -52,6 +58,7 @@ public class MapViewGui extends Application implements Initializable {
     private int selectedX1 = -1, selectedX2 = -1, selectedY1 = -1, selectedY2 = -1;//-1 means there is no selected cell!
     private boolean isDraggedExtra = false;
     private Extras selectedExtra;
+    private BuildingsDetails selectedBuildingDetails;
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
