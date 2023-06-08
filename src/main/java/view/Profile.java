@@ -1,15 +1,13 @@
 package view;
 
 import controller.FileController;
+import controller.OtherController;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
@@ -40,10 +38,11 @@ public class Profile extends Application {
 
         addTitle();
         addUsername();
-        //handle password change
+        addSlogan();
         addNickname();
         addEmail();
         addPassword();
+        addLeaderboard();
         addBackButton();
         addAvatar(user.getPictureName());
 
@@ -53,11 +52,66 @@ public class Profile extends Application {
         stage.setScene(scene);
     }
 
+    private void addLeaderboard() {
+        Button leaderboardButton = new Button("back");
+        //behaviour
+        leaderboardButton.relocate(320, 400);
+        mainPane.getChildren().add(leaderboardButton);
+    }
+
+    private void addSlogan() {
+        Label sloganLabel = new Label(user.getSlogan());
+        sloganLabel.relocate(900, 220);
+        sloganLabel.setFont(Font.font(50));
+        mainPane.getChildren().add(sloganLabel);
+        sloganLabel.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                changeSlogan();
+            }
+        });
+    }
+
+    private void changeSlogan() {
+        Pane pane = new Pane();
+        Scene scene = new Scene(pane);
+        Stage stage = new Stage();
+
+        Label newSlogan = new Label("new slogan:");
+        newSlogan.relocate(30, 30);
+        TextField sloganField = new TextField();
+        sloganField.relocate(30, 60);
+        Button saveButton = new Button("save");
+        saveButton.relocate(30, 130);
+
+        saveButton.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                stage.close();
+                user.setSlogan(sloganField.getText());
+                Profile profile = new Profile();
+                profile.setUser(user);
+                try {
+                    profile.start(StartingMenu.mainStage);
+                    successPopUp("slogan");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        pane.getChildren().addAll(sloganField, newSlogan, saveButton);
+        stage.setScene(scene);
+        stage.setHeight(220);
+        stage.setWidth(350);
+        stage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
+        stage.setTitle("Slogan Change");
+        stage.show();
+    }
+
     private void addBackButton() {
-        Button backButton=new Button("back");
+        Button backButton = new Button("back");
         backButton.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.getButton()==MouseButton.PRIMARY){
-                StartingMenu startingMenu=new StartingMenu();
+            if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                StartingMenu startingMenu = new StartingMenu();
                 try {
                     startingMenu.start(StartingMenu.mainStage);
                 } catch (Exception e) {
@@ -65,7 +119,7 @@ public class Profile extends Application {
                 }
             }
         });
-        backButton.relocate(320,400);
+        backButton.relocate(320, 400);
         mainPane.getChildren().add(backButton);
     }
 
@@ -111,8 +165,7 @@ public class Profile extends Application {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                }
-                else if(!pane.getChildren().contains(saveError))
+                } else if (!pane.getChildren().contains(saveError))
                     pane.getChildren().add(saveError);
             }
         });
@@ -179,9 +232,90 @@ public class Profile extends Application {
         mainPane.getChildren().add(passwordLabel);
         passwordLabel.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                //changePassword();
+                changePassword();
             }
         });
+    }
+
+    private void changePassword() {
+        Pane pane = new Pane();
+        Scene scene = new Scene(pane);
+        Stage stage = new Stage();
+
+        Label oldPassword = new Label("old password:");
+        Label newPassword = new Label("new password:");
+        TextArea captchaArea = new TextArea(OtherController.generateCaptcha());
+        PasswordField oldPasswordField = new PasswordField();
+        PasswordField newPasswordField = new PasswordField();
+        TextField captchaField=new TextField();
+        Button saveButton = new Button("save");
+        oldPassword.relocate(40, 30);
+        oldPasswordField.relocate(40, 60);
+        newPassword.relocate(40, 90);
+        newPasswordField.relocate(40, 120);
+        captchaArea.relocate(50, 180);
+        captchaArea.minWidth(400);
+        captchaArea.minHeight(140);
+        saveButton.relocate(40, 450);
+        captchaField.relocate(280,370);
+
+
+        Label error = new Label("weakPassword");
+        error.setTextFill(Color.RED);
+        error.setFont(Font.font(12));
+        error.relocate(200, 125);
+        newPasswordField.textProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (!CheckValidion.check(newPasswordField.getText(), CheckValidion.CHECK_PASSWORD)) {
+                    if (!pane.getChildren().contains(error))
+                        pane.getChildren().add(error);
+                } else if (pane.getChildren().contains(error))
+                    pane.getChildren().remove(error);
+            }
+        });
+
+        Label saveError = new Label("weakPassword");
+        saveError.setTextFill(Color.RED);
+        saveError.setFont(Font.font(12));
+        saveError.relocate(140, 450);
+
+        saveButton.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.getButton()==MouseButton.PRIMARY){
+                if(!oldPasswordField.getText().equals(user.getPassword())) {
+                    saveError.setText("old password is incorrect");
+                    if(!pane.getChildren().contains(saveError))
+                        pane.getChildren().add(saveError);
+                }
+                if(!OtherController.checkCaptcha(captchaField.getText())) {
+                    saveError.setText("captcha is incorrect");
+                    if(!pane.getChildren().contains(saveError))
+                        pane.getChildren().add(saveError);
+                }
+
+                if(OtherController.checkCaptcha(captchaField.getText())&&oldPasswordField.getText().equals(user.getPassword())&&
+                        CheckValidion.check(newPasswordField.getText(), CheckValidion.CHECK_PASSWORD)){
+                    user.setPassword(newPasswordField.getText());
+                    stage.close();
+                    Profile profile = new Profile();
+                    profile.setUser(user);
+                    try {
+                        profile.start(StartingMenu.mainStage);
+                        successPopUp("password");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+
+        pane.getChildren().addAll(captchaArea,captchaField,oldPasswordField,newPasswordField,newPassword,oldPassword,saveButton);
+        stage.setScene(scene);
+        stage.setHeight(600);
+        stage.setWidth(700);
+        stage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
+        stage.setTitle("Password Change");
+        stage.show();
     }
 
     private void addTitle() {
@@ -363,15 +497,15 @@ public class Profile extends Application {
     }
 
     public void successPopUp(String factor) {
-        Pane pane=new Pane();
-        Label changedLabel=new Label(factor+" changed successfully");
-        changedLabel.relocate(15,20);
+        Pane pane = new Pane();
+        Label changedLabel = new Label(factor + " changed successfully");
+        changedLabel.relocate(15, 20);
         changedLabel.setFont(Font.font(18));
         pane.getChildren().add(changedLabel);
 
 
-        Scene scene=new Scene(pane);
-        Stage stage =new Stage();
+        Scene scene = new Scene(pane);
+        Stage stage = new Stage();
         stage.setScene(scene);
         stage.setHeight(200);
         stage.setWidth(260);
