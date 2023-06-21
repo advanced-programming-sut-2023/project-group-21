@@ -27,6 +27,12 @@ import java.nio.file.Files;
 import java.time.Duration;
 
 public class Profile extends Application {
+//    private final MainMenu mainMenu;
+//
+//    public Profile(MainMenu mainMenu) {
+//        this.mainMenu=mainMenu;
+//    }
+
     private Pane mainPane;
 
     private User user;
@@ -111,9 +117,10 @@ public class Profile extends Application {
         Button backButton = new Button("back");
         backButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                StartingMenu startingMenu = new StartingMenu();
+                MainMenu mainMenu = new MainMenu();
+                mainMenu.setUser(this.user);
                 try {
-                    startingMenu.start(StartingMenu.mainStage);
+                    mainMenu.start(StartingMenu.mainStage);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
