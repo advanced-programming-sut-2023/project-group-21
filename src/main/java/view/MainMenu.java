@@ -101,20 +101,6 @@ public class MainMenu extends Application {
         Button gameButton = new Button("Game");
         Button quitButton = new Button("Quit");
 
-        Button temp=new Button("temp (trade)");
-        temp.relocate(760,300);
-        temp.setOnMouseClicked(mouseEvent -> {
-            TradingMenu tradingMenu=new TradingMenu();
-            Government government=new Government(user,new Cell(20,20));
-            tradingMenu.setGovernment(government);
-            tradingMenu.addGovernments(new Government(user,new Cell(10,10)));
-            tradingMenu.addGovernments(new Government(user,new Cell(18,18)));
-            try {
-                tradingMenu.start(mainStage);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
 
         gameButton.relocate(760, 60);
         profileButton.relocate(760, 120);
@@ -165,7 +151,7 @@ public class MainMenu extends Application {
             }
         });
 
-        mainPane.getChildren().addAll(gameButton, profileButton, mapButton, quitButton,temp);
+        mainPane.getChildren().addAll(gameButton, profileButton, mapButton, quitButton);
     }
 
     private void addBorders() {

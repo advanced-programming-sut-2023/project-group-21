@@ -20,6 +20,17 @@ Button:hover{
     -fx-border-color: white;
 }
 
+#trade{
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #010100;
+    -fx-max-width: 40;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 5 10;
+    -fx-cursor: Hand;
+}
+
 #show-button{
     -fx-background-color: white;
     -fx-background-radius: 5;

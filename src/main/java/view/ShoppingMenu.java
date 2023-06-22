@@ -17,6 +17,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import model.Cell;
 import model.Government;
 import model.User;
 import model.generalenums.Resource;
@@ -37,11 +38,14 @@ public class ShoppingMenu extends Application {
     private Label selected;
     private Label message;
     private int selectedAmount=1;
+    private Stage shopStage;
 
     @Override
     public void start(Stage stage) throws Exception {
         URL url = StartMenu.class.getResource("/FXML/ShoppingMenu.fxml");
         pane = FXMLLoader.load(url);
+        Scene scene=new Scene(pane);
+        shopStage=new Stage();
 
         Timeline labelsTimeline=new Timeline(new KeyFrame(Duration.millis(100), actionEvent -> {
             updateLabel();
@@ -52,8 +56,7 @@ public class ShoppingMenu extends Application {
         addLabels();
         addButtons();
 
-        Scene scene=new Scene(pane);
-        Stage shopStage=new Stage();
+
         shopStage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
         shopStage.setTitle("shopping menu");
         shopStage.setScene(scene);
@@ -65,10 +68,44 @@ public class ShoppingMenu extends Application {
         Button buy=new Button("buy");
         Label increase=new Label(" + ");
         Label decrease=new Label(" - ");
+        Button addOffer=new Button("addOffer");
+        Button allOffers=new Button("allOffers");
+        allOffers.relocate(60,260);
+        addOffer.relocate(60,300);
         increase.relocate(580,220);
         decrease.relocate(540,218);
         increase.setId("increase");
         decrease.setId("increase");
+
+
+        addOffer.setOnMouseClicked(mouseEvent -> {
+            TradingMenu tradingMenu=new TradingMenu();
+            Government government=new Government(new User("s","s","s","s","s"),new Cell(20,20));
+            tradingMenu.setGovernment(government);
+            tradingMenu.addGovernments(new Government(new User("a","a","a","a","a"),new Cell(10,10)));
+            tradingMenu.addGovernments(new Government(new User("d","d","d","d","d"),new Cell(18,18)));
+            tradingMenu.isAddMenu(true);
+            try {
+                tradingMenu.start(shopStage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        allOffers.setOnMouseClicked(mouseEvent -> {
+            TradingMenu tradingMenu=new TradingMenu();
+            Government government=new Government(new User("s","s","s","s","s"),new Cell(20,20));
+            tradingMenu.setGovernment(government);
+            tradingMenu.addGovernments(new Government(new User("a","a","a","a","a"),new Cell(10,10)));
+            tradingMenu.addGovernments(new Government(new User("d","d","d","d","d"),new Cell(18,18)));
+            try {
+                tradingMenu.start(shopStage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
         increase.setOnMouseClicked(mouseEvent -> {
             selectedAmount++;
         });
@@ -91,7 +128,7 @@ public class ShoppingMenu extends Application {
             }
         });
 
-        pane.getChildren().addAll(sell,buy,increase,decrease);
+        pane.getChildren().addAll(sell,buy,increase,decrease,addOffer,allOffers);
     }
 
     private void addMessage(String string) {
@@ -117,7 +154,7 @@ public class ShoppingMenu extends Application {
         buyPrice.relocate(540,140);
         sellPrice.relocate(660,140);
         message=new Label();
-        message.relocate(100,300);
+        message.relocate(40,200);
         message.setId("error");
         pane.getChildren().addAll(amount,name,buyPrice,sellPrice,title,goldAmount,selected);
     }

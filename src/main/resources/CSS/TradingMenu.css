@@ -3,11 +3,26 @@ root{
     -fx-background-size: cover;
 }
 
+ChoiceBox{
+    -fx-max-height: 10;
+    -fx-min-width: 170;
+    -fx-border-color: #010100;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 5 10;
+}
+
+ChoiceBox:hover{
+    -fx-background-color: #696666;
+    -fx-border-color: white;
+}
+
+
 Button{
     -fx-background-color: white;
     -fx-background-radius: 5;
     -fx-border-color: #010100;
-    -fx-min-width: 100;
+    -fx-min-width: 80;
     -fx-border-radius: 5;
     -fx-border-width: 1;
     -fx-padding: 5 10;
@@ -15,7 +30,6 @@ Button{
 }
 
 Button:hover{
-
     -fx-background-color: #696666;
     -fx-border-color: white;
 }
