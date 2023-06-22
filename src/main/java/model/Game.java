@@ -17,6 +17,7 @@ import static java.lang.Math.min;
 
 public class Game {
     private static final int mapSizeSmall = 8;
+    private static ArrayList<TradeRequest> tradeRequests=new ArrayList<>();
     private static final ArrayList<User> users = new ArrayList<>();
     public static final String directions = "nwesr";
     private static int xCoordinates = 10, yCoordinates = 10;
@@ -32,6 +33,14 @@ public class Game {
             "The harder the conflict, the more glorious the triumph",
             "The only easy day was yesterday"
     );
+    public static void addTradeRequest(TradeRequest request){
+        tradeRequests.add(request);
+    }
+
+    public static ArrayList<TradeRequest> getTradeRequests() {
+        return tradeRequests;
+    }
+
     private static final ArrayList<Trade> trades = new ArrayList<>();
 
     public static final String[] SECURITY_QUESTION = {"what is your favorite food ?", "what is your father s name ?",

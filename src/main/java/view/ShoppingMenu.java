@@ -22,9 +22,8 @@ import model.Government;
 import model.User;
 import model.generalenums.Resource;
 
-import java.awt.*;
 import java.net.URL;
-import java.nio.Buffer;
+
 
 public class ShoppingMenu extends Application {
     private Government government;
