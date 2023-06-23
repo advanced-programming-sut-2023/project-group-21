@@ -174,6 +174,11 @@ public class ShoppingMenu extends Application {
         resourceInShop(Resource.BOW,100,140);
         resourceInShop(Resource.CROSSBOW,140,140);
         resourceInShop(Resource.MACE,180,140);
+        resourceInShop(Resource.SPEAR, 20, 180);
+        resourceInShop(Resource.SWORD, 60, 180);
+        resourceInShop(Resource.ALE, 100, 180);
+        resourceInShop(Resource.HOPS, 140, 180);
+        resourceInShop(Resource.PIKE, 180, 180);
     }
 
     private void resourceInShop(Resource resource, int x, int y){

@@ -10,6 +10,8 @@ public class TradeRequest {
     private int amount;
     private int price;
     private Resource resource;
+    private boolean accepted;
+    private String status;
 
     public TradeRequest(boolean isBuyRequest, Government sender, Government receiver, int amount, int price, Resource resource) {
         this.isBuyRequest = isBuyRequest;
@@ -20,10 +22,26 @@ public class TradeRequest {
         this.resource = resource;
     }
 
-    public void finish() {
+    public String  getStatus(){
+        if(!isDone())
+            return "unchecked";
+        else if(isAccepted())
+            return "accepted";
+        else
+            return "rejected";
+    }
+
+    public void accept() {
+        accepted=true;
         isDone = true;
     }
 
+    public void reject(){
+        accepted=false;
+        isDone=true;
+    }
+
+    public boolean isAccepted(){ return accepted;}
     public boolean isDone() {
         return isDone;
     }
