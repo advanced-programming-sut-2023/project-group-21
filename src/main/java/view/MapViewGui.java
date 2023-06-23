@@ -2,7 +2,6 @@ package view;
 
 import controller.GameController;
 import controller.MapController;
-import controller.VboxCreator;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -19,24 +18,25 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.Cell;
 import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
-import view.message.GameMessage;
 import view.message.MapMessages;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
+
 
 public class MapViewGui extends Application implements Initializable {
     private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
             "/src/main/resources/CSS/Texture.css";
     private String[] textureItem;
+    private static Stage mainWindows;
+    private final Label errorLabel = new Label("");
     private double startDragX = 0, startDragY = 0;
     private int CELL_SIZE = 75;
     @FXML
@@ -46,16 +46,19 @@ public class MapViewGui extends Application implements Initializable {
     private Cell[][] showingMap;
     private int currentX = 5, currentY = 5;
     public MapController mapController;
-    public static MapController mapControllerStatic ;
+    public static MapController mapControllerStatic;
     private boolean isStartDrag = false;
     private static MainMenu staticMainMenu;
     @FXML
     private ScrollPane scrollPane;
     @FXML
     private VBox objectBox;
+    private double startMoveX = 0, startMoveY = 0;
     private int selectedX1 = -1, selectedX2 = -1, selectedY1 = -1, selectedY2 = -1;//-1 means there is no selected cell!
     private boolean isDraggedExtra = false;
     private Extras selectedExtra;
+    private long currentTimeZoom = System.currentTimeMillis();//set current time for zoom
+    private long currentTimeHover = currentTimeZoom;//to make delay hover!
     private BuildingsDetails selectedBuildingDetails;
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -68,7 +71,7 @@ public class MapViewGui extends Application implements Initializable {
         staticGameController = gameController;
     }
 
-    public static void setStaticGameController(GameController gameController){
+    public static void setStaticGameController(GameController gameController) {
         MapViewGui.staticGameController = gameController;
     }
 
@@ -84,10 +87,11 @@ public class MapViewGui extends Application implements Initializable {
 
     @Override
     public void start(Stage stage) {
-        if (mapControllerStatic ==null){
+        if (mapControllerStatic == null) {
             mapController = new MapController();
             mapControllerStatic = mapController;
-        }else
+            mainWindows = stage;
+        } else
             mapController = mapControllerStatic;
         if (gameController == null)
             gameController = staticGameController;
@@ -128,13 +132,8 @@ public class MapViewGui extends Application implements Initializable {
 
                     }
                 });
-                label.hoverProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        System.out.println("Hovering...");
-                    } else {
-                        System.out.println("Retreating...");
-                    }
-                });
+                label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1 - 1,currentY + i2 -1)));
+
                 cellPane.getChildren().add(label);
             }
         if (600 % CELL_SIZE != 0) {
@@ -167,7 +166,7 @@ public class MapViewGui extends Application implements Initializable {
             selectedX1 = selectedX2 = (xInt + currentX - 1);
             selectedY1 = selectedY2 = (yInt + currentY - 1);
             showMap(showingMap);
-            System.out.println("test!");
+//            System.out.println("test!");
             return;
         }
         selectedX1 = (int) ((x / CELL_SIZE) + currentX - 1);
@@ -185,9 +184,6 @@ public class MapViewGui extends Application implements Initializable {
         showMap(showingMap);
     }
 
-    private void moveMap(int x, int y) {
-        System.out.println("(" + x + "," + y + ")");
-    }
 
     public void save() {
         mapController.saveMap();
@@ -225,18 +221,24 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void zoomIn() {
+        if (System.currentTimeMillis() - currentTimeZoom < 700)
+            return;
         if (CELL_SIZE <= 95)
             CELL_SIZE += 5;
         if (CELL_SIZE == 85)
             CELL_SIZE = 90;
+        currentTimeZoom = System.currentTimeMillis();
         showMap(showingMap);
     }
 
     public void zoomOut() {
+        if (System.currentTimeMillis() - currentTimeZoom < 700)
+            return;
         if (CELL_SIZE >= 80)
             CELL_SIZE -= 5;
         if (CELL_SIZE == 85)
             CELL_SIZE = 80;
+        currentTimeZoom = System.currentTimeMillis();
         showMap(showingMap);
     }
 
@@ -258,33 +260,42 @@ public class MapViewGui extends Application implements Initializable {
 
 
     private void raiseError(MapMessages messages) {//raise error
-        // need repair
-        System.out.println(messages.toString());
-//        Alert alert = new Alert(Alert.AlertType.ERROR);
-//        alert.setTitle("error!");
-//        alert.setContentText(null);
-//        alert.setContentText(messages.toString());
-//        alert.showAndWait();
+        // repaired!
+        errorLabel.setText(messages.toString());
+        if (!mainPane.getChildren().contains(errorLabel))
+            mainPane.getChildren().add(errorLabel);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        errorLabel.relocate(900,200);
         if (gameController == null)
             gameController = staticGameController;
-        if (mapControllerStatic ==null){
-            if (MainMenu.staticMapController != null)
-                mapController = MainMenu.staticMapController;
+        if (mapControllerStatic == null) {
+            if (MainMenu.staticMapController != null) {
+            }
             else {
                 MainMenu.staticMapController = new MapController();
-                mapController = MainMenu.staticMapController;
             }
+            mapController = MainMenu.staticMapController;
             mapControllerStatic = mapController;
-        }else
+        } else
             mapController = mapControllerStatic;
         textureItem = new String[GroundTexture.values().length];
-        for(int i = 0;i<textureItem.length;i++)
+        for (int i = 0; i < textureItem.length; i++)
             textureItem[i] = GroundTexture.values()[i].getName();
         initExtra();
+        cellPane.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent scrollEvent) {
+                if (scrollEvent.getDeltaY()<1 && scrollEvent.getDeltaY()>-1)
+                    return;
+                if (scrollEvent.getDeltaY()>0)
+                    zoomIn();
+                else
+                    zoomOut();
+            }
+        });
         mainPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {// for handling shortcuts!
@@ -307,30 +318,52 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        if(!mapController.isInitState())
+        if (!mapController.isInitState())
             mapController.loadMapNormal();
         showMap(mapController.showMapGui(currentX, currentY));
-
 
         cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                if(mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    if (mouseEvent.getButton() == MouseButton.MIDDLE){
+                        startMoveX = mouseEvent.getX();
+                        startMoveY = mouseEvent.getY();
+                    }
+                    return;
+                }
                 isStartDrag = true;
                 startDragX = mouseEvent.getX();
                 startDragY = mouseEvent.getY();
-                System.out.println("i'm here");
             }
         });
 
         cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    if (mouseEvent.getButton() == MouseButton.MIDDLE){
+                        double deltaX = mouseEvent.getX() - startMoveX;
+                        double deltaY = mouseEvent.getY() - startMoveY;
+                        if (deltaX >  CELL_SIZE)
+                            goLeft();
+                        if (deltaX < -1 * CELL_SIZE)
+                            goRight();
+                        if (deltaY > CELL_SIZE)
+                            goDown();
+                        if (deltaY < -1 * CELL_SIZE)
+                            goUp();
+                    }
+                    return;
+                }
                 if (isDraggedExtra) {
                     isDraggedExtra = false;
                     MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
                     if (messages != MapMessages.SUCCESS) {
                         raiseError(messages);
+                    }else {
+                        raiseError(MapMessages.NULL_MESSAGE);
                     }
                     showMap(showingMap);
                     return;
@@ -355,34 +388,35 @@ public class MapViewGui extends Application implements Initializable {
     public void gotoXY() {
         Stage goStage = new Stage();
         Pane thisPane = new Pane();
-        Scene scene = new Scene(thisPane);
-        scene.getStylesheets().add(pathCssFile);
+        Scene scene = new Scene(thisPane,320,200);
+//        scene.getStylesheets().add(pathCssFile);
         goStage.setScene(scene);
         Spinner<Integer> xSpinner = new Spinner<>();
         Spinner<Integer> ySpinner = new Spinner<>();
-        xSpinner.setEditable(false);ySpinner.setEditable(false);
+        xSpinner.setMaxWidth(70);ySpinner.setMaxWidth(70);
+//        xSpinner.setEditable(false);ySpinner.setEditable(false);
         SpinnerValueFactory<Integer> XFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
-                mapController.getMap().length,mapController.getMap().length/2);
+                mapController.getMap().length, mapController.getMap().length / 2);
         SpinnerValueFactory<Integer> YFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
-                mapController.getMap().length,mapController.getMap()[0].length/2);
+                mapController.getMap().length, mapController.getMap()[0].length / 2);
         xSpinner.setValueFactory(XFactory);
         ySpinner.setValueFactory(YFactory);
         Button go = new Button("go");
-        go.relocate(100,120);
-        xSpinner.relocate(50,30);
-        ySpinner.relocate(200,30);
+        go.relocate(100, 120);
+        xSpinner.relocate(50, 30);
+        ySpinner.relocate(200, 30);
         go.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                currentX = xSpinner.getValue() - 1 ;
-                currentY = ySpinner.getValue() - 1 ;
-                showMap(mapController.showMapGui(xSpinner.getValue()-1,ySpinner.getValue()-1));
+                currentX = xSpinner.getValue() - 1;
+                currentY = ySpinner.getValue() - 1;
+                showMap(mapController.showMapGui(xSpinner.getValue() - 1, ySpinner.getValue() - 1));
+                goStage.close();
             }
         });
-        thisPane.getChildren().addAll(go,xSpinner,ySpinner);
+        thisPane.getChildren().addAll(go, xSpinner, ySpinner);
         goStage.show();
     }
-
 
     public void initExtra() {
         objectBox.getChildren().remove(0, objectBox.getChildren().size());
@@ -410,16 +444,13 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
-    private void showDetail(int x1,int y1,int x2){
-
-    }
 
     private void setTexture(int x1, int y1, int x2, int y2) {//use function this way: x1 <= x2 && y1 <= y2
         Label label = new Label("");
         ChoiceBox<String> textureBox = new ChoiceBox<>();
         textureBox.getItems().addAll(textureItem);
         textureBox.setValue(textureItem[0]);
-        textureBox.relocate(130,70);
+        textureBox.relocate(130, 70);
         Stage stage = new Stage();
         stage.initOwner(mainStage);
         stage.setResizable(false);
@@ -442,14 +473,14 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
         Button change = new Button("save");
-        change.relocate(100,100);
+        change.relocate(100, 100);
         pane.getChildren().add(change);
         change.setOnMouseClicked(mouseEvent -> {
             MapMessages messages;
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                messages = mapController.setTexture(x1,x2,y1,y2,textureBox.getValue());
+                messages = mapController.setTexture(x1, x2, y1, y2, textureBox.getValue());
                 showMap(showingMap);
-                if(messages == MapMessages.SUCCESS)
+                if (messages == MapMessages.SUCCESS)
                     stage.close();
                 else {
                     label.setText(messages.toString());

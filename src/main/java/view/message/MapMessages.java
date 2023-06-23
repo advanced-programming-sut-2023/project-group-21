@@ -12,7 +12,8 @@ public enum MapMessages {
     UNABLE_TO_PUT_HOLD("unable to put hold!"),
     TOO_MANY_HOLD("there is too many hold in the map!"),
     UNABLE_TO_PUT_EXTRA("there is already "),
-    UNABLE("unable to set texture!")
+    UNABLE("unable to set texture!"),
+    NULL_MESSAGE("")
     ;
 
     private final String message;
