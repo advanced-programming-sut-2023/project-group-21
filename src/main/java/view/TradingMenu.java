@@ -10,17 +10,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import model.Government;
-import model.TradeRequest;
+import model.*;
 import model.generalenums.Resource;
 import view.message.TradeMenuMessage;
 
@@ -45,6 +48,7 @@ public class TradingMenu extends Application {
     private Label selectedPriceLabel;
     private int selectedPrice;
     private Label errorLabel;
+    private ArrayList<Label> receivedRequestLabels=new ArrayList<>();
 
     @Override
     public void start(Stage passedStage) throws Exception {
@@ -59,17 +63,104 @@ public class TradingMenu extends Application {
         stage = passedStage;
 
 
+        //if selected label!=null make it red and 2 buttons to do the accept and reject and update that label when pressed and do the logic of
+        //adding or substracting coin or resources
+
         if (addMenu) {
             addOfferMenu();
         }
-//        else
-//            showAllOffers();
+        else
+            showAllOffers();
 
         tradeScene = new Scene(pane);
         stage.setScene(tradeScene);
         stage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
         stage.setTitle("shopping menu");
         stage.show();
+    }
+
+    private void showAllOffers() {
+        User user1=new User("a","a","a","a","a");
+        User user2=new User("s","s","s","s","s");
+        Game.addTradeRequest(new TradeRequest(false,traderGovernment,new Government(user1,new Cell(10,10)),5,4,Resource.BOW));
+        Game.addTradeRequest(new TradeRequest(true,traderGovernment,new Government(user2,new Cell(10,10)),5,4,Resource.BOW));
+        Game.addTradeRequest(new TradeRequest(false,new Government(user2,new Cell(10,10)),traderGovernment,5,4,Resource.BOW));
+        Game.addTradeRequest(new TradeRequest(true,new Government(user1,new Cell(10,10)),traderGovernment,5,4,Resource.BOW));
+        addReceivedOffers(getReceivedOffers(traderGovernment));
+        addSentOffers(getSentOffers(traderGovernment));
+    }
+
+    private ArrayList<TradeRequest> getReceivedOffers(Government traderGovernment) {
+        ArrayList<TradeRequest> result=new ArrayList<>();
+        for (TradeRequest request : Game.getTradeRequests()) {
+            if(request.getReceiver().equals(traderGovernment))
+                result.add(request);
+        }
+        return result;
+    }
+
+    private ArrayList<TradeRequest> getSentOffers(Government traderGovernment) {
+        ArrayList<TradeRequest> result=new ArrayList<>();
+        for (TradeRequest request : Game.getTradeRequests()) {
+            if(request.getSender().equals(traderGovernment))
+                result.add(request);
+        }
+        return result;
+    }
+
+    private void addReceivedOffers(ArrayList<TradeRequest> requests){
+        Label title=new Label("received");
+        title.setId("title2");
+        title.relocate(190,40);
+        Line separator=new Line(400,60,400,470);
+
+
+        ScrollPane scrollPane=new ScrollPane();
+        scrollPane.setPrefSize(320,340);
+        scrollPane.relocate(70,120);
+        VBox vBox=new VBox(10);
+        for (TradeRequest request : requests) {
+            String type;
+            if(request.isBuyRequest())
+                type="sell";
+            else
+                type="buy";
+            Label requestLabel=new Label(request.getSender().getLord().getUserName()+" | "+request.getAmount()+" | "+request.getPrice()+ " | " +type+" | "+request.getStatus());
+            requestLabel.setId("showOffers");
+            receivedRequestLabels.add(requestLabel);
+            vBox.getChildren().add(requestLabel);
+        }
+        scrollPane.setContent(vBox);
+
+        pane.getChildren().addAll(scrollPane,title,separator);
+
+    }
+
+    private void addSentOffers(ArrayList<TradeRequest> requests){
+        Label title=new Label("sent");
+        title.setId("title2");
+        title.relocate(540,40);
+
+
+        ScrollPane scrollPane=new ScrollPane();
+        scrollPane.setPrefSize(320,340);
+        scrollPane.relocate(410,120);
+        VBox vBox=new VBox(10);
+        for (TradeRequest request : requests) {
+            String type;
+            if(request.isBuyRequest())
+                type="sell";
+            else
+                type="buy";
+            Label requestLabel=new Label(request.getReceiver().getLord().getUserName()+" | "+request.getAmount()+" | "+request.getPrice()+ " | " +type+" | "+request.getStatus());
+            requestLabel.setId("showOffers");
+            receivedRequestLabels.add(requestLabel);
+            vBox.getChildren().add(requestLabel);
+        }
+        scrollPane.setContent(vBox);
+
+        pane.getChildren().addAll(scrollPane,title);
+
     }
 
     private void addCountControls() {
@@ -175,6 +266,11 @@ public class TradingMenu extends Application {
         resourceInShop(Resource.BOW, 140, 140);
         resourceInShop(Resource.CROSSBOW, 180, 140);
         resourceInShop(Resource.MACE, 220, 140);
+        resourceInShop(Resource.SPEAR, 60, 180);
+        resourceInShop(Resource.SWORD, 100, 180);
+        resourceInShop(Resource.ALE, 140, 180);
+        resourceInShop(Resource.HOPS, 180, 180);
+        resourceInShop(Resource.PIKE, 220, 180);
     }
 
     private void resourceInShop(Resource circleResource, int x, int y) {

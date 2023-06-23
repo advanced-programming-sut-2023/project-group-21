@@ -3,6 +3,18 @@ root{
     -fx-background-size: cover;
 }
 
+ScrollPane{
+    -fx-border-color: #010100;
+    -fx-border-radius: 5;
+    -fx-border-width: 3;
+    -fx-padding: 3 6;
+}
+
+ScrollPane:hover{
+    -fx-background-color: white;
+    -fx-border-color: white;
+}
+
 ChoiceBox{
     -fx-max-height: 10;
     -fx-min-width: 170;
@@ -14,7 +26,7 @@ ChoiceBox{
 
 ChoiceBox:hover{
     -fx-background-color: #696666;
-    -fx-border-color: white;
+    -fx-border-color: Black;
 }
 
 
@@ -54,6 +66,11 @@ Button:hover{
     -fx-font-family: "Times New Roman";
 }
 
+#showOffers{
+    -fx-font-size:14;
+    -fx-font-family: "Times New Roman";
+}
+
 #title{
     -fx-text-fill: #010;
     -fx-font-size: 30;
@@ -61,6 +78,15 @@ Button:hover{
     -fx-border-radius: 3;
     -fx-font-family: "Times New Roman";
 }
+
+#title2{
+    -fx-text-fill: #010;
+    -fx-font-size: 22;
+    -fx-border-color: #010;
+    -fx-border-radius: 1;
+    -fx-font-family: "Times New Roman";
+}
+
 
 .label{
     -fx-text-fill: #010;
