@@ -4,6 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import model.building.Building;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
@@ -314,11 +315,32 @@ public class Cell {
                     new Image(Cell.class.getResource(building.getBuildingsDetails().getImagePath()).toExternalForm()));
             buildingImage.setFitHeight((double) size / 2);
             buildingImage.setFitWidth((double) size / 2);
-            label = new Label(null, buildingImage);
-        }
-        else {
-            label = new Label();
-        }
+            if (!people.isEmpty()) {
+                StackPane stackPane = new StackPane();
+                stackPane.getChildren().add(buildingImage);
+                for (Worker worker: people) {
+                    if (worker.getWorkerDetails().getImagePath() == null) continue;
+                    ImageView workerImage = new ImageView(
+                            new Image(Cell.class.getResource(worker.getWorkerDetails().getImagePath()).toExternalForm()));
+                    workerImage.setFitHeight((double) size / 2);
+                    workerImage.setFitWidth((double) size / 2);
+                    stackPane.getChildren().add(workerImage);
+                }
+                label = new Label(null, stackPane);
+            } else label = new Label(null, buildingImage);
+        } else if (!people.isEmpty()) {
+            StackPane stackPane = new StackPane();
+            for (Worker worker: people) {
+                if (worker.getWorkerDetails().getImagePath() == null) continue;
+                ImageView workerImage = new ImageView(
+                        new Image(Cell.class.getResource(worker.getWorkerDetails().getImagePath()).toExternalForm()));
+                workerImage.setFitHeight((double) size / 2);
+                workerImage.setFitWidth((double) size / 2);
+                stackPane.getChildren().add(workerImage);
+            }
+            label = new Label(null, stackPane);
+        } else label = new Label();
+
         label.setStyle("-fx-background-color: " + groundTexture.getRGB() + ";-fx-border-color: black;");
         label.setPrefWidth(size);
         label.setPrefHeight(size);

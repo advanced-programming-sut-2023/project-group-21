@@ -223,6 +223,7 @@ public class MainMenu extends Application {
                     myHolds.get(i).setExtras(null);
                 GameController gameController = new GameController(governments,mapController.getMap());
                 MapViewGui.setStaticGameController(gameController);
+                MapViewGui.isInGame = true;
                 MapViewGui mapViewGui = new MapViewGui();
                 mapViewGui.setMainMenu(this);
                 mapViewGui.setMapController(mapController);

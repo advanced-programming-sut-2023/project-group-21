@@ -7,16 +7,16 @@
 
    <children>
       <Pane fx:id="cellPane" layoutX="256.0" layoutY="28.0" maxHeight="600.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" styleClass="mapPane" />
-      <Button layoutX="58.0" layoutY="680.0" mnemonicParsing="false" onAction="#back" text="back" />
-      <Button layoutY="680.0" mnemonicParsing="false" onAction="#save" text="save" />
-      <Button layoutX="16.0" layoutY="226.0" onAction="#gotoXY" text="go to" textAlignment="CENTER" />
-      <Button layoutX="124.0" layoutY="680.0" mnemonicParsing="false" onAction="#goUp" text="up" />
-      <Button layoutY="60.0" mnemonicParsing="false" onAction="#goDown" text="down" />
-      <Button layoutY="94.0" mnemonicParsing="false" onAction="#goLeft" text="left" />
-      <Button layoutX="7.0" layoutY="137.0" mnemonicParsing="false" onAction="#zoomIn" text="zoom-in" />
-      <Button layoutX="6.0" layoutY="185.0" mnemonicParsing="false" onAction="#zoomOut" text="zoom-out" />
-      <Button mnemonicParsing="false" onAction="#goRight" text="right" />
-      <ScrollPane fx:id="scrollPane" layoutX="943.0" layoutY="269.0" prefHeight="400.0" prefWidth="100.0">
+      <Button layoutX="100.0" layoutY="680.0" mnemonicParsing="false" maxWidth="80" onAction="#back" text="back" />
+      <Button layoutX="10.0" layoutY="680.0" mnemonicParsing="false" onAction="#save" maxWidth="80" text="save" />
+      <Button layoutX="190.0" layoutY="680.0" onAction="#gotoXY" text="go to" maxWidth="80" textAlignment="CENTER" />
+      <Button layoutX="75.0" layoutY="10.0" mnemonicParsing="false" maxWidth="30" onAction="#goUp" text="up" />
+      <Button layoutX="75.0" layoutY="50.0" mnemonicParsing="false" onAction="#goDown" maxWidth="30" text="down" />
+      <Button layoutY="30.0" mnemonicParsing="false" onAction="#goLeft" maxWidth="30" text="left" />
+      <Button layoutX="150.0" layoutY="30.0" mnemonicParsing="false" onAction="#goRight" maxWidth="30" text="right" />
+      <Button layoutX="7.0" layoutY="90.0" mnemonicParsing="false" onAction="#zoomIn" maxWidth="90" text="zoom-in" />
+      <Button layoutX="87.0" layoutY="90.0" mnemonicParsing="false" onAction="#zoomOut" maxWidth="90" text="zoom-out" />
+      <ScrollPane fx:id="scrollPane" layoutX="943.0" layoutY="290.0" prefHeight="400.0" prefWidth="100.0">
          <content>
           <VBox fx:id="objectBox" minHeight="0.0" minWidth="0.0" prefWidth="100.0" />
          </content>

@@ -1,5 +1,8 @@
 package controller;
 
+import javafx.geometry.Pos;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import model.Cell;
 import model.Game;
 import model.Government;
@@ -88,8 +91,8 @@ public class GameController {
         BuildingsDetails buildingsDetails = BuildingsDetails.getBuildingDetailsByName(type);
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (buildingsDetails == null) return GameMessage.NO_BUILDING;
-        if (map[x - 1][y - 1].getExtra() != null) return GameMessage.OCCUPIED;
-        if (map[x - 1][y - 1].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
+        if (map[x ][y ].getExtra() != null) return GameMessage.OCCUPIED;
+        if (map[x ][y ].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         if (buildingType != null && (buildingType.equals(BuildingsDetails.BuildingType.PRODUCT_MAKER) ||
                 buildingType.equals(BuildingsDetails.BuildingType.QUARRY)))
@@ -97,7 +100,7 @@ public class GameController {
         if (getNumberOfPeasants() < buildingsDetails.getWorkersCount()) return GameMessage.NOT_ENOUGH_PEOPLE;
         if (buildingType != null && buildingType.equals(BuildingsDetails.BuildingType.OIL_SMELTER)) {
             boolean hasEngineer = false;
-            for (Worker worker : map[x - 1][y - 1].getPeople()) {
+            for (Worker worker : map[x ][y ].getPeople()) {
                 if (worker instanceof Engineer && !((Engineer) worker).hasOil() && !((Engineer) worker).hasMachine() &&
                         ((Engineer) worker).getWorkplace() == null) {
                     hasEngineer = true;
@@ -108,7 +111,8 @@ public class GameController {
         }
         if (buildingsDetails.getRequiredResource() != null) {
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
-                if (currentGovernment.getResources().containsKey(entry.getKey()) &&
+                if (!currentGovernment.getResources().containsKey(entry.getKey()) ||
+                        currentGovernment.getResources().get(entry.getKey()) == null ||
                         currentGovernment.getResources().get(entry.getKey()) < entry.getValue())
                     return GameMessage.NOT_ENOUGH_RESOURCE;
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
@@ -121,7 +125,7 @@ public class GameController {
     public String showDetails(int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return "out of index!!";
         try {
-            return map[x - 1][y - 1].showDetails();
+            return map[x ][y ].showDetails();
         } catch (ArrayIndexOutOfBoundsException e) {
             return "out of index";
         }
@@ -141,38 +145,38 @@ public class GameController {
                 buildingsDetails.equals(BuildingsDetails.INN))
             currentGovernment.setReligionRate(true);
         if (buildingType == null) {
-            currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+            currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x ][y ], persons));
             return;
         }
         switch (buildingType) {
-            case PRODUCT_MAKER -> currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x - 1][y - 1],
+            case PRODUCT_MAKER -> currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x ][y ],
                     Objects.requireNonNull(ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails)), persons));
-            case STORAGE -> currentGovernment.addBuilding(new Storage(currentGovernment, map[x - 1][y - 1],
+            case STORAGE -> currentGovernment.addBuilding(new Storage(currentGovernment, map[x ][y ],
                     Objects.requireNonNull(ContainerDetails.getContainerByBuilding(buildingsDetails)), persons));
-            case GATE -> currentGovernment.addBuilding(new Gate(currentGovernment, map[x - 1][y - 1],
+            case GATE -> currentGovernment.addBuilding(new Gate(currentGovernment, map[x ][y ],
                     ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons, true, false));
-            case RESIDENCY -> currentGovernment.addBuilding(new Residency(currentGovernment, map[x - 1][y - 1],
+            case RESIDENCY -> currentGovernment.addBuilding(new Residency(currentGovernment, map[x ][y ],
                     Objects.requireNonNull(ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails)), persons));
             case WEAPON_PRODUCTION ->
-                    currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x - 1][y - 1],
+                    currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x ][y ],
                             ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
             case STABLE ->
-                    currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x - 1][y - 1], persons));
+                    currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x ][y ], persons));
             case TRAP ->
-                    currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
-            case QUARRY -> currentGovernment.addBuilding(new Quarry(currentGovernment, map[x - 1][y - 1], persons));
-            case TOWER -> currentGovernment.addBuilding(new Tower(currentGovernment, map[x - 1][y - 1],
+                    currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x ][y ], persons));
+            case QUARRY -> currentGovernment.addBuilding(new Quarry(currentGovernment, map[x ][y ], persons));
+            case TOWER -> currentGovernment.addBuilding(new Tower(currentGovernment, map[x ][y ],
                     Objects.requireNonNull(TowerDetails.getTowerDetailsByBuildingDetails(buildingsDetails)), persons));
             case OX_TETHER ->
-                    currentGovernment.addBuilding(new OxTether(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+                    currentGovernment.addBuilding(new OxTether(currentGovernment, buildingsDetails, map[x ][y ], persons));
             default ->
-                    currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x - 1][y - 1], persons));
+                    currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x ][y ], persons));
         }
 
     }
 
     private boolean textureMatches(BuildingsDetails buildingsDetails, int x, int y) {
-        Cell cell = map[x - 1][y - 1];
+        Cell cell = map[x ][y ];
         return (!buildingsDetails.getName().equals("quarry") || cell.getGroundTexture().equals(GroundTexture.STONE)) &&
                 (!buildingsDetails.getName().equals("iron mine") || cell.getGroundTexture().equals(GroundTexture.IRON)) &&
                 ((!buildingsDetails.getName().contains("farm") && !buildingsDetails.getName().equals("apple orchard")) ||
@@ -181,23 +185,23 @@ public class GameController {
     }
 
     public GameMessage selectBuilding(int x, int y) {
-        selectedBuilding = map[x - 1][y - 1].getBuilding();
+        selectedBuilding = map[x ][y ].getBuilding();
         if (selectedBuilding == null) return GameMessage.NO_BUILDING_TO_SELECT;
         if (!selectedBuilding.getGovernment().equals(currentGovernment)) return GameMessage.NOT_YOUR_BUILDING;
         return GameMessage.SUCCESS;
     }
 
     public GameMessage checkMakeTroop(String type, int count, int x, int y) {
-        if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
-        if (selectedBuilding == null) return GameMessage.NO_SELECTED_BUILDING;
-        if (map[x - 1][y - 1].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
+//        if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
+//        if (selectedBuilding == null) return GameMessage.NO_SELECTED_BUILDING;
+//        if (map[x ][y ].getBuilding() != null) return GameMessage.ALREADY_BUILDING;
         WorkerDetails worker = WorkerDetails.getWorkerDetailsByName(type);
-        BuildingsDetails.BuildingType buildingType = selectedBuilding.getBuildingsDetails().getBuildingType();
-        if (worker == null) return GameMessage.NO_SUCH_UNIT;
-        if (!buildingType.equals(BuildingsDetails.BuildingType.TROOP_TRAINER)) return GameMessage.BAD_BUILDING;
+//        BuildingsDetails.BuildingType buildingType = selectedBuilding.getBuildingsDetails().getBuildingType();
+//        if (worker == null) return GameMessage.NO_SUCH_UNIT;
+//        if (!buildingType.equals(BuildingsDetails.BuildingType.TROOP_TRAINER)) return GameMessage.BAD_BUILDING;
         EuropeanSoldiersDetails europeanSoldiers = EuropeanSoldiersDetails.getDetailsByWorkerDetails(worker);
-        if (!worker.getTrainerBuilding().equals(selectedBuilding.getBuildingsDetails()))
-            return GameMessage.NO_SUITABLE_BUILDING;
+//        if (!worker.getTrainerBuilding().equals(selectedBuilding.getBuildingsDetails()))
+//            return GameMessage.NO_SUITABLE_BUILDING;
         if (!worker.getTrainerBuilding().equals(BuildingsDetails.MERCENARY_POST) && getNumberOfPeasants() < count)
             return GameMessage.NOT_ENOUGH_PEOPLE;
         if (worker.getGold() * count >
@@ -210,7 +214,7 @@ public class GameController {
             for (Resource equipment : europeanSoldiers.getEquipments())
                 currentGovernment.reduceResources(equipment, count);
         }
-        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(worker, map[x - 1][y - 1]);
+        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(worker, map[x ][y ]);
         return GameMessage.SUCCESS;
     }
 
@@ -252,8 +256,8 @@ public class GameController {
 
     public GameMessage selectUnit(int x, int y) {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
-        if (map[x - 1][y - 1].getPeople().isEmpty()) return GameMessage.NO_PEOPLE_TO_SELECT;
-        selectedWorker = map[x - 1][y - 1].getPeople().get(0);
+        if (map[x ][y ].getPeople().isEmpty()) return GameMessage.NO_PEOPLE_TO_SELECT;
+        selectedWorker = map[x ][y ].getPeople().get(0);
         return GameMessage.SUCCESS;
     }
 
@@ -262,12 +266,12 @@ public class GameController {
         if (selectedWorker == null) return GameMessage.NO_SELECTED_UNIT;
         if (selectedWorker instanceof Engineer && (((Engineer) selectedWorker).getWorkplace() != null ||
                 ((Engineer) selectedWorker).getMachine() != null)) return GameMessage.ENGINEER_OCCUPIED;
-        if (map[x - 1][y - 1].getBuilding() != null && !(map[x - 1][y - 1].getBuilding() instanceof Tower))
+        if (map[x ][y ].getBuilding() != null && !(map[x ][y ].getBuilding() instanceof Tower))
             return null;
-        if (Game.UNPASSABLE.contains(map[x - 1][y - 1].getGroundTexture()) || map[x - 1][y - 1].getExtra() != null)
+        if (Game.UNPASSABLE.contains(map[x ][y ].getGroundTexture()) || map[x ][y ].getExtra() != null)
             return GameMessage.UNREACHABLE_CELL;
         if (selectedWorker.isOnTower()) selectedWorker.setOnTower(false);
-        selectedWorker.setDestination(map[x - 1][y - 1]);
+        selectedWorker.setDestination(map[x ][y ]);
         return GameMessage.SUCCESS;
     }
 
@@ -275,15 +279,15 @@ public class GameController {
         if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedWorker == null) return GameMessage.NO_SELECTED_UNIT;
-        selectedWorker.setPatrolMovement(map[x1 - 1][y1 - 1], map[x2 - 1][y2 - 1]);
+        selectedWorker.setPatrolMovement(map[x1 ][y1 ], map[x2 ][y2 ]);
         return GameMessage.SUCCESS;
     }
 
     public GameMessage setStateUnit(int x, int y, String mode) {
-        if (map[x - 1][y - 1].getPeople().isEmpty()) return GameMessage.NO_PEOPLE_TO_SELECT;
+        if (map[x ][y ].getPeople().isEmpty()) return GameMessage.NO_PEOPLE_TO_SELECT;
         if (!(mode.equals("offensive") || mode.equals("defensive") || mode.equals("standing")))
             return GameMessage.INVALID_STATE;
-        map[x - 1][y - 1].getPeople().get(0).setState(mode);
+        map[x ][y ].getPeople().get(0).setState(mode);
         return GameMessage.SUCCESS;
     }
 
@@ -305,7 +309,7 @@ public class GameController {
         if (x > map.length || x < 1 || y > map.length || y < 1) return GameMessage.OUT_OF_RANGE;
         if (selectedWorker == null || selectedWorker instanceof Engineer) return GameMessage.NO_SELECTED_UNIT;
         Worker enemy = null;
-        for (Worker person : map[x - 1][y - 1].getPeople()) {
+        for (Worker person : map[x ][y ].getPeople()) {
             if (!person.getGovernment().equals(selectedWorker.getGovernment()))
                 enemy = person;
         }
@@ -322,7 +326,7 @@ public class GameController {
             return GameMessage.NO_SUITABLE;
         if (getDistance(x, y) > selectedWorker.getRange()) return GameMessage.OUT_OF_RANGE;
         Worker enemy = null;
-        for (Worker person : map[x - 1][y - 1].getPeople()) {
+        for (Worker person : map[x ][y ].getPeople()) {
             if (!person.getGovernment().equals(selectedWorker.getGovernment()))
                 enemy = person;
         }
@@ -354,7 +358,7 @@ public class GameController {
         if (direction.length() > 1) return GameMessage.INVALID_DIRECTION;
         if (!Game.directions.contains(direction)) return GameMessage.INVALID_DIRECTION;
         if (!checkTunnel(x, y, direction)) return GameMessage.CANT_TUNNEL;
-        tunnels.put(map[x - 1][y - 1], direction);
+        tunnels.put(map[x ][y ], direction);
         return GameMessage.SUCCESS;
     }
 
@@ -508,9 +512,9 @@ public class GameController {
         if (opens.get(totalDistance).get(endDistance) == null)
             return;
         checkCell(x1 + 1, y1, distancesOfStart + 1, abs(x1 + 1 - x2) + abs(y1 - y2), 'e');
-        checkCell(x1 - 1, y1, distancesOfStart + 1, abs(x1 - 1 - x2) + abs(y1 - y2), 'w');
+        checkCell(x1 , y1, distancesOfStart + 1, abs(x1  - x2) + abs(y1 - y2), 'w');
         checkCell(x1, y1 + 1, distancesOfStart + 1, abs(x1 - x2) + abs(y1 + 1 - y2), 'n');
-        checkCell(x1, y1 - 1, distancesOfStart + 1, abs(x1 - x2) + abs(y1 - 1 - y2), 'e');
+        checkCell(x1, y1 , distancesOfStart + 1, abs(x1 - x2) + abs(y1  - y2), 'e');
         opens.get(totalDistance).get(endDistance).remove(map[x1][y1]);
     }
 
@@ -1056,19 +1060,19 @@ public class GameController {
         if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         Machine myMachine = null;
-        for (int i1 = 0; i1 < map[x1 - 1][y1 - 1].getMachine().size(); i1++) {
-            if (map[x1 - 1][y1 - 1].getMachine().get(i1).getSpeed() != 0)
-                myMachine = map[x1 - 1][y1 - 1].getMachine().get(i1);
+        for (int i1 = 0; i1 < map[x1 ][y1 ].getMachine().size(); i1++) {
+            if (map[x1 ][y1 ].getMachine().get(i1).getSpeed() != 0)
+                myMachine = map[x1 ][y1 ].getMachine().get(i1);
         }
         if (myMachine == null)
             return GameMessage.UNABLE_TO_MOVE;
         Cell cell1 = null;
-        callOtherFunction(x1 - 1, y1 - 1, x2 - 1, y2 - 1, 'a');
+        callOtherFunction(x1 , y1 , x2 , y2 , 'a');
         Machine machine = null;
-        for (int i1 = 0; i1 < map[x1 - 1][y1 - 1].getMachine().size(); i1++) {
-            if (map[x1 - 1][y1 - 1].getMachine().get(i1).getSpeed() != 0 &&
-                    map[x1 - 1][y1 - 1].getMachine().get(i1).getGovernment() == currentGovernment)
-                machine = map[x1 - 1][y1 - 1].getMachine().get(i1);
+        for (int i1 = 0; i1 < map[x1 ][y1 ].getMachine().size(); i1++) {
+            if (map[x1 ][y1 ].getMachine().get(i1).getSpeed() != 0 &&
+                    map[x1 ][y1 ].getMachine().get(i1).getGovernment() == currentGovernment)
+                machine = map[x1 ][y1 - 1].getMachine().get(i1);
         }
         if (machine == null) return GameMessage.UNABLE_TO_MOVE;
         if (machine.getGovernment() != currentGovernment) return GameMessage.NOT_BELONG_TO_YOU;
@@ -1090,7 +1094,7 @@ public class GameController {
             if (path.get(length - 1 - i).doesHaveHole() || path.get(length - 1 - i).doesHaveOil())
                 machine.getDamaged(100);
             if (machine.getHitPoint() > 0) {
-                cell1 = path.get(length - 1 - i);
+                cell1 = path.get(length  - i);
                 path.get(length - 1 - i).addMachine(machine);
                 machine.setCell(path.get(length - 1 - i));
             }
@@ -1181,4 +1185,26 @@ public class GameController {
         for (Worker worker : cell.getPeople()) worker.getDamaged(70);
     }
 
+    public int getPopularityRate() {
+        return currentGovernment.getPopularityRate();
+    }
+
+    public int getCountByResource(Resource resource) {
+        return currentGovernment.getResourceAmount(resource);
+    }
+
+    public int getGold() {
+        return currentGovernment.getGold();
+    }
+
+    public VBox getResourceList() {
+        VBox vBox = new VBox();
+        vBox.setSpacing(15);
+        vBox.setAlignment(Pos.CENTER);
+        for (Map.Entry<Resource, Integer> entry: currentGovernment.getResources().entrySet()) {
+            if (entry.getKey().equals(Resource.GOLD)) continue;
+            vBox.getChildren().add(new Text(entry.getKey().getName() + ": " + entry.getValue()));
+        }
+        return vBox;
+    }
 }

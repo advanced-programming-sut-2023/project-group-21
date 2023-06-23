@@ -3,26 +3,35 @@ package view;
 import controller.GameController;
 import controller.MapController;
 import controller.VboxCreator;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.Cell;
 import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
+import model.human.Enums.WorkerDetails;
+import model.machine.MachineDetails;
 import view.message.GameMessage;
 import view.message.MapMessages;
 
@@ -30,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MapViewGui extends Application implements Initializable {
@@ -48,7 +57,6 @@ public class MapViewGui extends Application implements Initializable {
     public MapController mapController;
     public static MapController mapControllerStatic ;
     private boolean isStartDrag = false;
-    public static boolean isInGame = false;
     private static MainMenu staticMainMenu;
     @FXML
     private ScrollPane scrollPane;
@@ -57,12 +65,20 @@ public class MapViewGui extends Application implements Initializable {
     private int selectedX1 = -1, selectedX2 = -1, selectedY1 = -1, selectedY2 = -1;//-1 means there is no selected cell!
     private boolean isDraggedExtra = false;
     private Extras selectedExtra;
-    private BuildingsDetails selectedBuildingDetails;
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
+
+
+    public static boolean isInGame = false;
+    private double cursorX, cursorY;
     private GameController gameController;
     private static GameController staticGameController;
+    private BuildingsDetails selectedBuildingDetails;
+    private MachineDetails selectedMachineDetails;
+    private WorkerDetails selectedWorkerDetails;
+    private final SplitPane details = new SplitPane(), resourcesDetails = new SplitPane();
+
 
     public void setGameController(GameController gameController) {
         this.gameController = gameController;
@@ -94,8 +110,14 @@ public class MapViewGui extends Application implements Initializable {
             gameController = staticGameController;
         this.mainStage = stage;
         try {
-            Parent parent1 = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
-            Scene mapScene = new Scene(parent1);
+            AnchorPane anchorPane = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
+            BackgroundImage myBI= new BackgroundImage(
+                    new Image(Objects.requireNonNull(MainMenu.class.getResource("/images/Gamebg.png")).toExternalForm(),
+                            1080, 720, false, false),
+                    BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
+                    BackgroundSize.DEFAULT);
+            anchorPane.setBackground(new Background(myBI));
+            Scene mapScene = new Scene(anchorPane);
             stage.setScene(mapScene);
             stage.show();
         } catch (IOException e) {
@@ -129,11 +151,22 @@ public class MapViewGui extends Application implements Initializable {
 
                     }
                 });
+                final Cell finalCell = myMap[i1][i2];
                 label.hoverProperty().addListener((observable, oldValue, newValue) -> {
+                    VBox vBox = new VBox();
+                    vBox.setTranslateX(cursorX);
+                    vBox.setTranslateY(cursorY);
+                    System.out.println("X: " + cursorX + " Y: " + cursorY);
+                    vBox.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+                    mainPane.getChildren().add(vBox);
                     if (newValue) {
-                        System.out.println("Hovering...");
+                        createDetails(vBox, finalCell);
                     } else {
-                        System.out.println("Retreating...");
+                        System.out.println(mainPane.getChildren().size());
+                        mainPane.getChildren().remove(vBox);
+                        mainPane.getChildren().remove(mainPane.getChildren().size()-1);
+                        System.out.println("FSDFSDFSDF");
+                        System.out.println(mainPane.getChildren().size());
                     }
                 });
                 cellPane.getChildren().add(label);
@@ -155,8 +188,16 @@ public class MapViewGui extends Application implements Initializable {
             cellPane.getChildren().add(label);
         }
     }
+
+    private void createDetails(VBox vBox, Cell finalCell) {
+        Text text = new Text(finalCell.showDetails());
+        vBox.getChildren().add(text);
+    }
+
     public void initGame() {
-        System.out.println("GAME");
+        initializeDetailsBox();
+        initializeResourcesBox();
+        createCategoryBox();
         objectBox.getChildren().remove(0, objectBox.getChildren().size());
         ImageView imageView;
         Image image;
@@ -176,8 +217,196 @@ public class MapViewGui extends Application implements Initializable {
             });
             objectBox.getChildren().add(label);
         }
-        System.out.println(44);
     }
+
+    private void createCategoryBox() {
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setMaxWidth(200);
+        vBox.setTranslateX(30);
+        vBox.setTranslateY(500);
+        Button foodProcess = new Button("Food Process");
+        foodProcess.setMaxWidth(205);
+        foodProcess.setFont(Font.font(10));
+        foodProcess.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.FOOD_PROCESSING_BUILDINGS));
+
+        HBox hBox1 = new HBox();
+        Button castle = new Button("Castle");
+        castle.setFont(Font.font(10));
+        castle.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.CASTLE_BUILDINGS));
+        Button farm = new Button("Farm");
+        farm.setFont(Font.font(10));
+        farm.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.FARM_BUILDINGS));
+        Button industry = new Button("Industry");
+        industry.setFont(Font.font(10));
+        industry.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.INDUSTRY_BUILDINGS));
+        hBox1.getChildren().addAll(castle, farm, industry);
+
+        HBox hBox2 = new HBox();
+        Button machine = new Button("Machine");
+        machine.setFont(Font.font(10));
+        machine.setOnMouseClicked(mouseEvent -> updateObjectBox(null));
+        Button town = new Button("Town");
+        town.setFont(Font.font(10));
+        town.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.TOWN_BUILDING));
+        Button weapon = new Button("Weapon");
+        weapon.setFont(Font.font(10));
+        weapon.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.WEAPONS_BUILDINGS));
+        hBox2.getChildren().addAll(machine, town, weapon);
+
+        vBox.getChildren().addAll(foodProcess, hBox1, hBox2);
+        mainPane.getChildren().add(vBox);
+    }
+
+    private void initializeResourcesBox() {
+        mainPane.getChildren().add(resourcesDetails);
+        resourcesDetails.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
+        resourcesDetails.setOpacity(0.7);
+        resourcesDetails.setTranslateX(50);
+        resourcesDetails.setTranslateY(200);
+        resourcesDetails.setPrefWidth(120);
+        resourcesDetails.setOrientation(Orientation.VERTICAL);
+        resourcesDetails.setDividerPositions(0.2);
+        Text text = new Text("Resources");
+        text.setFont(Font.font("Verdana", FontWeight.BOLD, FontPosture.REGULAR, 20));
+        resourcesDetails.getItems().addAll(text, gameController.getResourceList());
+    }
+
+    private void initializeDetailsBox() {
+        mainPane.getChildren().add(details);
+        details.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
+        details.setOpacity(0.7);
+        details.setTranslateX(900);
+        details.setTranslateY(10);
+        details.setOrientation(Orientation.VERTICAL);
+        details.setDividerPositions(0.2);
+        VBox properties = new VBox();
+        properties.getChildren().addAll(new Text("\nPopularity: " + gameController.getPopularity()),
+                new Text("Rate: " + gameController.getPopularityRate()),
+                new Text("Gold: " + gameController.getGold()));
+        properties.setAlignment(Pos.CENTER);
+        properties.setSpacing(20);
+        properties.setMaxWidth(500);
+        details.setPrefWidth(120);
+        Text text = new Text("Details");
+        text.setFont(Font.font("Times New Roman", FontWeight.BOLD, FontPosture.REGULAR, 20));
+        details.getItems().addAll(text, properties);
+    }
+
+    private void updateResourcesBox() {
+        resourcesDetails.getItems().remove(1);
+        resourcesDetails.getItems().add(gameController.getResourceList());
+    }
+
+    private void updateDetailsBox() {
+        VBox properties = (VBox) details.getItems().get(1);
+        properties.getChildren().remove(0, properties.getChildren().size());
+        properties.getChildren().addAll(new Text("\nPopularity: " + gameController.getPopularity()),
+                new Text("Rate: " + gameController.getPopularityRate()),
+                new Text("Gold: " + gameController.getGold()));
+    }
+
+    private void updateObjectBox(Map<String, BuildingsDetails> map) {
+        if (map == null) {
+            objectBox.getChildren().remove(0, objectBox.getChildren().size());
+            ImageView imageView;
+            Image image;
+            Label label;
+            for (Map.Entry<String, MachineDetails> entry: VboxCreator.MACHINES.entrySet()) {
+                image = new Image(entry.getKey());
+                imageView = new ImageView(image);
+                imageView.setFitWidth(90);
+                imageView.setFitHeight(70);
+                label = new Label(null, imageView);
+                label.setStyle("-fx-border-color: black;");
+                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        selectedMachineDetails = entry.getValue();
+                        selectedExtra = null;
+                        selectedWorkerDetails = null;
+                        selectedBuildingDetails = null;
+                    }
+                });
+                objectBox.getChildren().add(label);
+            }
+        } else {
+            objectBox.getChildren().remove(0, objectBox.getChildren().size());
+            ImageView imageView;
+            Image image;
+            Label label;
+            for (Map.Entry<String, BuildingsDetails> entry: map.entrySet()) {
+                image = new Image(entry.getKey());
+                imageView = new ImageView(image);
+                imageView.setFitWidth(90);
+                imageView.setFitHeight(70);
+                label = new Label(null, imageView);
+                label.setStyle("-fx-border-color: black;");
+                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        selectedBuildingDetails = entry.getValue();
+                        selectedExtra = null;
+                        selectedWorkerDetails = null;
+                        selectedMachineDetails = null;
+                    }
+                });
+                objectBox.getChildren().add(label);
+            }
+        }
+    }
+
+    private void updateObjectBoxTroops(Map<String, WorkerDetails> map) {
+        if (map == null) {
+            objectBox.getChildren().remove(0, objectBox.getChildren().size());
+            ImageView imageView;
+            Image image;
+            Label label;
+            for (Map.Entry<String, MachineDetails> entry: VboxCreator.MACHINES.entrySet()) {
+                image = new Image(entry.getKey());
+                imageView = new ImageView(image);
+                imageView.setFitWidth(90);
+                imageView.setFitHeight(70);
+                label = new Label(null, imageView);
+                label.setStyle("-fx-border-color: black;");
+                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        selectedMachineDetails = entry.getValue();
+                        selectedExtra = null;
+                        selectedWorkerDetails = null;
+                        selectedBuildingDetails = null;
+                    }
+                });
+                objectBox.getChildren().add(label);
+            }
+        } else {
+            objectBox.getChildren().remove(0, objectBox.getChildren().size());
+            ImageView imageView;
+            Image image;
+            Label label;
+            for (Map.Entry<String, WorkerDetails> entry: map.entrySet()) {
+                image = new Image(entry.getKey());
+                imageView = new ImageView(image);
+                imageView.setFitWidth(90);
+                imageView.setFitHeight(70);
+                label = new Label(null, imageView);
+                label.setStyle("-fx-border-color: black;");
+                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        selectedWorkerDetails = entry.getValue();
+                        selectedBuildingDetails = null;
+                        selectedMachineDetails = null;
+                        selectedExtra = null;
+                    }
+                });
+                objectBox.getChildren().add(label);
+            }
+        }
+    }
+
+
 
     public void setMapController(MapController mapController) {
         this.mapController = mapController;
@@ -191,7 +420,7 @@ public class MapViewGui extends Application implements Initializable {
             selectedX1 = selectedX2 = (xInt + currentX - 1);
             selectedY1 = selectedY2 = (yInt + currentY - 1);
             showMap(showingMap);
-            System.out.println("test!");
+//            System.out.println("test!");
             return;
         }
         selectedX1 = (int) ((x / CELL_SIZE) + currentX - 1);
@@ -310,6 +539,11 @@ public class MapViewGui extends Application implements Initializable {
             textureItem[i] = GroundTexture.values()[i].getName();
         if (!isInGame) initExtra();
         else initGame();
+
+        mainPane.setOnMouseMoved(mouseEvent -> {
+            cursorX = mouseEvent.getX();
+            cursorY = mouseEvent.getY();
+        });
         mainPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {// for handling shortcuts!
@@ -347,7 +581,7 @@ public class MapViewGui extends Application implements Initializable {
             }
         });
 
-        cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
+        cellPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (selectedExtra != null) {
@@ -358,13 +592,36 @@ public class MapViewGui extends Application implements Initializable {
                         raiseError(messages);
                     }
                     showMap(showingMap);
+                    selectedExtra = null;
                     return;
-                }
-                if (selectedBuildingDetails != null) {
-                    System.out.println(gameController);
-//                    GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
-//                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails.getName());
-//                    System.out.println(gameMessage);
+                } else if (selectedBuildingDetails != null) {
+                    GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails.getName());
+                    alert(gameMessage);
+                    showMap(showingMap);
+                    updateDetailsBox();
+                    updateResourcesBox();
+                    selectedBuildingDetails = null;
+                } else if (selectedWorkerDetails != null) {
+                    GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(),1,
+                            currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1);
+                    alert(gameMessage);
+                    System.out.println(gameMessage);
+                    updateDetailsBox();
+                    updateResourcesBox();
+                    selectedWorkerDetails = null;
+                    showMap(showingMap);
+                } else {
+                    Cell cell = mapController.getCell(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1);
+                    if (cell != null && cell.getBuilding() != null) {
+                        switch (cell.getBuilding().getBuildingsDetails()) {
+                            case BARRACKS -> updateObjectBoxTroops(VboxCreator.EUROPEAN_SOLDIERS);
+                            case MERCENARY_POST -> updateObjectBoxTroops(VboxCreator.ARABIAN_SOLDIERS);
+                            case ENGINEERS_GUILD -> updateObjectBoxTroops(VboxCreator.ENGINEERS_GUILD);
+                        }
+                    }
                 }
                 if (!isStartDrag) {
                     selectCell(mouseEvent.getX(), mouseEvent.getY(), mouseEvent.getX(), mouseEvent.getY());
@@ -381,6 +638,16 @@ public class MapViewGui extends Application implements Initializable {
                 isStartDrag = false;
             }
         });
+    }
+
+    private void alert(GameMessage gameMessage) {
+        if (gameMessage.equals(GameMessage.SUCCESS)) return;
+        Text text = new Text(420, 700, gameMessage.toString());
+        text.setFill(Color.RED);
+        text.setFont(Font.font(20));
+        mainPane.getChildren().add(text);
+        new Timeline(new KeyFrame(Duration.millis(1000),
+                actionEvent -> mainPane.getChildren().remove(text))).play();
     }
 
     public void gotoXY() {

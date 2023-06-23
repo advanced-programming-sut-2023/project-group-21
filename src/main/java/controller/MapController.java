@@ -239,4 +239,8 @@ public class MapController {
         else
             initializeMap(400,true);
     }
+
+    public Cell getCell(int x, int y) {
+        return map[x][y];
+    }
 }

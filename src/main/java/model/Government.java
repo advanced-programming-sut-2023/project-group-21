@@ -93,6 +93,7 @@ public class Government {
     }
 
     public void addTrainedPeople(WorkerDetails workerDetails, Cell cell) {
+        reduceResources(Resource.GOLD, workerDetails.getGold());
         for (int i = 0; i < people.size(); i++) {
             if (!(people.get(i) instanceof Worker) && people.get(i).getWorkPlace() == null) {
                 people.remove(i);
@@ -216,6 +217,7 @@ public class Government {
     }
 
     public int getGold() {
+        if (resources.get(Resource.GOLD) == null) return 0;
         return resources.get(Resource.GOLD);
     }
 
