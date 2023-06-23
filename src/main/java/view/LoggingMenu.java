@@ -139,8 +139,9 @@ public class LoggingMenu extends Application {
                 }
                 saveAnswer.setOnMouseClicked(mouseEvent1 -> {
                     if (mouseEvent1.getButton() == MouseButton.PRIMARY) {
-                        // check answer if(answer.getText().equals(FileController.getUserByUsername(usernameField.getText())))
-                        newPasswordScene(stage);
+                        // check answer
+                        //if(answer.getText().equals(FileController.getUserByUsername(usernameField.getText()).getPasswordRecoveryAnswer()))
+                            newPasswordScene(stage);
                     }
                 });
             }

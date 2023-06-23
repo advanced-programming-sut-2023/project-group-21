@@ -175,14 +175,14 @@ public class MapController {
     }
 
     public void saveMap(String username) {
-        String temp = "";
+        StringBuilder temp = new StringBuilder();
         for (int i1 = 0; i1 < map.length; i1++) {
             for (int i2 = 0; i2 < map[i1].length; i2++)
-                temp += map[i1][i2].makeSaveCode();
+                temp.append(map[i1][i2].makeSaveCode());
             if (i1 != map.length - 1)
-                temp += "\n";
+                temp.append("\n");
         }
-        FileController.saveMap(username, temp);
+        FileController.saveMap(username, temp.toString());
     }
 
     public void loadMap(String username) {

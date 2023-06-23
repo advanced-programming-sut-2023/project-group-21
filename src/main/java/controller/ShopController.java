@@ -36,6 +36,20 @@ public class ShopController {
         return ShopMessage.SUCCESS;
     }
 
+    public ShopMessage buyResource(Resource resource, int amount) {
+        if (amount >= currentGovernment.leftStorage(resource))
+            return ShopMessage.NO_CAPACITY;
+        if ((amount * resource.getCostBuy()) > resources.get(Resource.GOLD))
+            return ShopMessage.NOT_ENOUGH_MONEY;
+        if (resources.containsKey(resource))
+            resources.replace(resource, resources.get(resource) + amount);
+        else
+            resources.put(resource, amount);
+        int coinChange = amount * resource.getCostBuy();
+        resources.replace(Resource.GOLD, resources.get(Resource.GOLD) - coinChange);
+        return ShopMessage.SUCCESS;
+    }
+
     public ShopMessage sell(String name, int amount) {
         Resource resource = Resource.getResourceByName(name);
         if (resource == null || resource == Resource.GOLD)
@@ -50,6 +64,17 @@ public class ShopController {
         int coinChange = amount * resource.getCostSell();
         resources.replace(Resource.GOLD, resources.get(Resource.GOLD) + coinChange);
         // it needs repair
+        return ShopMessage.SUCCESS;
+    }
+
+    public ShopMessage sellResource(Resource resource, int amount) {
+        if (!resources.containsKey(resource) || amount > (resources.get(resource)))
+            return ShopMessage.NOT_ENOUGH;
+        resources.replace(resource, resources.get(resource) - amount);
+        if (resources.get(resource) == 0)
+            resources.remove(resource);
+        int coinChange = amount * resource.getCostSell();
+        resources.replace(Resource.GOLD, resources.get(Resource.GOLD) + coinChange);
         return ShopMessage.SUCCESS;
     }
 

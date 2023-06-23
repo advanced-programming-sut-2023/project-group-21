@@ -14,7 +14,6 @@ Pane{
     -fx-max-width: 320;
     -fx-max-height: 150;
     -fx-min-height: 150;
-    -fx-background-color: #bac1a5;
 }
 
 Label{
@@ -27,9 +26,9 @@ TextField{
 }
 
 Spinner{
-    -fx-background-color: white;
-    -fx-max-width: 50px;
+    -fx-max-width: 70;
 }
+
 
 ChoiceBox{
 }

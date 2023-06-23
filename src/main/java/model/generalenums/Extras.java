@@ -1,7 +1,7 @@
 package model.generalenums;
 
 public enum Extras {
-    SHRUB("shrub","a","shrub.jpeg"),
+    SHRUB("shrub","a","shrub.png"),
     CHERRY_TREE("cherry","b","cherry.png"),
     OLIVE_TREE("olive","c","olive.png"),
     COCONUT_TREE("coconut","d","coconut.png"),

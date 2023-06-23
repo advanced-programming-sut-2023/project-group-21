@@ -102,6 +102,7 @@ public class MainMenu extends Application {
         Button gameButton = new Button("Game");
         Button quitButton = new Button("Quit");
 
+
         gameButton.relocate(760, 60);
         profileButton.relocate(760, 120);
         mapButton.relocate(760, 180);
@@ -111,8 +112,18 @@ public class MainMenu extends Application {
         quitButton.setOnMouseClicked(mouseEvent -> {
             initController();
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                FileController.finish();
-                Platform.exit();
+                //repair
+                //the government
+                Government government=new Government(user,new Cell(20,20));
+                ShoppingMenu shoppingMenu=new ShoppingMenu();
+                shoppingMenu.setGovernment(government);
+                try {
+                    shoppingMenu.start(StartingMenu.mainStage);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+//                FileController.finish();
+//                Platform.exit();
             }
         });
 
@@ -129,6 +140,16 @@ public class MainMenu extends Application {
         gameButton.setOnMouseClicked(mouseEvent -> {
             initController();
             startGame();
+        });
+
+        profileButton.setOnMouseClicked(mouseEvent -> {
+            Profile profile=new Profile();
+            profile.setUser(user);
+            try {
+                profile.start(StartingMenu.mainStage);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         });
 
         mainPane.getChildren().addAll(gameButton, profileButton, mapButton, quitButton);

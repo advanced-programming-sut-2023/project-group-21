@@ -12,6 +12,10 @@ public class User {
         pictureName="pic1.jpg";
     }
 
+    public String getPasswordRecoveryAnswer() {
+        return passwordRecoveryAnswer;
+    }
+
     public String getUserName() {
         return userName;
     }

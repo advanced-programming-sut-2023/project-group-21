@@ -6,6 +6,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import model.building.Building;
+import model.building.Enums.BuildingsDetails;
+import model.building.Gate;
+import model.building.Tower;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
 import model.human.Person;
@@ -84,7 +87,10 @@ public class Cell {
 
     public String showDetails() {
         StringBuilder details = new StringBuilder();
+        details.append(("(" + xCoordinates + "," + yCoordinates + ")\n"));
         details.append("Texture: ").append(getGroundTexture().getName()).append("\n");
+        if (extra != null)
+            details.append("extra: ").append(extra.getName()).append("\n");
         if (building != null)
             details.append("Building: ").append(building.getName()).append(" | hitpoint: ").append(building.getHitPoint()).append("\n");
         if (!people.isEmpty()) {
@@ -116,7 +122,8 @@ public class Cell {
             details.append(machine.getName()).append(": ").append(machine.getGovernment().getLord().getUserName());
             details.append(" | ").append(machine.getHitPoint()).append("\n");
         }
-        details.append("Number of all People: ").append(people.size());
+        if (!people.isEmpty())
+            details.append("Number of all People: ").append(people.size());
         return details.toString();
     }
 
@@ -191,42 +198,39 @@ public class Cell {
     }
 
     public boolean checkCross(char myDirection, Cell anotherCell, char state) {
-        return true;
-//        if (this.building == null) {
-//            return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
-//                    && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
-//                    groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
-//        }
-//        //repair
-//        if (state == 'n') {
-//            if (groundTexture != GroundTexture.SOIL || extra != null)
-//                return false;
-//            if (building != null) {
-//                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
-//                    return true;
-//                return building instanceof Gate && ((Gate) building).checkState();
-//            }
-//            return true;
-//        }
-//        if (state == 'a') {
-//            if (groundTexture != GroundTexture.SOIL || extra != null)
-//                return false;
-//            if (building != null) {
-//                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
-//                    return true;
-//                return building instanceof Gate && ((Gate) building).checkState();
-//            }
-//            if (groundTexture != GroundTexture.SOIL || extra != null)
-//                return false;
-//            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
-//                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
-//                return true;
-//        }
-//        if (groundTexture != GroundTexture.SOIL || extra != null)
-//            return false;
-//        return building != null && building instanceof Tower
-//                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
-//                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
+
+        if (this.building == null) {
+            return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
+                    && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
+                    groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
+        }
+        //repair
+        if (state == 'n') {
+            if (groundTexture != GroundTexture.SOIL || extra != null)
+                return false;
+                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
+                    return true;
+                return building instanceof Gate && ((Gate) building).checkState();
+        }
+        if (state == 'a') {
+            if (groundTexture != GroundTexture.SOIL || extra != null)
+                return false;
+            if (building != null) {
+                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
+                    return true;
+                return building instanceof Gate && ((Gate) building).checkState();
+            }
+            if (groundTexture != GroundTexture.SOIL || extra != null)
+                return false;
+            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
+                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
+                return true;
+        }
+        if (groundTexture != GroundTexture.SOIL || extra != null)
+            return false;
+        return building instanceof Tower
+                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
+                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
     }
 
     public void putLadder() {
@@ -289,22 +293,13 @@ public class Cell {
         return label;
     }
 
-    public String detailForHover(){
-        StringBuilder result = new StringBuilder();
-        if (building != null)
-            result.append(building.toString()).append("\n");
-        for (Worker person : people)
-            if (person != null)
-                result.append(person.toString()).append("\n");
-        return result.toString();
-    }
 
     public void setExtra(Extras extra) {
         this.extra = extra;
     }
 
     private Label getLabel(int xShow, int yShow, int size) {
-        Label label ;
+        Label label;
         if (extra != null) {
             ImageView iv = new ImageView(MY_PATH_EXTRA + extra.getImagePath());
             iv.setFitHeight((double) size / 2);

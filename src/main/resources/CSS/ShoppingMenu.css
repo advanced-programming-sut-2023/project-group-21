@@ -1,0 +1,109 @@
+root{
+    -fx-background-image: url("../images/shop.jpg");
+    -fx-background-size: cover;
+}
+
+Button{
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #010100;
+    -fx-min-width: 100;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 5 10;
+    -fx-cursor: Hand;
+}
+
+Button:hover{
+
+    -fx-background-color: #696666;
+    -fx-border-color: white;
+}
+
+#trade{
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #010100;
+    -fx-max-width: 40;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 5 10;
+    -fx-cursor: Hand;
+}
+
+#show-button{
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-border-color: #010100;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-padding: 5 10;
+    -fx-cursor: Hand;
+}
+#show-button:hover{
+    -fx-background-color: #696666;
+    -fx-border-color: white;
+}
+
+
+#increase{
+    -fx-font-size:34;
+    -fx-font-family: "Times New Roman";
+}
+
+#title{
+    -fx-text-fill: #010;
+    -fx-font-size: 30;
+    -fx-border-color: #010;
+    -fx-border-radius: 3;
+    -fx-font-family: "Times New Roman";
+}
+
+.label{
+    -fx-text-fill: #010;
+    -fx-font-size: 20;
+    -fx-font-family: "Times New Roman";
+}
+
+.Background{
+    -fx-background-image: url("../images/shop.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: stretch;
+}
+
+TextField{
+    -fx-border-radius: 5;
+    -fx-border-color: #010;
+    -fx-border-width: 1;
+    -fx-padding: 5;
+    -fx-text-fill: #010;
+    -fx-pref-width: 150;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.5),10,0,0,1);
+}
+
+TextField:focused{
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.5),10,0,0,1);
+}
+
+#PassField{
+    -fx-border-radius: 5;
+    -fx-border-color: #010;
+    -fx-border-width: 1;
+    -fx-padding: 5;
+    -fx-text-fill: #010;
+    -fx-pref-width: 150;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.5),10,0,0,1);
+}
+
+#error{
+    -fx-text-fill: #C2302D;
+    -fx-font-size: 14;
+    -fx-font-family: "Times New Roman";
+}
+
+#PassField:focused{
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.5),10,0,0,1);
+}

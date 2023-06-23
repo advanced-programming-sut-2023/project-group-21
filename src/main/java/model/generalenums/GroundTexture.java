@@ -1,17 +1,17 @@
 package model.generalenums;
 
 public enum GroundTexture {
-    SOIL("soil", ColorCode.WHITE,"i"),
+    SOIL("soil", ColorCode.INTENSE_YELLOW,"i"),
     GRAVEL("gravel", ColorCode.RED,"j"),
     STONE("stone", ColorCode.INTENSE_BLACK,"k"),
     ROCK("rock", ColorCode.INTENSE_WHITE,"l"),
     IRON("iron", ColorCode.INTENSE_RED,"m"),
     GRASS("grass", ColorCode.INTENSE_GREEN,"n"),
     MEADOW("meadow", ColorCode.YELLOW,"o"),
-    DENSE_MEADOW("dense meadow", ColorCode.INTENSE_YELLOW,"p"),
+    DENSE_MEADOW("dense meadow", ColorCode.WHITE,"p"),
     PETROL("petrol", ColorCode.BLACK,"q"),
     PLAIN("plain", ColorCode.INTENSE_WHITE,"r"),
-    SHALLOW_WATER("shallow water", ColorCode.CYAN,"s"),
+    SHALLOW_WATER("shallow water", ColorCode.WHITE,"s"),
     RIVER("river", ColorCode.BLUE,"t"),
     SMALL_LAKE("small lake", ColorCode.PURPLE,"u"),
     BIG_LAKE("big lake", ColorCode.INTENSE_PURPLE,"x"),
