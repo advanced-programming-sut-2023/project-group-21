@@ -88,6 +88,8 @@ public class Cell {
         StringBuilder details = new StringBuilder();
         details.append(("(" + xCoordinates + "," + yCoordinates + ")\n"));
         details.append("Texture: ").append(getGroundTexture().getName()).append("\n");
+        if (extra != null)
+            details.append("extra: ").append(extra.getName()).append("\n");
         if (building != null)
             details.append("Building: ").append(building.getName()).append(" | hitpoint: ").append(building.getHitPoint()).append("\n");
         if (!people.isEmpty()) {
@@ -290,15 +292,6 @@ public class Cell {
         return label;
     }
 
-    public String detailForHover() {
-        StringBuilder result = new StringBuilder();
-        if (building != null)
-            result.append(building).append("\n");
-        for (Worker person : people)
-            if (person != null)
-                result.append(person).append("\n");
-        return result.toString();
-    }
 
     public void setExtra(Extras extra) {
         this.extra = extra;

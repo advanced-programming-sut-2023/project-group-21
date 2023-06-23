@@ -132,7 +132,7 @@ public class MapViewGui extends Application implements Initializable {
 
                     }
                 });
-                label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1 - 1,currentY + i2 -1)));
+                label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1 ,currentY + i2 )));
 
                 cellPane.getChildren().add(label);
             }
@@ -389,6 +389,7 @@ public class MapViewGui extends Application implements Initializable {
         Stage goStage = new Stage();
         Pane thisPane = new Pane();
         Scene scene = new Scene(thisPane,320,200);
+        thisPane.setStyle("-fx-background-color : yellow");
 //        scene.getStylesheets().add(pathCssFile);
         goStage.setScene(scene);
         Spinner<Integer> xSpinner = new Spinner<>();
