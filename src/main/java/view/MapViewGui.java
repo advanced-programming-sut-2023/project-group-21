@@ -71,7 +71,6 @@ public class MapViewGui extends Application implements Initializable {
     private Extras selectedExtra;
     private long currentTimeZoom = System.currentTimeMillis();//set current time for zoom
     private long currentTimeHover = currentTimeZoom;//to make delay hover!
-    private BuildingsDetails selectedBuildingDetails;
     private Stage mainStage;
     //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
@@ -201,10 +200,11 @@ public class MapViewGui extends Application implements Initializable {
             imageView.setFitHeight(70);
             label = new Label(null, imageView);
             label.setStyle("-fx-border-color: black;");
-            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            label.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
                     selectedBuildingDetails = entry.getValue();
+                    System.out.println("h");
                 }
             });
             objectBox.getChildren().add(label);
@@ -311,7 +311,7 @@ public class MapViewGui extends Application implements Initializable {
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
                 label.setStyle("-fx-border-color: black;");
-                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
                         selectedMachineDetails = entry.getValue();
@@ -334,7 +334,7 @@ public class MapViewGui extends Application implements Initializable {
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
                 label.setStyle("-fx-border-color: black;");
-                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
                         selectedBuildingDetails = entry.getValue();
@@ -361,7 +361,7 @@ public class MapViewGui extends Application implements Initializable {
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
                 label.setStyle("-fx-border-color: black;");
-                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
                         selectedMachineDetails = entry.getValue();
@@ -384,7 +384,7 @@ public class MapViewGui extends Application implements Initializable {
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
                 label.setStyle("-fx-border-color: black;");
-                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
                         selectedWorkerDetails = entry.getValue();
@@ -532,12 +532,10 @@ public class MapViewGui extends Application implements Initializable {
             textureItem[i] = GroundTexture.values()[i].getName();
         if (!isInGame) initExtra();
         else initGame();
-
         mainPane.setOnMouseMoved(mouseEvent -> {
             cursorX = mouseEvent.getX();
             cursorY = mouseEvent.getY();
         });
-        initExtra();
         cellPane.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent scrollEvent) {
@@ -590,34 +588,49 @@ public class MapViewGui extends Application implements Initializable {
                 startDragY = mouseEvent.getY();
             }
         });
-
+        cellPane.setOnMouseDragReleased(new EventHandler<MouseDragEvent>() {
+            @Override
+            public void handle(MouseDragEvent mouseDragEvent) {
+                System.out.println("sa");
+            }
+        });
         cellPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                System.out.println("re");
                 if (selectedExtra != null) {
-                if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
-                    if (mouseEvent.getButton() == MouseButton.MIDDLE){
-                        double deltaX = mouseEvent.getX() - startMoveX;
-                        double deltaY = mouseEvent.getY() - startMoveY;
-                        if (deltaX >  CELL_SIZE)
-                            goLeft();
-                        if (deltaX < -1 * CELL_SIZE)
-                            goRight();
-                        if (deltaY > CELL_SIZE)
-                            goDown();
-                        if (deltaY < -1 * CELL_SIZE)
-                            goUp();
-                    }
-                    return;
-                }
-                if (isDraggedExtra) {
+//                if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
+//                    if (mouseEvent.getButton() == MouseButton.MIDDLE){
+//                        double deltaX = mouseEvent.getX() - startMoveX;
+//                        double deltaY = mouseEvent.getY() - startMoveY;
+//                        if (deltaX >  CELL_SIZE)
+//                            goLeft();
+//                        if (deltaX < -1 * CELL_SIZE)
+//                            goRight();
+//                        if (deltaY > CELL_SIZE)
+//                            goDown();
+//                        if (deltaY < -1 * CELL_SIZE)
+//                            goUp();
+//                    }
+//                    return;
+//                }
+//                if (isDraggedExtra) {
+//                    isDraggedExtra = false;
+//                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+//                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
+//                    if (messages != MapMessages.SUCCESS) {
+//                        raiseError(messages);
+//                    }else {
+//                        raiseError(MapMessages.NULL_MESSAGE);
+//                    }
+//                    showMap(showingMap);
+//                    selectedExtra = null;
+//                    return;
                     isDraggedExtra = false;
                     MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
                     if (messages != MapMessages.SUCCESS) {
                         raiseError(messages);
-                    }else {
-                        raiseError(MapMessages.NULL_MESSAGE);
                     }
                     showMap(showingMap);
                     selectedExtra = null;
@@ -726,7 +739,7 @@ public class MapViewGui extends Application implements Initializable {
             int finalI = i;
             label = new Label(null, imageView);
             label.setStyle("-fx-border-color: black;");
-            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            label.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
                     System.out.println(finalI);
