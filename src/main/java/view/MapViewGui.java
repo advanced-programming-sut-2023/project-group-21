@@ -31,6 +31,8 @@ import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
 import model.human.Enums.WorkerDetails;
+import model.human.Person;
+import model.human.Worker;
 import model.machine.MachineDetails;
 import view.message.GameMessage;
 import view.message.MapMessages;
@@ -38,6 +40,7 @@ import view.message.MapMessages;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -55,7 +58,9 @@ public class MapViewGui extends Application implements Initializable {
     private Pane cellPane;
     @FXML
     private AnchorPane mainPane;
+    private ArrayList<Worker> guiWorker;
     private Cell[][] showingMap;
+    private int destinationX = 5, destinatioinY = 5;
     private int currentX = 5, currentY = 5;
     public MapController mapController;
     public static MapController mapControllerStatic;
@@ -65,16 +70,15 @@ public class MapViewGui extends Application implements Initializable {
     private ScrollPane scrollPane;
     @FXML
     private VBox objectBox;
-    private final double X_CELL_PANE = 256.0,Y_CELL_PANE = 28.0;
+    private final double X_CELL_PANE = 256.0, Y_CELL_PANE = 28.0;
     private double startMoveX = 0, startMoveY = 0;
     private int selectedX1 = -1, selectedX2 = -1, selectedY1 = -1, selectedY2 = -1;//-1 means there is no selected cell!
     private boolean isDraggedExtra = false;
     private Extras selectedExtra;
     private long currentTimeZoom = System.currentTimeMillis();//set current time for zoom
     private long currentTimeHover = currentTimeZoom;//to make delay hover!
-    private double XFullDrag = 0,YFullDrag = 0;
+    private double XFullDrag = 0, YFullDrag = 0;
     private Stage mainStage;
-    //    Alert alert = new Alert(Alert.AlertType.ERROR);
     private MainMenu mainMenu;
 
 
@@ -120,7 +124,7 @@ public class MapViewGui extends Application implements Initializable {
         this.mainStage = stage;
         try {
             AnchorPane anchorPane = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
-            BackgroundImage myBI= new BackgroundImage(
+            BackgroundImage myBI = new BackgroundImage(
                     new Image(Objects.requireNonNull(MainMenu.class.getResource("/images/Gamebg.png")).toExternalForm(),
                             1080, 720, false, false),
                     BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
@@ -147,20 +151,26 @@ public class MapViewGui extends Application implements Initializable {
                     label.setOpacity(0.4);
                 }
                 int finalI1 = i2;
-                label.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
-                    public void handle(ContextMenuEvent contextMenuEvent) {
-                        isDraggedExtra = false;
-                        if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
-                                (currentY + finalI1 - 1) <= selectedY2 && (currentY + finalI1 - 1) >= selectedY1)
-                            setTexture(selectedX1, selectedY1, selectedX2, selectedY2);
-                        else
-                            setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
-                                    currentX + finalI - 1, currentY + finalI1 - 1);
-
+                    public void handle(MouseEvent mouseEvent) {
+                        if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                            System.out.println("click on sec");
+                            isDraggedExtra = false;
+                            if (!isInGame) {
+                                if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
+                                        (currentY + finalI1 - 1) <= selectedY2 && (currentY + finalI1 - 1) >= selectedY1)
+                                    setTexture(selectedX1, selectedY1, selectedX2, selectedY2);
+                                else
+                                    setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
+                                            currentX + finalI - 1, currentY + finalI1 - 1);
+                            } else {
+                                showMoveStage(finalI + currentX - 1, finalI1 + currentY - 1);
+                            }
+                        }
                     }
                 });
-                label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1 ,currentY + i2 )));
+                label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1, currentY + i2)));
 
                 cellPane.getChildren().add(label);
             }
@@ -195,12 +205,13 @@ public class MapViewGui extends Application implements Initializable {
         ImageView imageView;
         Image image;
         Label label;
-        for (Map.Entry<String, BuildingsDetails> entry: VboxCreator.CASTLE_BUILDINGS.entrySet()) {
+        for (Map.Entry<String, BuildingsDetails> entry : VboxCreator.CASTLE_BUILDINGS.entrySet()) {
             image = new Image(entry.getKey());
             imageView = new ImageView(image);
             imageView.setFitWidth(90);
             imageView.setFitHeight(70);
             label = new Label(null, imageView);
+            label.setTooltip(new Tooltip(entry.getValue().getName()));
             label.setStyle("-fx-border-color: black;");
             label.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
@@ -305,12 +316,13 @@ public class MapViewGui extends Application implements Initializable {
             ImageView imageView;
             Image image;
             Label label;
-            for (Map.Entry<String, MachineDetails> entry: VboxCreator.MACHINES.entrySet()) {
+            for (Map.Entry<String, MachineDetails> entry : VboxCreator.MACHINES.entrySet()) {
                 image = new Image(entry.getKey());
                 imageView = new ImageView(image);
                 imageView.setFitWidth(90);
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
+                label.setTooltip(new Tooltip(entry.getValue().getName()));
                 label.setStyle("-fx-border-color: black;");
                 label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
@@ -328,13 +340,14 @@ public class MapViewGui extends Application implements Initializable {
             ImageView imageView;
             Image image;
             Label label;
-            for (Map.Entry<String, BuildingsDetails> entry: map.entrySet()) {
+            for (Map.Entry<String, BuildingsDetails> entry : map.entrySet()) {
                 image = new Image(entry.getKey());
                 imageView = new ImageView(image);
                 imageView.setFitWidth(90);
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
                 label.setStyle("-fx-border-color: black;");
+                label.setTooltip(new Tooltip(entry.getValue().getName()));
                 label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
@@ -355,13 +368,14 @@ public class MapViewGui extends Application implements Initializable {
             ImageView imageView;
             Image image;
             Label label;
-            for (Map.Entry<String, MachineDetails> entry: VboxCreator.MACHINES.entrySet()) {
+            for (Map.Entry<String, MachineDetails> entry : VboxCreator.MACHINES.entrySet()) {
                 image = new Image(entry.getKey());
                 imageView = new ImageView(image);
                 imageView.setFitWidth(90);
                 imageView.setFitHeight(70);
                 label = new Label(null, imageView);
                 label.setStyle("-fx-border-color: black;");
+                label.setTooltip(new Tooltip(entry.getValue().getName()));
                 label.setOnMousePressed(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
@@ -378,7 +392,7 @@ public class MapViewGui extends Application implements Initializable {
             ImageView imageView;
             Image image;
             Label label;
-            for (Map.Entry<String, WorkerDetails> entry: map.entrySet()) {
+            for (Map.Entry<String, WorkerDetails> entry : map.entrySet()) {
                 image = new Image(entry.getKey());
                 imageView = new ImageView(image);
                 imageView.setFitWidth(90);
@@ -398,7 +412,6 @@ public class MapViewGui extends Application implements Initializable {
             }
         }
     }
-
 
 
     public void setMapController(MapController mapController) {
@@ -446,10 +459,6 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
-    public void resetFields() {
-        if (cellPane.getChildren().size() > 1)
-            cellPane.getChildren().remove(0, cellPane.getChildren().size() - 1);
-    }
 
     public void goRight() {
         if (currentX < mapController.getMap().length - 8)
@@ -513,15 +522,133 @@ public class MapViewGui extends Application implements Initializable {
             mainPane.getChildren().add(errorLabel);
     }
 
+    private void showMoveStage(int x, int y) {//80px normal 64px selected!
+        System.out.println("showMoveStage is called!");
+        Stage moveUnitStage = new Stage();
+        //buttons
+        Button moveButton = new Button("move");
+        moveButton.relocate(150, 360);
+        Button resetMove = new Button("reset");
+        resetMove.relocate(250,300);
+        //scroll pane
+        ScrollPane scrollPane1 = new ScrollPane();
+        scrollPane1.relocate(50, 60);
+        scrollPane1.resize(80, 300);
+        scrollPane1.setMaxWidth(300);
+        scrollPane1.setMinHeight(97);
+        SpinnerValueFactory<Integer> factoryValueX = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                mapController.getMap().length + 1);
+        Spinner<Integer> spinnerX = new Spinner<>(factoryValueX);
+        SpinnerValueFactory<Integer> factoryValueY = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
+                mapController.getMap().length + 1);
+        Spinner<Integer> spinnerY = new Spinner<>(factoryValueY);
+        spinnerX.relocate(100, 280);
+        spinnerX.setMaxWidth(60);
+        spinnerY.setMaxWidth(60);
+        spinnerY.relocate(300, 280);
+        HBox hBox = new HBox();
+        scrollPane1.setContent(hBox);
+        ArrayList<Worker> people = null;
+        if (x <= selectedX2 && x >= selectedX1 && y <= selectedY2 && y >= selectedY1) {
+            people = new ArrayList<>();
+            for (int i1 = selectedX1; i1 <= selectedX2; i1++)
+                for (int i2 = selectedY1; i2 <= selectedY2; i2++)
+                    people.addAll(mapController.getCell(i1, i2).getPeople());//more than one cell
+        } else
+            people = mapController.getCell(x, y).getPeople();//for selecting one cell
+        for (Worker person : people) {
+            if (person.getGovernment() == gameController.getCurrentGovernment() &&
+                    person.getWorkerDetails().getSpeed() != 0 && person.getWorkPlace() == null) {
+                ImageView view = new ImageView(person.getWorkerDetails().getImagePath());
+                Label tempLabel = new Label(null, view);
+                tempLabel.setPrefSize(person.getIsGoingToMoveGui() ? 64 : 80, person.getIsGoingToMoveGui() ? 64 : 80);
+                tempLabel.setTooltip(new Tooltip(person.getWorkerDetails().getName() + "\n" +
+                        person.getPosition().toString() + "\n" + "hitpoint: " + person.getHitPoint()));
+                tempLabel.setAlignment(Pos.CENTER);
+                tempLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        person.setGoingToMoveGui(!person.getIsGoingToMoveGui());
+                        if (tempLabel.getWidth() > 75) {
+                            tempLabel.setPrefWidth(64);
+                            tempLabel.setPrefHeight(64);
+                        } else {
+                            tempLabel.setPrefHeight(80);
+                            tempLabel.setPrefWidth(80);//to show selection!
+                        }
+                    }
+                });
+                hBox.getChildren().add(tempLabel);
+            }
+        }
+        ArrayList<Worker> finalPeople = people;
+
+        resetMove.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getButton() == MouseButton.PRIMARY)
+                    for (Worker worker: finalPeople){
+                        worker.setGoingToMoveGui(false);
+                        worker.setDestination(worker.getPosition());
+                        moveUnitStage.close();
+                    }
+            }
+        });
+        moveButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                    destinationX = spinnerX.getValue();
+                    destinatioinY = spinnerY.getValue();
+                    move(finalPeople);
+                    moveUnitStage.close();
+                }
+            }
+        });
+        //some code
+        Pane pane = new Pane(moveButton, scrollPane1, spinnerX, spinnerY,resetMove);
+        pane.setStyle("-fx-background-color: #ac8fb1;");
+        Scene scened = new Scene(pane, 400, 400);
+        moveUnitStage.setScene(scened);
+        if (!hBox.getChildren().isEmpty())
+            moveUnitStage.show();
+        else
+            moveUnitStage.close();
+    }
+
+    private void move(ArrayList<Worker> workers) {
+        if (workers == null)
+            return;
+        guiWorker = workers;
+        for (Worker worker : workers)
+            if (worker.getIsGoingToMoveGui()) {
+                worker.setDestination(mapController.getCell(destinationX, destinatioinY));//
+                worker.setGoingToMoveGui(false);//ready for next turn!
+            }
+    }
+
+    private void nextTurn(){//called by pressing 'n'
+        if (!isInGame)
+            return;
+        System.out.println("next turn is called!");
+        gameController.nextTurn();//go to next turn
+        updateDetailsBox();
+        updateResourcesBox();
+        updateObjectBox(VboxCreator.CASTLE_BUILDINGS);//make it default
+        showMap(showingMap);//update map
+        if (guiWorker != null)
+            for (Worker myWorker:guiWorker)
+                myWorker.setGoingToMoveGui(false);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        errorLabel.relocate(900,200);
+        errorLabel.relocate(900, 200);
         if (gameController == null)
             gameController = staticGameController;
         if (mapControllerStatic == null) {
             if (MainMenu.staticMapController != null) {
-            }
-            else {
+            } else {
                 MainMenu.staticMapController = new MapController();
             }
             mapController = MainMenu.staticMapController;
@@ -540,23 +667,22 @@ public class MapViewGui extends Application implements Initializable {
         cellPane.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent scrollEvent) {
-                if (scrollEvent.getDeltaY()<1 && scrollEvent.getDeltaY()>-1)
+                if (scrollEvent.getDeltaY() < 1 && scrollEvent.getDeltaY() > -1)
                     return;
-                if (scrollEvent.getDeltaY()>0)
+                if (scrollEvent.getDeltaY() > 0)
                     zoomIn();
                 else
                     zoomOut();
             }
         });
 
-
         mainPane.setOnMouseDragReleased(new EventHandler<MouseDragEvent>() {
             @Override
             public void handle(MouseDragEvent mouseDragEvent) {
-                double xPane = mouseDragEvent.getX() - X_CELL_PANE,yPane = mouseDragEvent.getY() - Y_CELL_PANE;
-                if (xPane >= 600 || xPane<0 || yPane>= 600 || yPane<0)
+                double xPane = mouseDragEvent.getX() - X_CELL_PANE, yPane = mouseDragEvent.getY() - Y_CELL_PANE;
+                if (xPane >= 600 || xPane < 0 || yPane >= 600 || yPane < 0)
                     return;
-                if (!(XFullDrag >= 600 || XFullDrag < 0 || YFullDrag >= 600 || YFullDrag<0))
+                if (!(XFullDrag >= 600 || XFullDrag < 0 || YFullDrag >= 600 || YFullDrag < 0))
                     return;
                 if (selectedExtra != null) {
                     if (isDraggedExtra) {
@@ -565,7 +691,7 @@ public class MapViewGui extends Application implements Initializable {
                                 currentY + (int) (yPane / CELL_SIZE) - 1, selectedExtra);
                         if (messages != MapMessages.SUCCESS) {
                             raiseError(messages);
-                        }else {
+                        } else {
                             raiseError(MapMessages.NULL_MESSAGE);
                         }
                         showMap(showingMap);
@@ -590,7 +716,7 @@ public class MapViewGui extends Application implements Initializable {
                     updateResourcesBox();
                     selectedBuildingDetails = null;
                 } else if (selectedWorkerDetails != null) {
-                    GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(),1,
+                    GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(), 1,
                             currentX + (int) (xPane / CELL_SIZE) - 1,
                             currentY + (int) (yPane / CELL_SIZE) - 1);
                     alert(gameMessage);
@@ -622,7 +748,7 @@ public class MapViewGui extends Application implements Initializable {
                 else if (keyEvent.getCode() == KeyCode.Q)
                     back();
                 else if (keyEvent.getCode() == KeyCode.N)
-                    System.out.println("next turn!");//for going to next turn
+                    nextTurn();//for going to next turn
                 else if (keyEvent.getCode() == KeyCode.G)
                     gotoXY();
                 else if (keyEvent.getCode() == KeyCode.L)
@@ -633,6 +759,8 @@ public class MapViewGui extends Application implements Initializable {
                     goUp();
                 else if (keyEvent.getCode() == KeyCode.D)
                     goDown();
+                else if (keyEvent.getCode() == KeyCode.K)
+                    gameController.printAllGovernments();
             }
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -643,8 +771,8 @@ public class MapViewGui extends Application implements Initializable {
         cellPane.setOnDragDetected(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if(mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
-                    if (mouseEvent.getButton() == MouseButton.MIDDLE){
+                if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    if (mouseEvent.getButton() == MouseButton.MIDDLE) {
                         startMoveX = mouseEvent.getX();
                         startMoveY = mouseEvent.getY();
                     }
@@ -668,10 +796,10 @@ public class MapViewGui extends Application implements Initializable {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
-                    if (mouseEvent.getButton() == MouseButton.MIDDLE){
+                    if (mouseEvent.getButton() == MouseButton.MIDDLE) {
                         double deltaX = mouseEvent.getX() - startMoveX;
                         double deltaY = mouseEvent.getY() - startMoveY;
-                        if (deltaX >  CELL_SIZE)
+                        if (deltaX > CELL_SIZE)
                             goLeft();
                         if (deltaX < -1 * CELL_SIZE)
                             goRight();
@@ -683,18 +811,18 @@ public class MapViewGui extends Application implements Initializable {
                     return;
                 }
                 if (selectedExtra != null) {
-                if (isDraggedExtra) {
-                    isDraggedExtra = false;
-                    MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
-                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
-                    if (messages != MapMessages.SUCCESS) {
-                        raiseError(messages);
-                    }else {
-                        raiseError(MapMessages.NULL_MESSAGE);
-                    }
-                    showMap(showingMap);
-                    selectedExtra = null;
-                    return;
+                    if (isDraggedExtra) {
+                        isDraggedExtra = false;
+                        MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                                currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
+                        if (messages != MapMessages.SUCCESS) {
+                            raiseError(messages);
+                        } else {
+                            raiseError(MapMessages.NULL_MESSAGE);
+                        }
+                        showMap(showingMap);
+                        selectedExtra = null;
+                        return;
                     }
                     isDraggedExtra = false;
                     MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
@@ -714,7 +842,7 @@ public class MapViewGui extends Application implements Initializable {
                     updateResourcesBox();
                     selectedBuildingDetails = null;
                 } else if (selectedWorkerDetails != null) {
-                    GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(),1,
+                    GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(), 1,
                             currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1);
                     alert(gameMessage);
@@ -764,13 +892,14 @@ public class MapViewGui extends Application implements Initializable {
     public void gotoXY() {
         Stage goStage = new Stage();
         Pane thisPane = new Pane();
-        Scene scene = new Scene(thisPane,320,200);
+        Scene scene = new Scene(thisPane, 320, 200);
         thisPane.setStyle("-fx-background-color : yellow");
 //        scene.getStylesheets().add(pathCssFile);
         goStage.setScene(scene);
         Spinner<Integer> xSpinner = new Spinner<>();
         Spinner<Integer> ySpinner = new Spinner<>();
-        xSpinner.setMaxWidth(70);ySpinner.setMaxWidth(70);
+        xSpinner.setMaxWidth(70);
+        ySpinner.setMaxWidth(70);
 //        xSpinner.setEditable(false);ySpinner.setEditable(false);
         SpinnerValueFactory<Integer> XFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
                 mapController.getMap().length, mapController.getMap().length / 2);

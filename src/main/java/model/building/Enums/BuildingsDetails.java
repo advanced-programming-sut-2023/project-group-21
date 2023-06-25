@@ -118,6 +118,7 @@ public enum BuildingsDetails {
         return maxHitPoints;
     }
 
+
     public Map<Resource, Integer> getRequiredResource() {
         return requiredResource;
     }

@@ -92,7 +92,10 @@ public class Cell {
         if (extra != null)
             details.append("extra: ").append(extra.getName()).append("\n");
         if (building != null)
-            details.append("Building: ").append(building.getName()).append(" | hitpoint: ").append(building.getHitPoint()).append("\n");
+            details.append("Building: ").append(building.getName()).append(" | hitpoint: ").
+                    append(building.getHitPoint()).append("\n");
+        if (building != null && building.getBuildingsDetails() == BuildingsDetails.HOLD)
+            details.append("government: ").append(building.getGovernment().getLord().getUserName());
         if (!people.isEmpty()) {
 //            details.append("People: ").append("\n");
 //            for (int i = 0; i < people.size(); i++) {
@@ -198,39 +201,44 @@ public class Cell {
     }
 
     public boolean checkCross(char myDirection, Cell anotherCell, char state) {
-
-        if (this.building == null) {
-            return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
-                    && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
-                    groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
-        }
-        //repair
-        if (state == 'n') {
-            if (groundTexture != GroundTexture.SOIL || extra != null)
-                return false;
-                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
-                    return true;
-                return building instanceof Gate && ((Gate) building).checkState();
-        }
-        if (state == 'a') {
-            if (groundTexture != GroundTexture.SOIL || extra != null)
-                return false;
-            if (building != null) {
-                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
-                    return true;
-                return building instanceof Gate && ((Gate) building).checkState();
-            }
-            if (groundTexture != GroundTexture.SOIL || extra != null)
-                return false;
-            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
-                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
-                return true;
-        }
-        if (groundTexture != GroundTexture.SOIL || extra != null)
+        if (this.building != null || extra != null || this.groundTexture != GroundTexture.SOIL) {
+            System.out.println(xCoordinates + ":::::" + yCoordinates);
             return false;
-        return building instanceof Tower
-                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
-                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
+        }
+        return true;//i should fix it
+
+//        if (this.building == null) {
+//            return groundTexture != GroundTexture.PETROL && groundTexture != GroundTexture.BIG_LAKE
+//                    && groundTexture != GroundTexture.ROCK && groundTexture != GroundTexture.SMALL_LAKE &&
+//                    groundTexture != GroundTexture.RIVER && groundTexture != GroundTexture.SEA && extra == null;
+//        }
+//        //repair
+//        if (state == 'n') {
+//            if (groundTexture != GroundTexture.SOIL || extra != null)
+//                return false;
+//                if (building.getBuildingsDetails() == BuildingsDetails.WALL && anotherCell.hasLadder)
+//                    return true;
+//                return building instanceof Gate && ((Gate) building).checkState();
+//        }
+//        if (state == 'a') {
+//            if (groundTexture != GroundTexture.SOIL || extra != null)
+//                return false;
+//            if (building != null) {
+//                if (building.getBuildingsDetails() == BuildingsDetails.WALL)
+//                    return true;
+//                return building instanceof Gate && ((Gate) building).checkState();
+//            }
+//            if (groundTexture != GroundTexture.SOIL || extra != null)
+//                return false;
+//            if ((building.getBuildingsDetails().equals(BuildingsDetails.SQUARE_TOWER) ||
+//                    building.getBuildingsDetails().equals(BuildingsDetails.ROUND_TOWER)))
+//                return true;
+//        }
+//        if (groundTexture != GroundTexture.SOIL || extra != null)
+//            return false;
+//        return building instanceof Tower
+//                && (building.getBuildingsDetails() == BuildingsDetails.SQUARE_TOWER ||
+//                building.getBuildingsDetails() == BuildingsDetails.ROUND_TOWER);
     }
 
     public void putLadder() {

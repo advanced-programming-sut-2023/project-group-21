@@ -47,6 +47,14 @@ public class Government {
         }
     }
 
+    public String showDetails(){
+        StringBuilder builder = new StringBuilder();
+        for (Person worker5:people)
+            if (worker5 instanceof Worker)
+                builder.append(((Worker) worker5).getPosition()).append("  ").append(((Worker) worker5).getName()).append("\n");
+        return builder.toString();
+    }
+
     public User getLord() {
         return lord;
     }

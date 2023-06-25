@@ -202,20 +202,24 @@ public class GameController {
         EuropeanSoldiersDetails europeanSoldiers = EuropeanSoldiersDetails.getDetailsByWorkerDetails(worker);
 //        if (!worker.getTrainerBuilding().equals(selectedBuilding.getBuildingsDetails()))
 //            return GameMessage.NO_SUITABLE_BUILDING;
-        if (!worker.getTrainerBuilding().equals(BuildingsDetails.MERCENARY_POST) && getNumberOfPeasants() < count)
-            return GameMessage.NOT_ENOUGH_PEOPLE;
-        if (worker.getGold() * count >
-                currentGovernment.getResources().get(Resource.GOLD))
-            return GameMessage.MONEY_PROBLEM;
-        if (europeanSoldiers != null) {
-            for (Resource equipment : europeanSoldiers.getEquipments())
-                if (!currentGovernment.getResources().containsKey(equipment) || currentGovernment.getResources().get(equipment) < count)
-                    return GameMessage.NOT_ENOUGH_RESOURCE;
-            for (Resource equipment : europeanSoldiers.getEquipments())
-                currentGovernment.reduceResources(equipment, count);
+        try {
+            if (!worker.getTrainerBuilding().equals(BuildingsDetails.MERCENARY_POST) && getNumberOfPeasants() < count)
+                return GameMessage.NOT_ENOUGH_PEOPLE;
+            if (worker.getGold() * count >
+                    currentGovernment.getResources().get(Resource.GOLD))
+                return GameMessage.MONEY_PROBLEM;
+            if (europeanSoldiers != null) {
+                for (Resource equipment : europeanSoldiers.getEquipments())
+                    if (!currentGovernment.getResources().containsKey(equipment) || currentGovernment.getResources().get(equipment) < count)
+                        return GameMessage.NOT_ENOUGH_RESOURCE;
+                for (Resource equipment : europeanSoldiers.getEquipments())
+                    currentGovernment.reduceResources(equipment, count);
+            }
+            for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(worker, map[x][y]);
+            return GameMessage.SUCCESS;
+        }catch (NullPointerException e){
+            return GameMessage.UNABLE_TO_DROP_BUILDING1;
         }
-        for (int i = 0; i < count; i++) currentGovernment.addTrainedPeople(worker, map[x ][y ]);
-        return GameMessage.SUCCESS;
     }
 
     public int getNumberOfPeasants() {
@@ -423,9 +427,8 @@ public class GameController {
         return engineers;
     }
 
-    public GameMessage disbandUnit() {
+    public void disbandUnit() {
         selectedWorker.setDestination(currentGovernment.getBuildingByName("hold").getCell());
-        return GameMessage.SUCCESS;
     }
 
 
@@ -459,12 +462,8 @@ public class GameController {
         map[x1][y1].setDistanceOfStart(distanceOfStart);
         map[x1][y1].setTotal(total);
         openSet.add(map[x1][y1]);
-        if (opens.get(total) == null) {
-            opens.put(total, new TreeMap<Integer, ArrayList<Cell>>());
-        }
-        if (opens.get(total).get(distanceOfDestination) == null) {
-            opens.get(total).put(distanceOfDestination, new ArrayList<Cell>());
-        }
+        opens.computeIfAbsent(total, k -> new TreeMap<Integer, ArrayList<Cell>>());
+        opens.get(total).computeIfAbsent(distanceOfDestination, k -> new ArrayList<>());
         opens.get(total).get(distanceOfDestination).add(map[x1][y1]);
     }
 
@@ -477,25 +476,26 @@ public class GameController {
         int lastCellX;
         int lastCellY;
         switch (map[x1][y1].getDirection()) {
-            case 'n':
+            case 'n' -> {
                 lastCellY = y1 + 1;
                 lastCellX = x1;
-                break;
-            case 's':
+            }
+            case 's' -> {
                 lastCellY = y1 - 1;
                 lastCellX = x1;
-                break;
-            case 'e':
+            }
+            case 'e' -> {
                 lastCellX = x1 + 1;
                 lastCellY = y1;
-                break;
-            case 'w':
+            }
+            case 'w' -> {
                 lastCellX = x1 - 1;
                 lastCellY = y1;
-                break;
-            default:
+            }
+            default -> {
                 lastCellX = x1;
                 lastCellY = y1;
+            }
         }
         if (!map[x1][y1].checkCross(map[x1][y1].getDirection(), map[lastCellX][lastCellY], state))
             return;
@@ -549,12 +549,11 @@ public class GameController {
             }
         }
         decodePath(x, y);
-        for (int i1 = 0; i1 < map.length; i1++)
+        for (Cell[] cells : map)
             for (int i2 = 0; i2 < map.length; i2++)
-                map[i1][i2].refreshDirection();
-        Iterator<Cell> iterator = closed.iterator();
-        while (iterator.hasNext()) {
-            (iterator.next()).refreshDirection();
+                cells[i2].refreshDirection();
+        for (Cell cell : closed) {
+            cell.refreshDirection();
         }
         for (Map.Entry<Integer, TreeMap<Integer, ArrayList<Cell>>> entry : opens.entrySet()) {
             for (Map.Entry<Integer, ArrayList<Cell>> entry2 : entry.getValue().entrySet()) {
@@ -565,28 +564,27 @@ public class GameController {
         }
     }
 
+    public void printAllGovernments(){
+        for (Government gov: governments)
+            System.out.println(gov.showDetails());
+    }
+
     private void decodePath(int x2, int y2) {
         path = new ArrayList<>();
         if (!checkValidity(y2, y2, x2, y2))
             return;
+        System.out.println("here!!!");
         if (map[x2][y2].getDirection() == 'a')
             return;
+        System.out.println("here!");
         path.add(map[x2][y2]);
         while (map[x2][y2].getDirection() != 'a') {
             char dir = map[x2][y2].getDirection();
             switch (dir) {
-                case 'n':
-                    y2--;
-                    break;
-                case 's':
-                    y2++;
-                    break;
-                case 'w':
-                    x2++;
-                    break;
-                case 'e':
-                    x2--;
-                    break;
+                case 'n' -> y2--;
+                case 's' -> y2++;
+                case 'w' -> x2++;
+                case 'e' -> x2--;
             }
             path.add(map[x2][y2]);
         }
@@ -669,7 +667,6 @@ public class GameController {
     }
 
     private Building findBuilding(Machine machine) {
-        Cell cell = machine.getCell();
         int distance = 10000;
         Building selected = null;
         for (Government government : governments) {
@@ -1020,15 +1017,15 @@ public class GameController {
     public GameMessage openOrCloseGate(String state) {
         if (!(selectedBuilding instanceof Gate)) return GameMessage.NO_SELECTED_BUILDING;
         switch (state) {
-            case "open": {
+            case "open" -> {
                 ((Gate) selectedBuilding).setGate(true);
                 return GameMessage.SUCCESS;
             }
-            case "close": {
+            case "close" -> {
                 ((Gate) selectedBuilding).setGate(false);
                 return GameMessage.SUCCESS;
             }
-            default: {
+            default -> {
                 return GameMessage.INVALID_STATE;
             }
         }
@@ -1066,7 +1063,6 @@ public class GameController {
         }
         if (myMachine == null)
             return GameMessage.UNABLE_TO_MOVE;
-        Cell cell1 = null;
         callOtherFunction(x1 , y1 , x2 , y2 , 'a');
         Machine machine = null;
         for (int i1 = 0; i1 < map[x1 ][y1 ].getMachine().size(); i1++) {

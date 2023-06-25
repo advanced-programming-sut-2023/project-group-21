@@ -10,7 +10,18 @@ public class Worker extends Person {
     private Cell position;
     private Cell destination;
     private Cell firstCell,secondCell;
-    private boolean isPatrolOn = false, isOnTower = false;
+    private boolean isPatrolOn = false;
+    private boolean isOnTower = false;
+
+    public boolean getIsGoingToMoveGui() {
+        return isGoingToMoveGui;
+    }
+
+    public void setGoingToMoveGui(boolean goingToMoveGui) {
+        isGoingToMoveGui = goingToMoveGui;
+    }
+
+    private boolean isGoingToMoveGui = false;
     private Worker enemy;
     private boolean hasLadder = false;
     public boolean getPatrol(){
