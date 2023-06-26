@@ -204,9 +204,10 @@ public class Cell {
 
 //        System.out.println("check cross is called");
         if (this.building != null || extra != null || this.groundTexture != GroundTexture.SOIL) {
-            System.out.println(xCoordinates + ":::::" + yCoordinates);
+//            System.out.println(xCoordinates + " ::::: " + yCoordinates);
             return false;
         }
+//        System.out.println(xCoordinates + " :::::: " + yCoordinates);
         return true;//i should fix it
 
 //        if (this.building == null) {
