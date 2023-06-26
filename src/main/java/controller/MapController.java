@@ -125,6 +125,10 @@ public class MapController {
         return MapMessages.SUCCESS;
     }
 
+    public void removeBuilding(int x,int y){
+        map[x][y].setBuilding(null);
+    }
+
     public MapMessages setTexture(int x1, int x2, int y1, int y2, String type) {
         if (x1 > x2 || y1 > y2) return MapMessages.INVALID_NUMBER;
         if (x1 < 0 || x1 >= map.length || y1 < 0 || y1 > map.length) return MapMessages.OUT_OF_INDEX;
