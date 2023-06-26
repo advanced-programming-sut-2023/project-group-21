@@ -10,6 +10,7 @@
 
    <children>
       <Pane fx:id="cellPane" layoutX="256.0" layoutY="28.0" maxHeight="600.0" maxWidth="600.0" minHeight="600.0" minWidth="600.0" styleClass="mapPane" />
+      <Pane fx:id="miniMap" layoutX="7.0" layoutY="300.0" maxHeight="80" maxWidth="80" minHeight="80" minWidth="80"/>
       <Button layoutX="100.0" layoutY="680.0" mnemonicParsing="false" maxWidth="80" onAction="#back" text="back" />
       <Button layoutX="10.0" layoutY="680.0" mnemonicParsing="false" onAction="#save" maxWidth="80" text="save" />
       <Button layoutX="190.0" layoutY="680.0" onAction="#gotoXY" text="go to" maxWidth="80" textAlignment="CENTER" />

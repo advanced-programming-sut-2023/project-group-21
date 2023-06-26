@@ -6,6 +6,7 @@ import controller.VboxCreator;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,11 +54,12 @@ public class MapViewGui extends Application implements Initializable {
     private static Stage mainWindows;
     private final Label errorLabel = new Label("");
     private double startDragX = 0, startDragY = 0;
-    private int CELL_SIZE = 75;
+    private int CELL_SIZE = 75, MINI_MAP_SIZE = 10;
     @FXML
-    private Pane cellPane;
+    private Pane cellPane, miniMap;
     @FXML
     private AnchorPane mainPane;
+    private AnchorPane anchorPane;
     private ArrayList<Worker> guiWorker;
     private Cell[][] showingMap;
     private int destinationX = 5, destinatioinY = 5;
@@ -83,7 +85,6 @@ public class MapViewGui extends Application implements Initializable {
 
 
     public static boolean isInGame = false;
-    private double cursorX, cursorY;
     private GameController gameController;
     private static GameController staticGameController;
     private BuildingsDetails selectedBuildingDetails;
@@ -123,7 +124,7 @@ public class MapViewGui extends Application implements Initializable {
             gameController = staticGameController;
         this.mainStage = stage;
         try {
-            AnchorPane anchorPane = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
+            anchorPane = FXMLLoader.load(MapController.class.getResource("/FXML/Map.fxml"));
             BackgroundImage myBI = new BackgroundImage(
                     new Image(Objects.requireNonNull(MainMenu.class.getResource("/images/Gamebg.png")).toExternalForm(),
                             1080, 720, false, false),
@@ -227,33 +228,46 @@ public class MapViewGui extends Application implements Initializable {
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setMaxWidth(200);
-        vBox.setTranslateX(30);
-        vBox.setTranslateY(500);
+        vBox.setTranslateX(7);
+        vBox.setTranslateY(580);
         Button foodProcess = new Button("Food Process");
-        foodProcess.setMaxWidth(205);
+        foodProcess.setMaxWidth(100);
+        foodProcess.setMinWidth(100);
         foodProcess.setFont(Font.font(10));
         foodProcess.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.FOOD_PROCESSING_BUILDINGS));
 
         HBox hBox1 = new HBox();
         Button castle = new Button("Castle");
         castle.setFont(Font.font(10));
+        castle.setMaxWidth(100);
+        castle.setMinWidth(100);
         castle.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.CASTLE_BUILDINGS));
         Button farm = new Button("Farm");
+        farm.setMaxWidth(100);
+        farm.setMinWidth(100);
         farm.setFont(Font.font(10));
         farm.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.FARM_BUILDINGS));
         Button industry = new Button("Industry");
         industry.setFont(Font.font(10));
+        industry.setMaxWidth(100);
+        industry.setMinWidth(100);
         industry.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.INDUSTRY_BUILDINGS));
         hBox1.getChildren().addAll(castle, farm, industry);
 
         HBox hBox2 = new HBox();
         Button machine = new Button("Machine");
+        machine.setMaxWidth(100);
+        machine.setMinWidth(100);
         machine.setFont(Font.font(10));
         machine.setOnMouseClicked(mouseEvent -> updateObjectBox(null));
         Button town = new Button("Town");
+        town.setMaxWidth(100);
+        town.setMinWidth(100);
         town.setFont(Font.font(10));
         town.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.TOWN_BUILDING));
         Button weapon = new Button("Weapon");
+        weapon.setMaxWidth(100);
+        weapon.setMinWidth(100);
         weapon.setFont(Font.font(10));
         weapon.setOnMouseClicked(mouseEvent -> updateObjectBox(VboxCreator.WEAPONS_BUILDINGS));
         hBox2.getChildren().addAll(machine, town, weapon);
@@ -267,7 +281,7 @@ public class MapViewGui extends Application implements Initializable {
         resourcesDetails.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
         resourcesDetails.setOpacity(0.7);
         resourcesDetails.setTranslateX(50);
-        resourcesDetails.setTranslateY(200);
+        resourcesDetails.setTranslateY(150);
         resourcesDetails.setPrefWidth(120);
         resourcesDetails.setOrientation(Orientation.VERTICAL);
         resourcesDetails.setDividerPositions(0.2);
@@ -426,6 +440,7 @@ public class MapViewGui extends Application implements Initializable {
             selectedX1 = selectedX2 = (xInt + currentX - 1);
             selectedY1 = selectedY2 = (yInt + currentY - 1);
             showMap(showingMap);
+            miniMap();
             System.out.println("test!");
             return;
         }
@@ -442,6 +457,7 @@ public class MapViewGui extends Application implements Initializable {
         selectedX2 = maxX;
         selectedY2 = maxY;
         showMap(showingMap);
+        miniMap();
     }
 
 
@@ -466,6 +482,7 @@ public class MapViewGui extends Application implements Initializable {
         else
             return;
         showMap(mapController.showMapGui(currentX, currentY));
+        miniMap();
     }
 
     public void goLeft() {
@@ -474,6 +491,7 @@ public class MapViewGui extends Application implements Initializable {
         else
             return;
         showMap(mapController.showMapGui(currentX, currentY));
+        miniMap();
     }
 
     public void zoomIn() {
@@ -498,20 +516,22 @@ public class MapViewGui extends Application implements Initializable {
         showMap(showingMap);
     }
 
-    public void goDown() {
+    public void goUp() {
         if (currentY > 1)
             currentY--;
         else
             return;
         showMap(mapController.showMapGui(currentX, currentY));
+        miniMap();
     }
 
-    public void goUp() {
+    public void goDown() {
         if (currentY < mapController.getMap().length - 8)
             currentY++;
         else
             return;
         showMap(mapController.showMapGui(currentX, currentY));
+        miniMap();
     }
 
 
@@ -636,6 +656,7 @@ public class MapViewGui extends Application implements Initializable {
         updateResourcesBox();
         updateObjectBox(VboxCreator.CASTLE_BUILDINGS);//make it default
         showMap(showingMap);//update map
+        miniMap();
         if (guiWorker != null)
             for (Worker myWorker:guiWorker)
                 myWorker.setGoingToMoveGui(false);
@@ -660,10 +681,7 @@ public class MapViewGui extends Application implements Initializable {
             textureItem[i] = GroundTexture.values()[i].getName();
         if (!isInGame) initExtra();
         else initGame();
-        mainPane.setOnMouseMoved(mouseEvent -> {
-            cursorX = mouseEvent.getX();
-            cursorY = mouseEvent.getY();
-        });
+        miniMap();
         cellPane.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent scrollEvent) {
@@ -680,6 +698,7 @@ public class MapViewGui extends Application implements Initializable {
             @Override
             public void handle(MouseDragEvent mouseDragEvent) {
                 double xPane = mouseDragEvent.getX() - X_CELL_PANE, yPane = mouseDragEvent.getY() - Y_CELL_PANE;
+                System.out.println("coordinates: " + (int) (currentX + xPane / CELL_SIZE - 1) + " : " + (int) (currentY + yPane / CELL_SIZE - 1));
                 if (xPane >= 600 || xPane < 0 || yPane >= 600 || yPane < 0)
                     return;
                 if (!(XFullDrag >= 600 || XFullDrag < 0 || YFullDrag >= 600 || YFullDrag < 0))
@@ -695,6 +714,7 @@ public class MapViewGui extends Application implements Initializable {
                             raiseError(MapMessages.NULL_MESSAGE);
                         }
                         showMap(showingMap);
+                        miniMap();
                         selectedExtra = null;
                         return;
                     }
@@ -705,6 +725,7 @@ public class MapViewGui extends Application implements Initializable {
                         raiseError(messages);
                     }
                     showMap(showingMap);
+                    miniMap();
                     selectedExtra = null;
                     return;
                 } else if (selectedBuildingDetails != null) {
@@ -712,6 +733,7 @@ public class MapViewGui extends Application implements Initializable {
                             currentY + (int) (yPane / CELL_SIZE) - 1, selectedBuildingDetails.getName());
                     alert(gameMessage);
                     showMap(showingMap);
+                    miniMap();
                     updateDetailsBox();
                     updateResourcesBox();
                     selectedBuildingDetails = null;
@@ -725,6 +747,7 @@ public class MapViewGui extends Application implements Initializable {
                     updateResourcesBox();
                     selectedWorkerDetails = null;
                     showMap(showingMap);
+                    miniMap();
                 } else {
                     Cell cell = mapController.getCell(currentX + (int) (xPane / CELL_SIZE) - 1,
                             currentY + (int) (yPane / CELL_SIZE) - 1);
@@ -821,6 +844,7 @@ public class MapViewGui extends Application implements Initializable {
                             raiseError(MapMessages.NULL_MESSAGE);
                         }
                         showMap(showingMap);
+                        miniMap();
                         selectedExtra = null;
                         return;
                     }
@@ -831,6 +855,7 @@ public class MapViewGui extends Application implements Initializable {
                         raiseError(messages);
                     }
                     showMap(showingMap);
+                    miniMap();
                     selectedExtra = null;
                     return;
                 } else if (selectedBuildingDetails != null) {
@@ -838,6 +863,7 @@ public class MapViewGui extends Application implements Initializable {
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails.getName());
                     alert(gameMessage);
                     showMap(showingMap);
+                    miniMap();
                     updateDetailsBox();
                     updateResourcesBox();
                     selectedBuildingDetails = null;
@@ -851,6 +877,7 @@ public class MapViewGui extends Application implements Initializable {
                     updateResourcesBox();
                     selectedWorkerDetails = null;
                     showMap(showingMap);
+                    miniMap();
                 } else {
                     Cell cell = mapController.getCell(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                             currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1);
@@ -917,6 +944,7 @@ public class MapViewGui extends Application implements Initializable {
                 currentX = xSpinner.getValue() - 1;
                 currentY = ySpinner.getValue() - 1;
                 showMap(mapController.showMapGui(xSpinner.getValue() - 1, ySpinner.getValue() - 1));
+                miniMap();
                 goStage.close();
             }
         });
@@ -975,6 +1003,7 @@ public class MapViewGui extends Application implements Initializable {
                     for (int i2 = y1; i2 <= y2; i2++)
                         mapController.clear(i1, i2);
                 showMap(showingMap);
+                miniMap();
                 stage.close();
             }
         });
@@ -986,6 +1015,7 @@ public class MapViewGui extends Application implements Initializable {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 messages = mapController.setTexture(x1, x2, y1, y2, textureBox.getValue());
                 showMap(showingMap);
+                miniMap();
                 if (messages == MapMessages.SUCCESS)
                     stage.close();
                 else {
@@ -1000,11 +1030,28 @@ public class MapViewGui extends Application implements Initializable {
         stage.show();
     }
 
-    public void clear() {
-        for (int i = selectedX1; i < selectedX2; i++)
-            for (int j = selectedY1; j < selectedY2; j++)
-                mapController.clear(i, j);
-        showMap(showingMap);
+    public void miniMap() {
+        if (miniMap != null && miniMap.getChildren() != null) miniMap.getChildren().remove(0, miniMap.getChildren().size());
+        else miniMap = new Pane();
+        int startX = 0, startY = 0, centerX = currentX + 3, centerY = currentY + 3;
+        if (centerX < 10 && centerY < 10);
+        else if (centerX < 10) startY = centerY - 10;
+        else if (centerY < 10) startX = centerX - 10;
+        else if (centerX > 190 && centerY > 190) startY = startX = 180;
+        else if (centerX > 190) {
+            startX = 180;
+            startY = centerY - 10;
+        } else if (centerY > 190) {
+            startX = centerX - 10;
+            startY = 180;
+        } else {
+            startX = centerX - 10;
+            startY = centerY - 10;
+        }
+        for (int i1 = startX, x = 0; i1 < startX + 20; i1++, x++)
+            for (int i2 = startY, y = 0; i2 < startY + 20; i2++, y++) {
+                Label label = mapController.getCell(i1, i2).toLabel(MINI_MAP_SIZE * x, MINI_MAP_SIZE * y, MINI_MAP_SIZE);
+                miniMap.getChildren().add(label);
+            }
     }
-
 }
