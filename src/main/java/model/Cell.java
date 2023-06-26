@@ -201,6 +201,8 @@ public class Cell {
     }
 
     public boolean checkCross(char myDirection, Cell anotherCell, char state) {
+
+//        System.out.println("check cross is called");
         if (this.building != null || extra != null || this.groundTexture != GroundTexture.SOIL) {
             System.out.println(xCoordinates + ":::::" + yCoordinates);
             return false;

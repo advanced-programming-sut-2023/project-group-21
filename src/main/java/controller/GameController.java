@@ -25,6 +25,7 @@ import java.util.*;
 import static java.lang.Math.abs;
 
 public class GameController {
+    private BuildingsDetails copyBuildingDetail;
     private ArrayList<Cell> path = new ArrayList<>();
     private HashSet<Cell> closed = new HashSet<>();
     private TreeMap<Integer, TreeMap<Integer, ArrayList<Cell>>> opens = new TreeMap<>();
@@ -45,6 +46,14 @@ public class GameController {
         this.governments = governments;
         this.map = map;
         this.currentGovernment = governments.get(0);
+    }
+
+    public BuildingsDetails getCopyBuildingDetail() {
+        return copyBuildingDetail;
+    }
+
+    public void setCopyBuildingDetail(BuildingsDetails detail){
+        this.copyBuildingDetail = detail;
     }
 
     public String showFoodList() {
@@ -454,15 +463,15 @@ public class GameController {
     private void checkCell(int x1, int y1, int distanceOfStart, int distanceOfDestination, char dir) {
         if (!checkValidity(x1, y1, x1, y1))
             return;
-        if (closed.contains(map[x1][y1])) {
+        if (closed.contains(map[x1][y1]))
             return;
-        }
+
         map[x1][y1].changeDirection(dir);
         int total = distanceOfStart + distanceOfDestination;
         map[x1][y1].setDistanceOfStart(distanceOfStart);
         map[x1][y1].setTotal(total);
         openSet.add(map[x1][y1]);
-        opens.computeIfAbsent(total, k -> new TreeMap<Integer, ArrayList<Cell>>());
+        opens.computeIfAbsent(total, k -> new TreeMap<>());
         opens.get(total).computeIfAbsent(distanceOfDestination, k -> new ArrayList<>());
         opens.get(total).get(distanceOfDestination).add(map[x1][y1]);
     }
@@ -512,9 +521,9 @@ public class GameController {
         if (opens.get(totalDistance).get(endDistance) == null)
             return;
         checkCell(x1 + 1, y1, distancesOfStart + 1, abs(x1 + 1 - x2) + abs(y1 - y2), 'e');
-        checkCell(x1 , y1, distancesOfStart + 1, abs(x1  - x2) + abs(y1 - y2), 'w');
+        checkCell(x1 -1, y1, distancesOfStart + 1, abs(x1  - x2 -1) + abs(y1 - y2), 'w');
         checkCell(x1, y1 + 1, distancesOfStart + 1, abs(x1 - x2) + abs(y1 + 1 - y2), 'n');
-        checkCell(x1, y1 , distancesOfStart + 1, abs(x1 - x2) + abs(y1  - y2), 'e');
+        checkCell(x1, y1 - 1 , distancesOfStart + 1, abs(x1 - x2) + abs(y1  - y2 -1), 's');
         opens.get(totalDistance).get(endDistance).remove(map[x1][y1]);
     }
 
@@ -523,6 +532,7 @@ public class GameController {
         closed = new HashSet<>();
         checkCell(x1, y1, 0, abs(x1 - x) + abs(y1 - y), 'a');
         while (!opens.isEmpty() && map[x][y].getDirection() == 'a') {
+            System.out.println("program entered the loop!");
             Integer i = opens.firstKey();
             if (i == null)
                 return;
@@ -549,6 +559,7 @@ public class GameController {
             }
         }
         decodePath(x, y);
+
         for (Cell[] cells : map)
             for (int i2 = 0; i2 < map.length; i2++)
                 cells[i2].refreshDirection();

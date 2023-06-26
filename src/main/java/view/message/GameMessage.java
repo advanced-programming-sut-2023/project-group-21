@@ -47,7 +47,12 @@ public enum GameMessage {
     NO_ENGINEERS("no engineers in this place"),
     OCCUPIED("you can't place a building here."),
     ENGINEER_OCCUPIED("this engineer is occupied"),
-    NOT_BELONG_TO_YOU("it component does not belong to you!");
+    NOT_BELONG_TO_YOU("it component does not belong to you!"),
+    UNABLE_TO_COPY("you can only copy one tile!"),
+    NOTHING_TO_COPY("nothing to copy!"),
+    SUCCESS_COPY("successful copy"),
+    NOTHING_TO_PASTE("nothing to paste!"),
+    UNABLE_TO_PASTE("unable to paste!");
     private final String message;
     GameMessage(String message){
         this.message = message;
