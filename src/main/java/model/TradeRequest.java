@@ -1,16 +1,18 @@
 package model;
 
+import controller.TradingController;
 import model.generalenums.Resource;
+import view.message.TradeMenuMessage;
 
 public class TradeRequest {
-    private boolean isDone;
+    public boolean isDone;
     private boolean isBuyRequest;
     private Government sender;
     private Government receiver;
     private int amount;
     private int price;
     private Resource resource;
-    private boolean accepted;
+    public boolean accepted;
     private String status;
 
     public TradeRequest(boolean isBuyRequest, Government sender, Government receiver, int amount, int price, Resource resource) {
@@ -31,14 +33,18 @@ public class TradeRequest {
             return "rejected";
     }
 
-    public void accept() {
+    public TradeMenuMessage accept() {
         accepted=true;
         isDone = true;
+        TradingController tradingController=new TradingController();
+        TradeMenuMessage message= tradingController.accept(this);
+        return message;
     }
 
-    public void reject(){
-        accepted=false;
-        isDone=true;
+    public TradeMenuMessage reject(){
+        TradingController tradingController=new TradingController();
+        TradeMenuMessage message= tradingController.reject(this);
+        return message;
     }
 
     public boolean isAccepted(){ return accepted;}

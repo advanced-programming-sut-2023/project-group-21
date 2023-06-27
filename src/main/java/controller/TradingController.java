@@ -26,10 +26,51 @@ public class TradingController {
             return TradeMenuMessage.NOT_ENOUGH_MONEY;
         if(tradeRequest.getSender().leftStorage(tradeRequest.getResource())<tradeRequest.getAmount())
             return TradeMenuMessage.CAPACITY;
-        tradeRequest.getSender().getResources().replace(Resource.GOLD, tradeRequest.getSender().getResourceAmount(Resource.GOLD) + coinChange);
+        tradeRequest.getSender().reduceResources(Resource.GOLD,coinChange);
         Game.addTradeRequest(tradeRequest);
         return TradeMenuMessage.SUCCESS;
     }
+
+    public TradeMenuMessage accept(TradeRequest tradeRequest) {
+        int coinChange = tradeRequest.getAmount() * tradeRequest.getPrice();
+        if(tradeRequest.isBuyRequest()){
+            if(tradeRequest.getReceiver().getResourceAmount(tradeRequest.getResource())<tradeRequest.getAmount())
+                return TradeMenuMessage.NOT_EXISTENCE_IN_SELLER;
+            tradeRequest.getSender().addToResource(tradeRequest.getResource(),tradeRequest.getAmount());
+            tradeRequest.getReceiver().reduceResources(tradeRequest.getResource(),tradeRequest.getAmount());
+            tradeRequest.getReceiver().addToResource(Resource.GOLD,coinChange);
+            tradeRequest.accepted=true;
+            tradeRequest.isDone=true;
+            return TradeMenuMessage.SUCCESS;
+        }else {
+            if(tradeRequest.getReceiver().getGold()<coinChange)
+                return TradeMenuMessage.NOT_ENOUGH_MONEY;
+            tradeRequest.getSender().addToResource(Resource.GOLD,coinChange);
+            tradeRequest.getReceiver().addToResource(tradeRequest.getResource(),tradeRequest.getAmount());
+            tradeRequest.getReceiver().reduceResources(Resource.GOLD,coinChange);
+            //consider storage
+            tradeRequest.accepted=true;
+            tradeRequest.isDone=true;
+            return TradeMenuMessage.SUCCESS;
+        }
+    }
+
+    public TradeMenuMessage reject(TradeRequest tradeRequest) {
+        int coinChange = tradeRequest.getAmount() * tradeRequest.getPrice();
+        if(tradeRequest.isBuyRequest()){
+            tradeRequest.getSender().addToResource(Resource.GOLD,coinChange);
+            tradeRequest.accepted=false;
+            tradeRequest.isDone=true;
+            return TradeMenuMessage.SUCCESS;
+        }else {
+            tradeRequest.getSender().addToResource(tradeRequest.getResource(),tradeRequest.getAmount());
+            tradeRequest.accepted=false;
+            tradeRequest.isDone=true;
+            return TradeMenuMessage.SUCCESS;
+        }
+    }
+
+
 
 //    public TradeMenuMessage trade(String resourceName, int amount, int price, String message,Government government) {
 //        Government currentGovernment=government;
