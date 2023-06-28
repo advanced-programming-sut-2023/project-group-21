@@ -578,9 +578,10 @@ public class GameController {
         for (Cell[] cells : map)
             for (int i2 = 0; i2 < map.length; i2++)
                 cells[i2].refreshDirection();
-        for (Cell cell : closed) {
+        for (Cell cell : closed)
             cell.refreshDirection();
-        }
+        for (Cell myCell : openSet)
+            myCell.refreshDirection();
         for (Map.Entry<Integer, TreeMap<Integer, ArrayList<Cell>>> entry : opens.entrySet()) {
             for (Map.Entry<Integer, ArrayList<Cell>> entry2 : entry.getValue().entrySet()) {
                 for (int i1 = 0; i1 < entry2.getValue().size(); i1++) {
@@ -597,7 +598,7 @@ public class GameController {
 
     private void decodePath(int x2, int y2) {
         path = new ArrayList<>();
-        if (!checkValidity(y2, y2, x2, y2))
+        if (!checkValidity(x2, y2, x2, y2))
             return;
 //        System.out.println("here!!!");
         if (map[x2][y2].getDirection() == 'a')
