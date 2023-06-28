@@ -29,7 +29,8 @@ public enum BuildingsDetails {
             "/Game Images/Buildings/Castle Buildings/Barracks.png"),
     MERCENARY_POST("mercenary post", BuildingType.TROOP_TRAINER, 25, Map.of(Resource.WOOD, 10),0,
             "/Game Images/Buildings/Castle Buildings/Mercenary Post.png"),
-    ENGINEERS_GUILD("engineers guild", BuildingType.TROOP_TRAINER, 15, Map.of(Resource.WOOD, 10, Resource.GOLD, 100),0,
+    ENGINEERS_GUILD("engineers guild", BuildingType.TROOP_TRAINER, 15, Map.of(Resource.WOOD,
+            10, Resource.GOLD, 100),0,
             "/Game Images/Buildings/Castle Buildings/Engineers' Guild.jpg"),
     TANNERS_GUILD("tanners guild", BuildingType.TROOP_TRAINER, 15, Map.of(Resource.WOOD, 5), 0,
             "/Game Images/Buildings/Castle Buildings/Small GateHouse.png"),
@@ -98,14 +99,16 @@ public enum BuildingsDetails {
     DITCH("ditch", null, -1000, null,0,
             "/Game Images/Buildings/Castle Buildings/Small GateHouse.png");
     public enum BuildingType {
-        PRODUCT_MAKER, GATE, STORAGE, TOWER, TROOP_TRAINER, QUARRY, SIEGE_TENT, STABLE, TRAP, WEAPON_PRODUCTION, OIL_SMELTER, CAGED_WAR_DOGS, RESIDENCY, OX_TETHER
+        PRODUCT_MAKER, GATE, STORAGE, TOWER, TROOP_TRAINER, QUARRY, SIEGE_TENT, STABLE, TRAP, WEAPON_PRODUCTION,
+        OIL_SMELTER, CAGED_WAR_DOGS, RESIDENCY, OX_TETHER
     }
     private final String name, imagePath;
     private final BuildingType buildingType;
     private final int maxHitPoints, workersCount;
     private final Map<Resource, Integer> requiredResource;
 
-    BuildingsDetails(String name, BuildingType buildingType, int maxHitPoints, Map<Resource, Integer> requiredResource, int workersCount, String imagePath) {
+    BuildingsDetails(String name, BuildingType buildingType, int maxHitPoints, Map<Resource, Integer> requiredResource,
+                     int workersCount, String imagePath) {
         this.name = name;
         this.buildingType = buildingType;
         this.maxHitPoints = maxHitPoints;

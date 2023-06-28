@@ -14,7 +14,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.Cell;
@@ -40,15 +39,15 @@ public class ShoppingMenu extends Application {
     private Stage shopStage;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage sStage) throws Exception {
         URL url = StartMenu.class.getResource("/FXML/ShoppingMenu.fxml");
-        pane = FXMLLoader.load(url);
+        if (url != null) {
+            pane = FXMLLoader.load(url);
+        }
         Scene scene=new Scene(pane);
-        shopStage=new Stage();
+        shopStage= sStage;
 
-        Timeline labelsTimeline=new Timeline(new KeyFrame(Duration.millis(100), actionEvent -> {
-            updateLabel();
-        }));
+        Timeline labelsTimeline=new Timeline(new KeyFrame(Duration.millis(100), actionEvent -> updateLabel()));
         labelsTimeline.setCycleCount(-1);
         labelsTimeline.play();
         addPictures();
@@ -79,10 +78,13 @@ public class ShoppingMenu extends Application {
 
         addOffer.setOnMouseClicked(mouseEvent -> {
             TradingMenu tradingMenu=new TradingMenu();
-            Government government=new Government(new User("s","s","s","s","s"),new Cell(20,20));
+            Government government=new Government(new User("s","s","s","s",
+                    "s"),new Cell(20,20));
             tradingMenu.setGovernment(government);
-            tradingMenu.addGovernments(new Government(new User("a","a","a","a","a"),new Cell(10,10)));
-            tradingMenu.addGovernments(new Government(new User("d","d","d","d","d"),new Cell(18,18)));
+            tradingMenu.addGovernments(new Government(new User("a","a","a","a"
+                    ,"a"),new Cell(10,10)));
+            tradingMenu.addGovernments(new Government(new User("d","d","d","d",
+                    "d"),new Cell(18,18)));
             tradingMenu.isAddMenu(true);
             try {
                 tradingMenu.start(shopStage);
@@ -93,10 +95,13 @@ public class ShoppingMenu extends Application {
 
         allOffers.setOnMouseClicked(mouseEvent -> {
             TradingMenu tradingMenu=new TradingMenu();
-            Government government=new Government(new User("s","s","s","s","s"),new Cell(20,20));
+            Government government=new Government(new User("s","s","s","s",
+                    "s"),new Cell(20,20));
             tradingMenu.setGovernment(government);
-            tradingMenu.addGovernments(new Government(new User("a","a","a","a","a"),new Cell(10,10)));
-            tradingMenu.addGovernments(new Government(new User("d","d","d","d","d"),new Cell(18,18)));
+            tradingMenu.addGovernments(new Government(new User("a","a","a","a",
+                    "a"),new Cell(10,10)));
+            tradingMenu.addGovernments(new Government(new User("d","d","d","d"
+                    ,"d"),new Cell(18,18)));
             try {
                 tradingMenu.start(shopStage);
             } catch (Exception e) {
@@ -105,9 +110,7 @@ public class ShoppingMenu extends Application {
         });
 
 
-        increase.setOnMouseClicked(mouseEvent -> {
-            selectedAmount++;
-        });
+        increase.setOnMouseClicked(mouseEvent -> selectedAmount++);
         decrease.setOnMouseClicked(mouseEvent -> {
             if(selectedAmount>1)
                 selectedAmount--;
@@ -204,7 +207,7 @@ public class ShoppingMenu extends Application {
             if(government.getResourceAmount(resource)<0)
                 amount.setText("amount: "+0);
             else
-                amount.setText("amount: "+String.valueOf(government.getResourceAmount(resource)));
+                amount.setText("amount: "+ government.getResourceAmount(resource));
             sellPrice.setText("sell price: "+resource.getCostSell());
             buyPrice.setText("buy price: "+resource.getCostBuy());
             goldAmount.setText("gold: "+government.getGold());

@@ -6,6 +6,9 @@ import controller.VboxCreator;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.collections.MapChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -27,6 +30,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import model.Cell;
 import model.Government;
@@ -55,7 +59,8 @@ public class MapViewGui extends Application implements Initializable {
     private String[] textureItem;
     private final Label errorLabel = new Label("");
     private double startDragX = 0, startDragY = 0;
-    private int CELL_SIZE = 75, MINI_MAP_SIZE = 10;
+    private int CELL_SIZE = 75;
+    private final int MINI_MAP_SIZE = 10;
     @FXML
     private Pane cellPane, miniMap;
     @FXML
@@ -138,6 +143,23 @@ public class MapViewGui extends Application implements Initializable {
         }
     }
 
+    private void startShop(){
+        if (!isInGame)
+            return;
+        ShoppingMenu shoppingMenu=new ShoppingMenu();
+        shoppingMenu.setGovernment(gameController.getCurrentGovernment());
+        try {
+            Stage shoppingStage = new Stage();
+            shoppingStage.setOnCloseRequest(windowEvent -> {
+                updateDetailsBox();
+                updateResourcesBox();
+            });
+            shoppingMenu.start(shoppingStage);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void showMap(Cell[][] myMap) {
         showingMap = myMap;
         if (cellPane.getChildren().size() > 1)
@@ -151,9 +173,9 @@ public class MapViewGui extends Application implements Initializable {
                     label.setOpacity(0.4);
                 }
                 int finalI1 = i2;
+
                 label.setOnMouseClicked(mouseEvent -> {
                     if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                        System.out.println("click on sec");
                         isDraggedExtra = false;
                         if (!isInGame) {
                             if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
@@ -167,6 +189,7 @@ public class MapViewGui extends Application implements Initializable {
                         }
                     }
                 });
+
                 label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1, currentY + i2)));
 
                 cellPane.getChildren().add(label);
@@ -771,6 +794,8 @@ public class MapViewGui extends Application implements Initializable {
                 pasteBuilding();
             else if (keyEvent.getCode() == KeyCode.T)
                 showTaxStage();
+            else if (keyEvent.getCode() == KeyCode.Y)
+                startShop();
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         if (!mapController.isInitState())
@@ -923,11 +948,11 @@ public class MapViewGui extends Application implements Initializable {
         paneFear.getChildren().add(fearRateSlide);
         paneTax.getChildren().add(taxSpinner);
 
-        fearRateSlide.getProperties().addListener((InvalidationListener) observable ->
+        fearRateSlide.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) observable ->
                 ((Label)paneFear.getChildren().get(0)).setText("fear rate: "+(int)fearRateSlide.getValue()));
-        taxSpinner.getProperties().addListener((InvalidationListener) observable ->
+        taxSpinner.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) observable ->
                 ((Label)paneTax.getChildren().get(0)).setText("tax rate : " + taxSpinner.getValue()));
-        foodSpinner.getProperties().addListener((InvalidationListener) observable ->
+        foodSpinner.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) observable ->
                 ((Label)paneFood.getChildren().get(0)).setText("food rate : " + foodSpinner.getValue()));
 
         Button closeButton = new Button("save");
@@ -959,9 +984,9 @@ public class MapViewGui extends Application implements Initializable {
         iv.setFitHeight(20);
         Pane pane = new Pane(label,iv);
         if (type.equals("food"))
-            pane.setStyle("-fx-background-color: green");
+            pane.setStyle("-fx-background-color: green;");
         else
-            pane.setStyle("-fx-background-color: red");
+            pane.setStyle("-fx-background-color: red;");
 
         pane.relocate(20,Y);
         pane.setMinWidth(260);
@@ -974,7 +999,7 @@ public class MapViewGui extends Application implements Initializable {
         text.setFill(Color.RED);
         text.setFont(Font.font(20));
         mainPane.getChildren().add(text);
-        new Timeline(new KeyFrame(Duration.millis(1000),
+        new Timeline(new KeyFrame(Duration.millis(2000),
                 actionEvent -> mainPane.getChildren().remove(text))).play();
     }
 
