@@ -1,9 +1,12 @@
 package view;
 
 import controller.TradeController;
-import model.Game;
-import model.Government;
-import model.Trade;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import model.*;
+import model.generalenums.MessageEnum;
 import view.commands.TradeCommand;
 import view.message.TradeMenuMessage;
 
@@ -70,4 +73,21 @@ public class TradeMenu {
         System.out.print(show);
     }
 
+    public static class Test extends Application {
+        Message message = new Message("ali","this is only for test", MessageEnum.ROOM);
+
+        public static void main(String[] args) {
+            launch(args);
+        }
+
+        @Override
+        public void start(Stage primaryStage) {
+            MessageGui messageGui = new MessageGui(message);
+            Pane pane = new Pane();
+            pane.getChildren().add(messageGui.getPane());
+            Scene scene = new Scene(pane);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }
+    }
 }
