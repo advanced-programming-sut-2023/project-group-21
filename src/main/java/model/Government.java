@@ -224,6 +224,19 @@ public class Government {
         resources.put(Resource.GOLD, newGoldAmount);
     }
 
+    public void acceptSellSuccessfully(TradeRequest trade) {
+        int newGoldAmount = resources.get(Resource.GOLD) - trade.getAmount() * trade.getPrice();
+        resources.put(Resource.GOLD, newGoldAmount);
+    }
+
+    public void acceptBuySuccessfully(TradeRequest trade) {
+        if (resources.containsKey(trade.getResource())) {
+            resources.put(trade.getResource(), resources.get(trade.getResource()) + trade.getAmount());
+        }
+        int newGoldAmount = resources.get(Resource.GOLD) - trade.getAmount() * trade.getPrice();
+        resources.put(Resource.GOLD, newGoldAmount);
+    }
+
     public int getGold() {
         if (resources.get(Resource.GOLD) == null) return 0;
         return resources.get(Resource.GOLD);

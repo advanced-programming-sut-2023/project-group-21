@@ -49,7 +49,10 @@ public class TradingMenu extends Application {
     private int selectedPrice;
     private Label errorLabel;
     private ArrayList<Label> receivedRequestLabels=new ArrayList<>();
-
+    private TradeRequest currentTradeRequest;
+    private Button acceptTradeButton=new Button("accept");
+    private Button rejectTradeButton=new Button("reject");
+    private Label selectError=new Label();
     @Override
     public void start(Stage passedStage) throws Exception {
         URL url = StartMenu.class.getResource("/FXML/TradingMenu.fxml");
@@ -88,6 +91,47 @@ public class TradingMenu extends Application {
         Game.addTradeRequest(new TradeRequest(true,new Government(user1,new Cell(10,10)),traderGovernment,5,4,Resource.BOW));
         addReceivedOffers(getReceivedOffers(traderGovernment));
         addSentOffers(getSentOffers(traderGovernment));
+        addControlButtons();
+    }
+
+    private void addControlButtons() {
+        acceptTradeButton.relocate(100,80);
+        rejectTradeButton.relocate(180,80);
+        selectError.setId("error");
+        selectError.relocate(280,80);
+
+            acceptTradeButton.setOnMouseClicked(mouseEvent -> {
+                if(currentTradeRequest!=null) {
+                    if (!currentTradeRequest.getStatus().equals("unchecked")) {
+                        selectError.setText("select an unchecked offer");
+                    } else {
+                        selectError.setText(currentTradeRequest.accept().toString());
+                    }
+                }else {
+                    selectError.setText("select an offer");
+                    if (!pane.getChildren().contains(selectError))
+                        pane.getChildren().add(selectError);
+                }
+                if (!pane.getChildren().contains(selectError))
+                    pane.getChildren().add(selectError);
+            });
+            rejectTradeButton.setOnMouseClicked(mouseEvent -> {
+                if(currentTradeRequest!=null) {
+                    if (!currentTradeRequest.getStatus().equals("unchecked")) {
+                        selectError.setText("select an unchecked offer");
+                    } else {
+                        selectError.setText(currentTradeRequest.reject().toString());
+                    }
+                }else {
+                    selectError.setText("select an offer");
+                    if (!pane.getChildren().contains(selectError))
+                        pane.getChildren().add(selectError);
+                }
+                if (!pane.getChildren().contains(selectError))
+                    pane.getChildren().add(selectError);
+            });
+
+        pane.getChildren().addAll(acceptTradeButton,rejectTradeButton);
     }
 
     private ArrayList<TradeRequest> getReceivedOffers(Government traderGovernment) {
@@ -113,7 +157,7 @@ public class TradingMenu extends Application {
         title.setId("title2");
         title.relocate(190,40);
         Line separator=new Line(400,60,400,470);
-
+        ArrayList<Label> allLabels=new ArrayList<>();
 
         ScrollPane scrollPane=new ScrollPane();
         scrollPane.setPrefSize(320,340);
@@ -125,10 +169,20 @@ public class TradingMenu extends Application {
                 type="sell";
             else
                 type="buy";
-            Label requestLabel=new Label(request.getSender().getLord().getUserName()+" | "+request.getAmount()+" | "+request.getPrice()+ " | " +type+" | "+request.getStatus());
+            Label requestLabel=new Label(request.getSender().getLord().getUserName()+" | "+request.getResource().getName() +" | "+request.getAmount()+" | "+request.getPrice()+ " | " +type+" | "+request.getStatus());
             requestLabel.setId("showOffers");
+            allLabels.add(requestLabel);
             receivedRequestLabels.add(requestLabel);
             vBox.getChildren().add(requestLabel);
+            if(request.getStatus().equals("unchecked")){
+                requestLabel.setOnMouseClicked(mouseEvent -> {
+                    for (Label label : allLabels) {
+                        label.setTextFill(Color.BLACK);
+                    }
+                    requestLabel.setTextFill(Color.RED);
+                    currentTradeRequest=request;
+                });
+            }
         }
         scrollPane.setContent(vBox);
 
