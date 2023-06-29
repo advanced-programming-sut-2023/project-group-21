@@ -1,7 +1,20 @@
 package model;
 
+import model.generalenums.MessageEnum;
+
+import java.util.ArrayList;
+
 public class User {
     String userName, password, nickName, email, slogan, passwordRecoveryAnswer,pictureName;
+    private final ArrayList<Chat> chats = new ArrayList<>();
+
+    public ArrayList<Chat> getChats() {
+        return chats;
+    }
+
+    public void addChat(Chat chat){
+        chats.add(chat);
+    }
 
     public User(String userName, String password, String nickName, String email, String slogan) {
         this.userName = userName;
@@ -10,6 +23,8 @@ public class User {
         this.email = email;
         this.slogan = slogan;
         pictureName="pic1.jpg";
+        Chat chat = new Chat(this, MessageEnum.PRIVATE_CHAT);
+        chats.add(chat);
     }
 
     public String getPasswordRecoveryAnswer() {

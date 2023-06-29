@@ -75,4 +75,11 @@ public class TradeRequest {
     public Resource getResource() {
         return resource;
     }
+
+    public static class Messenger {
+        private final User user;
+        public Messenger(User user){
+            this.user = user;
+        }
+    }
 }

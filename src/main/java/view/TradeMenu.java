@@ -82,7 +82,7 @@ public class TradeMenu {
 
         @Override
         public void start(Stage primaryStage) {
-            MessageGui messageGui = new MessageGui(message);
+            MessageGui messageGui = new MessageGui(message,true);
             Pane pane = new Pane();
             pane.getChildren().add(messageGui.getPane());
             Scene scene = new Scene(pane);
