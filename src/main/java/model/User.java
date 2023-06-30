@@ -4,8 +4,11 @@ import model.generalenums.MessageEnum;
 
 import java.util.ArrayList;
 
-public class User {
-    String userName, password, nickName, email, slogan, passwordRecoveryAnswer,pictureName;
+public class User implements Comparable<User>{
+    private String userName, password, nickName, email, slogan, passwordRecoveryAnswer,pictureName;
+    private Integer score;
+    private Boolean isOnline;
+    private int ranking;
     private final ArrayList<Chat> chats = new ArrayList<>();
 
     public ArrayList<Chat> getChats() {
@@ -16,12 +19,14 @@ public class User {
         chats.add(chat);
     }
 
-    public User(String userName, String password, String nickName, String email, String slogan) {
+    public User(String userName, String password, String nickName, String email, String slogan,int score) {
         this.userName = userName;
         this.password = password;
         this.nickName = nickName;
         this.email = email;
         this.slogan = slogan;
+        this.score=score;
+        this.isOnline=false;
         pictureName="pic1.jpg";
         Chat chat = new Chat(this, MessageEnum.PRIVATE_CHAT);
         chats.add(chat);
@@ -81,5 +86,39 @@ public class User {
 
     public void setPictureName(String pictureName) {
         this.pictureName = pictureName;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public boolean getIsOnline() {
+        return isOnline;
+    }
+
+    public void setIsOnline(boolean online) {
+        isOnline = online;
+    }
+
+
+
+    @Override
+    public int compareTo(User user) {
+        if (user.getScore() >= this.score) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public void setRanking(int ranking) {
+        this.ranking = ranking;
+    }
+
+    public int getRanking() {
+        return ranking;
     }
 }

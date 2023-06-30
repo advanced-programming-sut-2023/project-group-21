@@ -105,10 +105,22 @@ public class FileController {
             if (tempObject.get("username").equals(username)) {
                 return (new User((String) tempObject.get("username"), (String) tempObject.get("password"),
                         (String) tempObject.get("nickname"), (String) tempObject.get("email"),
-                        (String) tempObject.get("slogan")));
+                        (String) tempObject.get("slogan"),((Long) tempObject.get("score")).intValue()));
             }
         }
         return null;
+    }
+
+    public static ArrayList<User> getAllUsers() {
+        JSONObject tempObject;
+        ArrayList<User> users=new ArrayList<>();
+        for (Object allUser : allUsers) {
+            tempObject = (JSONObject) allUser;
+                users.add(new User((String) tempObject.get("username"), (String) tempObject.get("password"),
+                        (String) tempObject.get("nickname"), (String) tempObject.get("email"),
+                        (String) tempObject.get("slogan"),((Long) tempObject.get("score")).intValue()));
+        }
+        return users;
     }
 
     public static boolean checkExistenceOfUserOrEmail(String info, boolean flag) {//true -->check username

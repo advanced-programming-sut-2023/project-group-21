@@ -5,13 +5,18 @@ import controller.OtherController;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -19,6 +24,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.User;
+import model.*;
 import view.commands.CheckValidion;
 
 import java.io.File;
@@ -27,12 +33,6 @@ import java.nio.file.Files;
 import java.time.Duration;
 
 public class Profile extends Application {
-//    private final MainMenu mainMenu;
-//
-//    public Profile(MainMenu mainMenu) {
-//        this.mainMenu=mainMenu;
-//    }
-
     private Pane mainPane;
 
     private User user;
@@ -52,6 +52,7 @@ public class Profile extends Application {
         addBackButton();
         addAvatar(user.getPictureName());
 
+
         Scene scene = new Scene(mainPane);
         stage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
         stage.setTitle("Stronghold");
@@ -59,15 +60,52 @@ public class Profile extends Application {
     }
 
     private void addLeaderboard() {
-        Button leaderboardButton = new Button("back");
-        //behaviour
-        leaderboardButton.relocate(320, 400);
+        Button leaderboardButton = new Button("leaderBoard");
+
+        leaderboardButton.setOnMouseClicked(mouseEvent -> {
+            Stage boardStage=new Stage();
+
+            TableView table = new TableView<User>();
+
+
+            TableColumn nameColumn = new TableColumn<User, String>("userName");
+            nameColumn.cellFactoryProperty();
+            nameColumn.setCellValueFactory(new PropertyValueFactory<User, String>("userName"));
+            TableColumn scoreColumn = new TableColumn<User, Integer>("score");
+            scoreColumn.cellFactoryProperty();
+            scoreColumn.setCellValueFactory(new PropertyValueFactory<User, Integer>("score"));
+            TableColumn timeColumn = new TableColumn<User, Boolean>("isOnline");
+            timeColumn.cellFactoryProperty();
+            timeColumn.setCellValueFactory(new PropertyValueFactory<User, Boolean>("isOnline"));
+            table.getColumns().addAll(nameColumn, scoreColumn, timeColumn);
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+            FileController.getAllUsers().sort(User::compareTo);
+            ObservableList<User> users= FXCollections.observableArrayList(FileController.getAllUsers());
+
+            table.setItems(users);
+            scoreColumn.setSortType(TableColumn.SortType.DESCENDING);
+            table.getSortOrder().add(scoreColumn);
+            table.prefHeightProperty().bind(boardStage.heightProperty());
+            table.prefWidthProperty().bind(boardStage.widthProperty());
+
+            Pane boardPane=new Pane(table);
+            Scene boardScene=new Scene(boardPane);
+            boardStage.setScene(boardScene);
+            boardStage.setWidth(400);
+            boardStage.setHeight(300);
+            boardStage.getIcons().add(new Image(StartMenu.class.getResourceAsStream("/images/logo.png")));
+            boardStage.setTitle("Leaderboard");
+            boardStage.show();
+        });
+
+        leaderboardButton.relocate(380, 400);
         mainPane.getChildren().add(leaderboardButton);
     }
 
     private void addSlogan() {
         Label sloganLabel = new Label(user.getSlogan());
-        sloganLabel.relocate(900, 220);
+        sloganLabel.relocate(820, 220);
         sloganLabel.setFont(Font.font(50));
         mainPane.getChildren().add(sloganLabel);
         sloganLabel.setOnMouseClicked(mouseEvent -> {
@@ -93,6 +131,8 @@ public class Profile extends Application {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 stage.close();
                 user.setSlogan(sloganField.getText());
+                if(sloganField.getText().isEmpty())
+                    user.setSlogan("slogan is empty");
                 Profile profile = new Profile();
                 profile.setUser(user);
                 try {
@@ -103,6 +143,8 @@ public class Profile extends Application {
                 }
             }
         });
+
+
 
         pane.getChildren().addAll(sloganField, newSlogan, saveButton);
         stage.setScene(scene);
@@ -274,10 +316,11 @@ public class Profile extends Application {
         newPasswordField.textProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                if (!CheckValidion.check(newPasswordField.getText(), CheckValidion.CHECK_PASSWORD)) {
+                //if (!CheckValidion.check(newPasswordField.getText(), CheckValidion.CHECK_PASSWORD)) {
                     if (!pane.getChildren().contains(error))
                         pane.getChildren().add(error);
-                } else if (pane.getChildren().contains(error))
+                //}
+                else if (pane.getChildren().contains(error))
                     pane.getChildren().remove(error);
             }
         });

@@ -83,8 +83,8 @@ public class TradingMenu extends Application {
     }
 
     private void showAllOffers() {
-        User user1=new User("a","a","a","a","a");
-        User user2=new User("s","s","s","s","s");
+        User user1=new User("a","a","a","a","a",0);
+        User user2=new User("s","s","s","s","s",0);
         Game.addTradeRequest(new TradeRequest(false,traderGovernment,new Government(user1,new Cell(10,10)),5,4,Resource.BOW));
         Game.addTradeRequest(new TradeRequest(true,traderGovernment,new Government(user2,new Cell(10,10)),5,4,Resource.BOW));
         Game.addTradeRequest(new TradeRequest(false,new Government(user2,new Cell(10,10)),traderGovernment,5,4,Resource.BOW));

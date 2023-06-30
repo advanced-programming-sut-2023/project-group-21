@@ -34,7 +34,7 @@ public class SignUpController {
             String answer) {
         password = FileController.encode(password);
         answer = FileController.encode(answer);
-        User user = new User(username, password, nickname, email, slogan);
+        User user = new User(username, password, nickname, email, slogan,0);
         FileController.addUserToFile(username,password,email,nickname,slogan,number,answer);
         return user;
     }

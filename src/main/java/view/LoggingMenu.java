@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import model.Game;
 import model.User;
+import model.building.SiegeTent;
 import view.commands.CheckValidion;
 
 import java.net.URL;
@@ -27,6 +28,7 @@ public class LoggingMenu extends Application {
     private TextField passwordShow;
     private Hyperlink forgotPassword;
     private StartingMenu startingMenu;
+    private String changedPassword;
 
     public void setStartingMenu(StartingMenu startingMenu) {
         this.startingMenu = startingMenu;
@@ -81,8 +83,7 @@ public class LoggingMenu extends Application {
                 if (FileController.getUserByUsername(usernameField.getText()) != null) {
                     User user;
                     user = FileController.getUserByUsername(usernameField.getText());
-                    if (user != null && FileController.getUserByUsername(usernameField.getText()).getPassword().
-                            equals(passwordField.getText())) {
+                    if (user != null && (user.getPassword().equals(passwordField.getText())||passwordField.getText().equals(changedPassword))) {
                         MainMenu mainMenu = new MainMenu();
                         mainMenu.setUser(user);
                         mainMenu.setLoggingMenu(this);
@@ -169,23 +170,30 @@ public class LoggingMenu extends Application {
 
         saveButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                passwordField.textProperty().addListener(new InvalidationListener() {
-                    @Override
-                    public void invalidated(Observable observable) {
-                        if (!CheckValidion.check(passwordField.getText(), CheckValidion.CHECK_PASSWORD)) {
-                            if (!pane.getChildren().contains(weakPasswordError)) {
-                                pane.getChildren().add(weakPasswordError);
-                            }
-                        } else if (pane.getChildren().contains(weakPasswordError)) {
-                            pane.getChildren().remove(weakPasswordError);
+                if (CheckValidion.check(passwordField.getText(), CheckValidion.CHECK_PASSWORD)) {
                             FileController.getUserByUsername(usernameField.getText()).setPassword(passwordField.getText());
+                            changedPassword=passwordField.getText();
                             stage.close();
-                        }
-                    }
-                });
+                }
             }
         });
 
+
+        passwordField.textProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if (!CheckValidion.check(passwordField.getText(), CheckValidion.CHECK_PASSWORD)) {
+                    if (!pane.getChildren().contains(weakPasswordError)) {
+                        pane.getChildren().add(weakPasswordError);
+                    }
+                } else {
+                    if (pane.getChildren().contains(weakPasswordError))
+                        pane.getChildren().remove(weakPasswordError);
+//                            FileController.getUserByUsername(usernameField.getText()).setPassword(passwordField.getText());
+//                            stage.close();
+                }
+            }
+        });
 
     }
 
