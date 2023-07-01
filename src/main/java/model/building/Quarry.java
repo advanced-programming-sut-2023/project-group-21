@@ -1,9 +1,8 @@
 package model.building;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
-import model.building.Enums.ProductMakerDetails;
 import model.human.Person;
 
 import java.util.ArrayList;

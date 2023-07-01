@@ -7,4 +7,7 @@ module StrongHold2 {
 
     opens view to javafx.fxml;
     exports view;
+    exports ServerConnection;
+    exports controller;
+    exports model;
 }

@@ -1,8 +1,8 @@
 package view;
 
 import controller.MapController;
-import model.Cell;
-import model.User;
+import ServerConnection.Cell;
+import ServerConnection.User;
 import view.commands.MapCommand;
 import view.message.MapMessages;
 

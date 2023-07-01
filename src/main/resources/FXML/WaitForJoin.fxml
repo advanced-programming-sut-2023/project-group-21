@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.WaitForJoinMenu"
+            prefHeight="720.0" prefWidth="1080.0">
+    <top>
+        <HBox alignment="CENTER">
+            <Text text="Waiting For Others to Join Your Game" textAlignment="CENTER" fill="cadetblue"/>
+        </HBox>
+    </top>
+
+</BorderPane>

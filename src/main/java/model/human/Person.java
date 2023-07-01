@@ -3,7 +3,9 @@ package model.human;
 import model.Government;
 import model.building.Building;
 
-public class Person {
+import java.io.Serializable;
+
+public class Person implements Serializable {
     int hitPoint = 15;
     Government government;
     Building workPlace = null;

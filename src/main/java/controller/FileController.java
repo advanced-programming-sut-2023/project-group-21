@@ -1,10 +1,11 @@
 package controller;
 
-import model.User;
+import ServerConnection.User;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import view.StartingMenu;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,10 +27,8 @@ public class FileController {
             Object temp = jp.parse(fileReader);
             allUsers = (JSONArray) temp;
             fileReader.close();
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             System.out.println(e.getMessage());
-        } catch (ParseException p) {
-            System.out.println(p.getMessage());
         }
     }
 
@@ -111,21 +110,26 @@ public class FileController {
         return null;
     }
 
-    public static boolean checkExistenceOfUserOrEmail(String info, boolean flag) {//true -->check username
-        if (flag) {
-            for (Object allUser : allUsers) {
-                JSONObject jsonObject = (JSONObject) allUser;
-                if (jsonObject.get("username").equals(info))
-                    return true;
-            }
-            return false;
-        }
-        for (Object allUser : allUsers) {
-            JSONObject jsonObject = (JSONObject) allUser;
-            if (jsonObject.get("email").equals(info))
-                return true;
-        }
-        return false;
+    public static boolean checkExistenceOfUserOrEmail(String info, boolean flag) throws IOException, InterruptedException, ClassNotFoundException {//true -->check username
+//        if (flag) {
+//            for (Object allUser : allUsers) {
+//                JSONObject jsonObject = (JSONObject) allUser;
+//                if (jsonObject.get("username").equals(info))
+//                    return true;
+//            }
+//            return false;
+//        }
+//        for (Object allUser : allUsers) {
+//            JSONObject jsonObject = (JSONObject) allUser;
+//            if (jsonObject.get("email").equals(info))
+//                return true;
+//        }
+//        return false;
+        int i = 0;
+        if (flag) i = 1;
+        StartingMenu.getDOut().writeObject("exist " + info + " " + i);
+        Thread.sleep(50);
+        return (boolean) StartingMenu.getDIn().readObject();
     }
 
     public static void changeStayed(String username) {
@@ -251,7 +255,7 @@ public class FileController {
                 }
         }
     }
-    public static String suggestUsername(String username) {
+    public static String suggestUsername(String username) throws IOException, InterruptedException, ClassNotFoundException {
         if (!checkExistenceOfUserOrEmail(username, true))
             return username;
         for (int i1 = 0; i1 < 100; i1++) {

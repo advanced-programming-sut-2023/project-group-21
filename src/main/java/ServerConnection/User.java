@@ -1,6 +1,8 @@
-package model;
+package ServerConnection;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     String userName, password, nickName, email, slogan, passwordRecoveryAnswer,pictureName;
 
     public User(String userName, String password, String nickName, String email, String slogan) {

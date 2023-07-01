@@ -8,7 +8,6 @@ import javafx.beans.Observable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
@@ -18,13 +17,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.User;
+import ServerConnection.User;
 import view.commands.CheckValidion;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.time.Duration;
 
 public class Profile extends Application {
 //    private final MainMenu mainMenu;
@@ -160,20 +159,24 @@ public class Profile extends Application {
 
         saveButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                if (!FileController.checkExistenceOfUserOrEmail(emailField.getText(), false)) {
-                    saveError.setText("existed email");
-                    stage.close();
-                    user.setEmail(emailField.getText());
-                    Profile profile = new Profile();
-                    profile.setUser(user);
-                    try {
-                        profile.start(StartingMenu.mainStage);
-                        successPopUp("email");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } else if (!pane.getChildren().contains(saveError))
-                    pane.getChildren().add(saveError);
+                try {
+                    if (!FileController.checkExistenceOfUserOrEmail(emailField.getText(), false)) {
+                        saveError.setText("existed email");
+                        stage.close();
+                        user.setEmail(emailField.getText());
+                        Profile profile = new Profile();
+                        profile.setUser(user);
+                        try {
+                            profile.start(StartingMenu.mainStage);
+                            successPopUp("email");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (!pane.getChildren().contains(saveError))
+                        pane.getChildren().add(saveError);
+                } catch (IOException | InterruptedException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -362,30 +365,42 @@ public class Profile extends Application {
         usernameTextField.textProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                if (!CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) || FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
-                    updateUsernameError(userNameError, usernameTextField.getText());
-                    if (!pane.getChildren().contains(userNameError)) {
-                        pane.getChildren().add(userNameError);
+                try {
+                    if (!CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) || FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
+                        updateUsernameError(userNameError, usernameTextField.getText());
+                        if (!pane.getChildren().contains(userNameError)) {
+                            pane.getChildren().add(userNameError);
+                        }
+                    } else if (pane.getChildren().contains(userNameError)) {
+                        pane.getChildren().remove(userNameError);
                     }
-                } else if (pane.getChildren().contains(userNameError)) {
-                    pane.getChildren().remove(userNameError);
+                } catch (IOException | InterruptedException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
 
         saveButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                if (CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) && !FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
-                    user.setUserName(usernameTextField.getText());
-                    stage.close();
-                    Profile profile = new Profile();
-                    profile.setUser(user);
-                    try {
-                        profile.start(StartingMenu.mainStage);
-                        successPopUp("username");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+                try {
+                    if (CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) && !FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
+                        user.setUserName(usernameTextField.getText());
+                        stage.close();
+                        Profile profile = new Profile();
+                        profile.setUser(user);
+                        try {
+                            profile.start(StartingMenu.mainStage);
+                            successPopUp("username");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -521,7 +536,7 @@ public class Profile extends Application {
         stage.show();
     }
 
-    private void updateUsernameError(Label label, String username) {
+    private void updateUsernameError(Label label, String username) throws IOException, InterruptedException, ClassNotFoundException {
         if (FileController.checkExistenceOfUserOrEmail(username, true))
             label.setText("The username exists");
         else

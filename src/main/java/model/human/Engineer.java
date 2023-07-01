@@ -1,6 +1,6 @@
 package model.human;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.building.Building;
 import model.human.Enums.WorkerDetails;

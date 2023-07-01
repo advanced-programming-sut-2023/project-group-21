@@ -1,4 +1,4 @@
-package model;
+package ServerConnection;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -7,8 +7,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
-import model.building.Gate;
-import model.building.Tower;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
 import model.human.Person;
@@ -16,9 +14,10 @@ import model.human.Worker;
 import model.machine.Machine;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Cell {
+public class Cell implements Serializable {
     private GroundTexture groundTexture = GroundTexture.SOIL;
     private int distanceOfStart = 0;
     private int distanceOfDestination = 0;

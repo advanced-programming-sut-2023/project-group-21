@@ -1,5 +1,7 @@
 package model;
 
+import ServerConnection.Cell;
+import ServerConnection.User;
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.building.Residency;
@@ -13,13 +15,14 @@ import model.human.Person;
 import model.human.Worker;
 import model.machine.Machine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Math.min;
 
-public class Government {
+public class Government implements Serializable {
     private final User lord;
     private int foodRate, taxRate, fearRate, popularityRate = 0, religionRate = 0, foodVariety = 0;
     private ArrayList<Building> buildings = new ArrayList<>();
@@ -29,7 +32,7 @@ public class Government {
     private final Building hold;
     private final ArrayList<Trade> trades = new ArrayList<>();
 
-    public Government(User lord,Cell cell) {
+    public Government(User lord, Cell cell) {
         Worker myLord = new Worker(WorkerDetails.LORD,this,cell,cell);
         people.add(myLord);
         cell.setExtras(null);

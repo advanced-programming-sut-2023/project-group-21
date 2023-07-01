@@ -1,15 +1,16 @@
 package model.building;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.generalenums.Resource;
 import model.building.Enums.BuildingsDetails;
 import model.human.Person;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Building {
+public class Building implements Serializable {
     private final Government government;
     private final BuildingsDetails buildingsDetails;
     private int hitPoint;

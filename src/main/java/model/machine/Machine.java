@@ -1,9 +1,8 @@
 package model.machine;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.human.Engineer;
-import model.human.Enums.WorkerDetails;
 
 import java.util.ArrayList;
 

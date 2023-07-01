@@ -1,10 +1,12 @@
 package model.human;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.human.Enums.WorkerDetails;
 
-public class Worker extends Person {
+import java.io.Serializable;
+
+public class Worker extends Person implements Serializable {
     private String state;
     private final WorkerDetails workerDetails;
     private Cell position;

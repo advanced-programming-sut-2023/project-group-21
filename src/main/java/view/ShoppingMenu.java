@@ -14,12 +14,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
-import model.User;
+import ServerConnection.User;
 import model.generalenums.Resource;
 
 import java.net.URL;

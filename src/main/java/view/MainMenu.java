@@ -1,28 +1,36 @@
 package view;
 
+import ServerConnection.GameEssentials;
+import ServerConnection.GroupGame;
 import controller.FileController;
 import controller.GameController;
 import controller.MapController;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
 
 import javafx.scene.shape.Line;
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
-import model.User;
+import ServerConnection.User;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -114,16 +122,21 @@ public class MainMenu extends Application {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 //repair
                 //the government
-                Government government=new Government(user,new Cell(20,20));
-                ShoppingMenu shoppingMenu=new ShoppingMenu();
-                shoppingMenu.setGovernment(government);
+//                Government government=new Government(user,new Cell(20,20));
+//                ShoppingMenu shoppingMenu=new ShoppingMenu();
+//                shoppingMenu.setGovernment(government);
+//                try {
+//                    shoppingMenu.start(StartingMenu.mainStage);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
                 try {
-                    shoppingMenu.start(StartingMenu.mainStage);
-                } catch (Exception e) {
+                    StartingMenu.getDOut().writeObject("logout");
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-//                FileController.finish();
-//                Platform.exit();
+                FileController.finish();
+                Platform.exit();
             }
         });
 
@@ -189,73 +202,149 @@ public class MainMenu extends Application {
 
     private void startGame() {
         initController();
-        ArrayList<Cell> myHolds = mapController.getMyHolds();
-        System.out.println(myHolds);
-        if (myHolds.size() < 2) {
-            Stage stage = new Stage();
-            Label label = new Label("too few hold!");
-            Scene scene = new Scene(label);
-            scene.getStylesheets().add(pathCssFile);
-            stage.setScene(scene);
-            stage.show();
-            return;
-        }
-        ArrayList<Government> governments = new ArrayList<>();
-        governments.add(new Government(user, myHolds.get(0)));
         Stage stage = new Stage();
         stage.setResizable(false);
-        stage.setTitle("start game");
-        stage.setMaxWidth(200);
-        stage.setMinWidth(200);
-        stage.setMaxHeight(200);
-        stage.setMinHeight(200);//set size
+        stage.setTitle("Start Game");
+        stage.setMaxWidth(400);
+        stage.setMinWidth(400);
+        stage.setMaxHeight(400);
+        stage.setMinHeight(400);
         Pane pane = new Pane();
-        Scene scene = new Scene(pane);
+        pane.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
+        Scene scene = new Scene(pane, 400, 200);
         scene.getStylesheets().add(pathCssFile);
         stage.setScene(scene);
-        TextField textField = new TextField();
-        textField.relocate(150, 50);
-        textField.setMinWidth(100);
-        textField.setMinWidth(100);
-        Label stateLabel = new Label();
-        stateLabel.setMaxWidth(60);
-        stateLabel.setMinWidth(60);
-        stateLabel.relocate(70, 100);
-        String usernamePlay = "";
-        Button addPlayer = new Button("add player");
-        addPlayer.relocate(150, 150);
-        Button startGame = new Button("start");
-        startGame.relocate(50, 150);
-        addPlayer.setOnMouseClicked(mouseEvent -> {
-            if (governments.size() < myHolds.size()) {
-                if (FileController.checkExistenceOfUserOrEmail(textField.getText(), true)) {
-                    User user1 = FileController.getUserByUsername(textField.getText());
-                    textField.setText("");
-                    stateLabel.setText("success!");
-                    governments.add(new Government(user1, myHolds.get(governments.size())));
-                } else
-                    stateLabel.setText("user does not exist");
-            } else
-                stateLabel.setText("too many player!");
-        });
-        startGame.setOnMouseClicked(mouseEvent -> {
-            if (governments.size() >= 2) {
-                for (int i = 0; i<myHolds.size() ; i++)
-                    myHolds.get(i).setExtras(null);
-                GameController gameController = new GameController(governments,mapController.getMap());
-                MapViewGui.setStaticGameController(gameController);
-                MapViewGui.isInGame = true;
-                MapViewGui mapViewGui = new MapViewGui();
-                mapViewGui.setMainMenu(this);
-                mapViewGui.setMapController(mapController);
-                mapViewGui.setGameController(gameController);
-                mapViewGui.start(StartingMenu.mainStage);//start the game ctl
-                stage.close();
-
+        TextField numberOfPlayers = new TextField();
+        numberOfPlayers.setPromptText("Number of Players");
+        numberOfPlayers.setMaxWidth(50);
+        numberOfPlayers.relocate(30, 30);
+        Button joinGame = new Button("Join a Game");
+        joinGame.relocate(220, 120);
+        joinGame.setPrefWidth(150);
+        Button createGame = new Button("New Game");
+        createGame.setPrefWidth(150);
+        createGame.relocate(30, 120);
+        stage.show();
+        pane.setStyle("-fx-max-height: 200;" + "-fx-min-height: 200;");
+        pane.getChildren().addAll(createGame, joinGame, numberOfPlayers);
+        createGame.setOnMouseClicked(mouseEvent -> {
+            ArrayList<Cell> myHolds = mapController.getMyHolds();
+            System.out.println(myHolds);
+            if (myHolds.size() < 2) {
+                Stage stage1 = new Stage();
+                Label label = new Label("too few hold!");
+                Scene scene1 = new Scene(label);
+                scene1.getStylesheets().add(pathCssFile);
+                stage1.setScene(scene1);
+                stage1.show();
+            } else {
+                String count = numberOfPlayers.getText();
+                if (count.trim().isEmpty() || !count.matches("\\d+")) {
+                    //TODO: add proper message
+                    System.out.println("not a number");
+                    return;
+                }
+                int playerCount = Integer.parseInt(count);
+                try {
+                    GroupGame groupGame = new GroupGame(user, playerCount, mapController);
+                    StartingMenu.getDOut().writeObject(groupGame);
+                    Thread.sleep(50);
+                    Object object = StartingMenu.getDIn().readObject();
+                    if (object instanceof Integer number) {
+                        groupGame.setId(number);
+                        pane.getChildren().remove(0, pane.getChildren().size());
+                        Text text = new Text("Waiting for other users\nto join...");
+                        text.relocate(100, 60);
+                        text.setTextAlignment(TextAlignment.CENTER);
+                        pane.getChildren().add(text);
+                        stage.close();
+                        WaitScene();
+                    } else if (object instanceof String message && message.equals("duplicate")) {
+                        Text text = new Text("You have already created\na game.");
+                        text.relocate(100, 60);
+                        text.setTextAlignment(TextAlignment.CENTER);
+                        pane.getChildren().add(text);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
-        pane.setStyle("-fx-max-height: 200;" + "-fx-min-height: 200;");
-        pane.getChildren().addAll(startGame, addPlayer, textField, stateLabel);
-        stage.show();
+
+        joinGame.setOnMouseClicked(mouseEvent -> {
+            try {
+                StartingMenu.getDOut().writeObject("join");
+                Thread.sleep(50);
+                Object object = StartingMenu.getDIn().readObject();
+                if (object == null || (object instanceof ArrayList<?> groupGames && groupGames.isEmpty()))
+                    System.out.println("empty");
+                else {
+                    JoinGameMenu menu = new JoinGameMenu();
+                    menu.setGames((ArrayList<GroupGame>) object);
+                    menu.setMainMenu(this);
+                    stage.close();
+                    menu.start(StartingMenu.mainStage);
+                }
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+//        ArrayList<Government> governments = new ArrayList<>();
+//        governments.add(new Government(user, myHolds.get(0)));
+//        TextField textField = new TextField();
+//        textField.relocate(50, 50);
+//        textField.setMinWidth(100);
+//        textField.setMinWidth(100);
+//        Label stateLabel = new Label();
+//        stateLabel.setMaxWidth(60);
+//        stateLabel.setMinWidth(60);
+//        stateLabel.relocate(70, 100);
+//        String usernamePlay = "";
+//        Button addPlayer = new Button("add player");
+//        addPlayer.relocate(150, 150);
+//        Button startGame = new Button("start");
+//        startGame.relocate(50, 150);
+//        addPlayer.setOnMouseClicked(mouseEvent -> {
+//            if (governments.size() < myHolds.size()) {
+//                if (FileController.checkExistenceOfUserOrEmail(textField.getText(), true)) {
+//                    User user1 = FileController.getUserByUsername(textField.getText());
+//                    textField.setText("");
+//                    stateLabel.setText("success!");
+//                    governments.add(new Government(user1, myHolds.get(governments.size())));
+//                } else
+//                    stateLabel.setText("user does not exist");
+//            } else
+//                stateLabel.setText("too many player!");
+//        });
+//        startGame.setOnMouseClicked(mouseEvent -> {
+//            if (governments.size() >= 2) {
+//                for (int i = 0; i<myHolds.size() ; i++)
+//                    myHolds.get(i).setExtras(null);
+//                GameController gameController = new GameController(governments,mapController.getMap());
+//                MapViewGui.setStaticGameController(gameController);
+//                MapViewGui.isInGame = true;
+//                MapViewGui mapViewGui = new MapViewGui();
+//                mapViewGui.setMainMenu(this);
+//                mapViewGui.setMapController(mapController);
+//                mapViewGui.setGameController(gameController);
+//                mapViewGui.start(StartingMenu.mainStage);//start the game ctl
+//                stage.close();
+//
+//            }
+//        });
+    }
+
+    private void WaitScene() throws Exception {
+        WaitForJoinMenu menu = new WaitForJoinMenu();
+        menu.setUser(user);
+        WaitForJoin waitForJoin = new WaitForJoin(menu, mapController, this);
+        waitForJoin.start();
+        menu.start(StartingMenu.mainStage);
+    }
+
+    public User getUser() {
+        return user;
     }
 }

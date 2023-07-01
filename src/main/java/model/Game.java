@@ -1,5 +1,7 @@
 package model;
 
+import ServerConnection.Cell;
+import ServerConnection.User;
 import model.building.Building;
 import model.building.Enums.BuildingsDetails;
 import model.building.Gate;
