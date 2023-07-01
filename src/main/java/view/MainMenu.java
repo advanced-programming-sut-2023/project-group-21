@@ -258,15 +258,14 @@ public class MainMenu extends Application {
                         text.setTextAlignment(TextAlignment.CENTER);
                         pane.getChildren().add(text);
                         stage.close();
-                        WaitForJoin waitForJoin = new WaitForJoin(mapController, this);
-                        waitForJoin.start();
+                        WaitScene();
                     } else if (object instanceof String message && message.equals("duplicate")) {
                         Text text = new Text("You have already created\na game.");
                         text.relocate(100, 60);
                         text.setTextAlignment(TextAlignment.CENTER);
                         pane.getChildren().add(text);
                     }
-                } catch (IOException | InterruptedException | ClassNotFoundException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -335,6 +334,14 @@ public class MainMenu extends Application {
 //
 //            }
 //        });
+    }
+
+    private void WaitScene() throws Exception {
+        WaitForJoinMenu menu = new WaitForJoinMenu();
+        menu.setUser(user);
+        WaitForJoin waitForJoin = new WaitForJoin(menu, mapController, this);
+        waitForJoin.start();
+        menu.start(StartingMenu.mainStage);
     }
 
     public User getUser() {

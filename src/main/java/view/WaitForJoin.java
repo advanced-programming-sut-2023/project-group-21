@@ -12,24 +12,27 @@ import java.util.ArrayList;
 public class WaitForJoin extends Thread {
     private final MapController mapController;
     private final MainMenu mainMenu;
-    public WaitForJoin(MapController mapController, MainMenu mainMenu) {
+    private final WaitForJoinMenu waitForJoinMenu;
+
+    public WaitForJoin(WaitForJoinMenu waitForJoinMenu, MapController mapController, MainMenu mainMenu) {
+        this.waitForJoinMenu = waitForJoinMenu;
         this.mapController = mapController;
         this.mainMenu = mainMenu;
     }
+
     @Override
     public void run() {
         super.run();
         System.out.println("In Wait");
         while (true) {
             try {
-//                if (StartingMenu.getInputStream().available() != 0) {
-                    Object object = StartingMenu.getDIn().readObject();
-                    if (object instanceof GroupGame groupGame) {
-                        System.out.println("Received permission to start game.");
-                        setupGame(groupGame);
-                        return;
-                    }
-//                }
+                Object object = StartingMenu.getDIn().readObject();
+                if (object instanceof GroupGame groupGame) {
+                    System.out.println("Received permission to start game.");
+                    setupGame(groupGame);
+                    return;
+                } else if (object instanceof String message)
+                    if (message.equals("no")) waitForJoinMenu.notEnoughUser();
             } catch (IOException | ClassNotFoundException | InterruptedException e) {
                 throw new RuntimeException(e);
             }

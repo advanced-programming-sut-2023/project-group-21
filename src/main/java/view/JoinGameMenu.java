@@ -1,16 +1,13 @@
 package view;
 
-import ServerConnection.GameEssentials;
 import ServerConnection.GroupGame;
-import controller.GameController;
+import ServerConnection.User;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -25,7 +22,6 @@ public class JoinGameMenu extends Application {
     private MainMenu mainMenu;
     private BorderPane borderPane;
     @Override
-    @SuppressWarnings("unchecked")
     public void start(Stage stage) throws Exception {
         borderPane = new BorderPane();
         gridPane = new GridPane();
@@ -38,7 +34,7 @@ public class JoinGameMenu extends Application {
         borderPane.setBottom(button);
         button.setOnMouseClicked(mouseEvent -> {
             try {
-                StartingMenu.getDOut().writeObject("join");
+                StartingMenu.getDOut().writeObject("refresh");
                 Thread.sleep(50);
 
             } catch (IOException | InterruptedException e) {
@@ -46,6 +42,10 @@ public class JoinGameMenu extends Application {
             }
         });
         createGridPane();
+
+        WaitForMap waitForMap = new WaitForMap(this, mainMenu);
+        waitForMap.start();
+
         Scene scene = new Scene(borderPane, 1280, 720);
         stage.setScene(scene);
         stage.show();
@@ -55,10 +55,7 @@ public class JoinGameMenu extends Application {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Fuck");
                 gridPane = new GridPane();
-                System.out.println("Grid size: " + gridPane.getChildren().size());
-                System.out.println("Game size: " + games.get(0).getPlayers().size());
                 int count = 0;
                 outer:
                 for (int i = 0; i < 5; i++) {
@@ -80,15 +77,25 @@ public class JoinGameMenu extends Application {
         Text idText = new Text("ID: " + groupGame.getId());
         Text owner = new Text("Owner: " + groupGame.getOwner().getUserName());
         Text capacity = new Text("Capacity: " + groupGame.getPlayers().size() + " / " + groupGame.getSize());
+
+        VBox names = new VBox();
+        names.setSpacing(3);
+        names.setAlignment(Pos.CENTER);
+        int max = Math.min(5, groupGame.getPlayers().size());
+        names.getChildren().add(new Text("Users:"));
+        for (int i = 0; i < max; i++) {
+            Text text = new Text((i+1) + ". " + groupGame.getPlayers().get(i).getUserName());
+            names.getChildren().add(text);
+        }
+        if (groupGame.getPlayers().size() > 5) names.getChildren().add(new Text("..."));
+
         Button button = new Button("Select");
-        vBox.getChildren().addAll(idText, owner, capacity, button);
+        vBox.getChildren().addAll(idText, owner, capacity, names, button);
         button.setOnMouseClicked(mouseEvent -> {
             try {
                 String request = "group " + groupGame.getId();
                 StartingMenu.getDOut().writeObject(request);
                 Thread.sleep(50);
-                WaitForMap waitForMap = new WaitForMap(this, mainMenu);
-                waitForMap.start();
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }

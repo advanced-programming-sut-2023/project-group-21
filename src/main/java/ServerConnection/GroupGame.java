@@ -64,5 +64,9 @@ public class GroupGame implements Serializable {
         size--;
         players.remove(desiredUser);
     }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 }
 

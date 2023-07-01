@@ -467,7 +467,7 @@ public class GameController {
             return;
         if (closed.contains(map[x1][y1]))
             return;
-
+        System.out.println(map[x1][y1].toString2());
         map[x1][y1].changeDirection(dir);
         int total = distanceOfStart + distanceOfDestination;
         map[x1][y1].setDistanceOfStart(distanceOfStart);
@@ -518,10 +518,12 @@ public class GameController {
         if (x1 == x2 && y1 == y2)
             return;
         closed.add(map[x1][y1]);
+        System.out.println(x1+" , " + y1);
         if (opens.get(totalDistance) == null)
             return;
         if (opens.get(totalDistance).get(endDistance) == null)
             return;
+        System.out.println("after that");
         checkCell(x1 + 1, y1, distancesOfStart + 1, abs(x1 + 1 - x2) + abs(y1 - y2), 'e');
         checkCell(x1 -1, y1, distancesOfStart + 1, abs(x1  - x2 -1) + abs(y1 - y2), 'w');
         checkCell(x1, y1 + 1, distancesOfStart + 1, abs(x1 - x2) + abs(y1 + 1 - y2), 'n');
@@ -532,26 +534,38 @@ public class GameController {
     private void callOtherFunction(int x1, int y1, int x, int y, char state) {
         opens = new TreeMap<>();
         closed = new HashSet<>();
+        System.out.println(x1 + " " + y1 + " " + x + " " + y);
         checkCell(x1, y1, 0, abs(x1 - x) + abs(y1 - y), 'a');
+        Cell tempCell = null;
         while (!opens.isEmpty() && map[x][y].getDirection() == 'a') {
-            System.out.println("program entered the loop!");
+//            System.out.println("program entered the loop!");
             Integer i = opens.firstKey();
             if (i == null)
-                return;
+                break;
             TreeMap<Integer, ArrayList<Cell>> treeMap = opens.get(i);
             if (treeMap == null)
-                return;
+                break;
             Integer i2 = null;
             if (!treeMap.isEmpty())
                 i2 = treeMap.firstKey();
+            else{
+                opens.remove(i);
+                i = opens.firstKey();
+                if (i != null){
+                    treeMap = opens.get(i);
+                    i2 = treeMap.firstKey();
+                }
+            }
             if (i2 == null)
-                return;
+                break;
             ArrayList<Cell> myCells = treeMap.get(i2);
             if (!(myCells == null || myCells.isEmpty())) {
                 Cell cell = myCells.get(0);
                 find2Path(cell.getxCoordinates(), cell.getyCoordinates(), x, y, cell.getDistanceOfStart(), state);
-                if (!myCells.isEmpty())
+                if (!myCells.isEmpty()) {
+                    tempCell = myCells.get(0);
                     myCells.remove(0);
+                }
                 if (treeMap.isEmpty())
                     opens.remove(i);
                 if (myCells.isEmpty())
@@ -560,14 +574,16 @@ public class GameController {
                 treeMap.remove(myCells);
             }
         }
+        System.out.println("*****" + tempCell);
         decodePath(x, y);
 
         for (Cell[] cells : map)
             for (int i2 = 0; i2 < map.length; i2++)
                 cells[i2].refreshDirection();
-        for (Cell cell : closed) {
+        for (Cell cell : closed)
             cell.refreshDirection();
-        }
+        for (Cell myCell : openSet)
+            myCell.refreshDirection();
         for (Map.Entry<Integer, TreeMap<Integer, ArrayList<Cell>>> entry : opens.entrySet()) {
             for (Map.Entry<Integer, ArrayList<Cell>> entry2 : entry.getValue().entrySet()) {
                 for (int i1 = 0; i1 < entry2.getValue().size(); i1++) {
@@ -584,12 +600,12 @@ public class GameController {
 
     private void decodePath(int x2, int y2) {
         path = new ArrayList<>();
-        if (!checkValidity(y2, y2, x2, y2))
+        if (!checkValidity(x2, y2, x2, y2))
             return;
-        System.out.println("here!!!");
+//        System.out.println("here!!!");
         if (map[x2][y2].getDirection() == 'a')
             return;
-        System.out.println("here!");
+//        System.out.println("here!");
         path.add(map[x2][y2]);
         while (map[x2][y2].getDirection() != 'a') {
             char dir = map[x2][y2].getDirection();
@@ -1089,7 +1105,7 @@ public class GameController {
     }
 
     public GameMessage checkMoveEquipments(int x1, int y1, int x2, int y2) {
-        System.out.println("salam");
+//        System.out.println("salam");
         if (x1 > map.length || x1 < 1 || y1 > map.length || y1 < 1) return GameMessage.OUT_OF_RANGE;
         if (x2 > map.length || x2 < 1 || y2 > map.length || y2 < 1) return GameMessage.OUT_OF_RANGE;
         Machine myMachine = null;

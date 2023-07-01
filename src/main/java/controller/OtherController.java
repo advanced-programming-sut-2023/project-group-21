@@ -5,7 +5,7 @@ package controller;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-        import java.util.Random;
+import java.util.Random;
 
 //make captcha && Delay && clear the screen
 public class OtherController {
@@ -26,6 +26,27 @@ public class OtherController {
             System.out.println(e.getMessage());
         }
         sleepTime += sleepRate;
+    }
+
+    public static int calculateLineNumber(String text){
+        int result = 0;
+        for (int i = 0;i<text.length();i++)
+            if (text.charAt(i) == '\n')
+                result++;
+        return result;
+    }
+
+    public static String makeAlignment(String input, int numberOfChar) {//it should improve!
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            if (!(i % numberOfChar == 0 && i != 0))
+                builder.append(input.charAt(i));
+            else
+                builder.append(input.charAt(i)).append('\n');
+        }
+        builder.append('\n');
+        builder.append(' ');
+        return builder.toString();
     }
 
 

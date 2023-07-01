@@ -10,4 +10,6 @@ module StrongHold2 {
     exports ServerConnection;
     exports controller;
     exports model;
+
+    opens model to javafx.fxml;
 }

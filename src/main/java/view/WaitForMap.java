@@ -31,9 +31,12 @@ public class WaitForMap extends Thread {
                     setupGame(groupGame);
                     return;
                 } else if (object instanceof ArrayList<?> games) {
+                    System.out.println("Received refreshed.");
                     ArrayList<GroupGame> gameArrayList = (ArrayList<GroupGame>) games;
                     joinGameMenu.games = gameArrayList;
                     joinGameMenu.createGridPane();
+                } else if (object instanceof String message) {
+                    System.out.println("Received message: " + message);
                 }
             } catch (IOException | ClassNotFoundException | InterruptedException e) {
                 throw new RuntimeException(e);
