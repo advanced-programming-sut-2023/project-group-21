@@ -81,9 +81,9 @@ public class Profile extends Application {
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 //            FileController.getAllUsers().sort(User::compareTo);
-//            ObservableList<User> users= FXCollections.observableArrayList(FileController.getAllUsers());
+            ObservableList<User> users= FXCollections.observableArrayList(FileController.getAllUsers());
 
-            //table.setItems(users);
+            table.setItems(users);
             scoreColumn.setSortType(TableColumn.SortType.DESCENDING);
             table.getSortOrder().add(scoreColumn);
             table.prefHeightProperty().bind(boardStage.heightProperty());
