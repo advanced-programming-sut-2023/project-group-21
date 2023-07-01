@@ -104,7 +104,7 @@ public class FileController {
             if (tempObject.get("username").equals(username)) {
                 return (new User((String) tempObject.get("username"), (String) tempObject.get("password"),
                         (String) tempObject.get("nickname"), (String) tempObject.get("email"),
-                        (String) tempObject.get("slogan")));
+                        (String) tempObject.get("slogan"), 0));
             }
         }
         return null;

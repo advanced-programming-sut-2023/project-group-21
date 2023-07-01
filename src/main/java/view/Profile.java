@@ -24,7 +24,6 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ServerConnection.User;
-import model.User;
 import model.*;
 import view.commands.CheckValidion;
 

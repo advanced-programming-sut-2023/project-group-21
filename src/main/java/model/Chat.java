@@ -1,5 +1,6 @@
 package model;
 
+import ServerConnection.User;
 import controller.OtherController;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -27,7 +28,7 @@ public class Chat {
     private final MessageEnum messageEnum;
     VBox mainPane = new VBox();
 
-    public Chat(User admin,MessageEnum messageEnum) {
+    public Chat(User admin, MessageEnum messageEnum) {
         this.admin = admin;
         allUsers.add(admin);
         this.messageEnum = messageEnum;
