@@ -9,7 +9,9 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 
-public class MessageGui{
+import java.io.Serializable;
+
+public class MessageGui implements Serializable {
     private final Pane pane = new Pane();
     private final Label textLabel;
     private final Image iv;

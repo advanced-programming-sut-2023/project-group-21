@@ -857,8 +857,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
                 pasteBuilding();
             } else if (keyEvent.getCode() == KeyCode.T) {
                 showTaxStage();
-            }
-            else if (keyEvent.getCode() == KeyCode.Y)
+            } else if (keyEvent.getCode() == KeyCode.Y)
                 startShop();
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
