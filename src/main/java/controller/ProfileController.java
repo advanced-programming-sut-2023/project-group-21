@@ -1,8 +1,10 @@
 package controller;
 
-import model.User;
+import ServerConnection.User;
 import view.message.ProfileMessages;
 import view.commands.CheckValidion;
+
+import java.io.IOException;
 
 public class ProfileController {
     private final User user;
@@ -10,7 +12,7 @@ public class ProfileController {
     public ProfileController(User user){
         this.user = user;
     }
-    public ProfileMessages changeSomething(String username,String field,String newOption){
+    public ProfileMessages changeSomething(String username,String field,String newOption) throws IOException, InterruptedException, ClassNotFoundException {
         if(field.equals("username")&&FileController.checkExistenceOfUserOrEmail(newOption,true))
             return ProfileMessages.TAKEN_USERNAME;
         if(field.equals("email")&&FileController.checkExistenceOfUserOrEmail(newOption,true))

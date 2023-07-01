@@ -1,15 +1,12 @@
 package model.building;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.ContainerDetails;
-import model.generalenums.Resource;
 import model.human.Person;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Storage extends Building {
     private ContainerDetails containerDetails;

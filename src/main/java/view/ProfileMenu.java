@@ -1,11 +1,12 @@
 package view;
 
 import controller.ProfileController;
-import model.User;
+import ServerConnection.User;
 import view.commands.CheckValidion;
 import view.commands.ProfileCommands;
 import view.message.ProfileMessages;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
@@ -19,7 +20,7 @@ public class ProfileMenu {
         profileController = new ProfileController(currentUser);
     }
 
-    public void run(Scanner scanner) {
+    public void run(Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String line;
         Matcher matcher;
         while (true) {
@@ -61,7 +62,7 @@ public class ProfileMenu {
             System.out.println("password  changed successfully");
     }
 
-    public void checkChangeSomething(Matcher matcher) {
+    public void checkChangeSomething(Matcher matcher) throws IOException, InterruptedException, ClassNotFoundException {
         String option = matcher.group("whichOption");
         String newOption = matcher.group("newOption");
         if (!(option.equals("username") || option.equals("nickname") || option.equals("slogan") || option.equals("email"))) {

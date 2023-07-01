@@ -4,10 +4,11 @@ import controller.FileController;
 import controller.OtherController;
 import controller.SignUpController;
 import model.Game;
-import model.User;
+import ServerConnection.User;
 import view.commands.SignUpCommands;
 import view.message.SignUpMessages;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
@@ -15,7 +16,7 @@ public class SignUpMenu {
     SignUpController signUpController = new SignUpController();
 
 
-    public void run(Scanner scanner) {
+    public void run(Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String line;
         Matcher matcher;
         while (true) {
@@ -41,7 +42,7 @@ public class SignUpMenu {
 
 
     public void doAction(Scanner scanner, Matcher matcher, String username, String password, String email,
-                         String nickname, String slogan) {
+                         String nickname, String slogan) throws IOException, InterruptedException, ClassNotFoundException {
         String answer;
         String AnswerConfirm;
         int questionNumber = 0;
@@ -89,7 +90,7 @@ public class SignUpMenu {
     }
 
 
-    public void checkCreateUser(Matcher matcher, Scanner scanner) {
+    public void checkCreateUser(Matcher matcher, Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
 
         String username = matcher.group("username");
         String password = matcher.group("password");
@@ -111,7 +112,7 @@ public class SignUpMenu {
             doAction(scanner, matcher, username, password, email, nickname, slogan);
     }
 
-    public void checkCreateUserPassword(Matcher matcher, Scanner scanner) {
+    public void checkCreateUserPassword(Matcher matcher, Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String username = matcher.group("username");
         String email = matcher.group("email");
         String slogan = matcher.group("slogan");

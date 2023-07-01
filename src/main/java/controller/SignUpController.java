@@ -1,7 +1,7 @@
 package controller;
 
 import model.Game;
-import model.User;
+import ServerConnection.User;
 import view.commands.CheckValidion;
 import view.message.SignUpMessages;
 
@@ -10,14 +10,14 @@ import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 
-import javax.xml.catalog.CatalogManager;
+import java.io.IOException;
 
 
 public class SignUpController {
     private String  slogan;
 
     public SignUpMessages createUserLastCheck(String username, String password, String email, String nickname,
-            String slogan) {
+            String slogan) throws IOException, InterruptedException, ClassNotFoundException {
         if (FileController.checkExistenceOfUserOrEmail(username, true)) {
             OtherController.sleepNormal();
             return SignUpMessages.USERNAME_REPEAT;
@@ -31,7 +31,7 @@ public class SignUpController {
     }
 
     public User createUser(String username, String password, String email, String nickname, String slogan, int number,
-            String answer) {
+                           String answer) {
         password = FileController.encode(password);
         answer = FileController.encode(answer);
         User user = new User(username, password, nickname, email, slogan);

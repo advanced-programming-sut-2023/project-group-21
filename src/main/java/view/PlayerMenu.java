@@ -1,5 +1,6 @@
 package view;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -7,9 +8,9 @@ import java.util.regex.Matcher;
 import controller.FileController;
 
 import controller.OtherController;
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
-import model.User;
+import ServerConnection.User;
 import view.commands.PlayerMenuCommand;
 
 
@@ -22,7 +23,7 @@ public class PlayerMenu {
         this.user = user;
     }
 
-    public void run(Scanner scanner) {
+    public void run(Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String line ;
         Matcher matcher;
         while (true) {
@@ -44,7 +45,7 @@ public class PlayerMenu {
     }
 
 
-    public void checkMenu(Matcher matcher, Scanner scanner) {
+    public void checkMenu(Matcher matcher, Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         ArrayList<Cell> myHolds;
         String menuName = matcher.group("menuName");
         switch (menuName) {

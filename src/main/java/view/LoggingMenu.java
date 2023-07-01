@@ -1,5 +1,6 @@
 package view;
 
+import ServerConnection.LoginMessage;
 import controller.FileController;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -12,9 +13,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import model.Game;
-import model.User;
+import ServerConnection.User;
 import view.commands.CheckValidion;
 
+import java.io.IOException;
 import java.net.URL;
 
 public class LoggingMenu extends Application {
@@ -78,21 +80,38 @@ public class LoggingMenu extends Application {
         //behaviour
         saveButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                if (FileController.getUserByUsername(usernameField.getText()) != null) {
-                    User user;
-                    user = FileController.getUserByUsername(usernameField.getText());
-                    if (user != null && FileController.getUserByUsername(usernameField.getText()).getPassword().
-                            equals(passwordField.getText())) {
+                try {
+                    StartingMenu.getDOut().writeObject(new LoginMessage(usernameField.getText(), passwordField.getText()));
+                    Thread.sleep(50);
+                    Object object = StartingMenu.getDIn().readObject();
+                    if (object instanceof String message) {
+                        errorLabel.setText(message);
+                        if (!mainPane.getChildren().contains(errorLabel))
+                            mainPane.getChildren().add(errorLabel);
+                    } else if (object instanceof User user) {
                         MainMenu mainMenu = new MainMenu();
                         mainMenu.setUser(user);
                         mainMenu.setLoggingMenu(this);
                         mainMenu.start(StartingMenu.mainStage);
-                    } else {
-                        errorLabel.setText("incorrect password");
-                        if (!mainPane.getChildren().contains(errorLabel))
-                            mainPane.getChildren().add(errorLabel);
                     }
+                } catch (IOException | InterruptedException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
+//                if (FileController.getUserByUsername(usernameField.getText()) != null) {
+//                    User user;
+//                    user = FileController.getUserByUsername(usernameField.getText());
+//                    if (user != null && FileController.getUserByUsername(usernameField.getText()).getPassword().
+//                            equals(passwordField.getText())) {
+//                        MainMenu mainMenu = new MainMenu();
+//                        mainMenu.setUser(user);
+//                        mainMenu.setLoggingMenu(this);
+//                        mainMenu.start(StartingMenu.mainStage);
+//                    } else {
+//                        errorLabel.setText("incorrect password");
+//                        if (!mainPane.getChildren().contains(errorLabel))
+//                            mainPane.getChildren().add(errorLabel);
+//                    }
+//                }
             }
         });
         showButton.setOnMouseClicked(mouseEvent -> {

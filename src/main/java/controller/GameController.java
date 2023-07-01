@@ -1,9 +1,11 @@
 package controller;
 
+import ServerConnection.DropBuilding;
+import ServerConnection.MakeTroop;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import model.Cell;
+import ServerConnection.Cell;
 import model.Game;
 import model.Government;
 import model.building.*;
@@ -127,7 +129,7 @@ public class GameController {
             for (Map.Entry<Resource, Integer> entry : buildingsDetails.getRequiredResource().entrySet())
                 currentGovernment.reduceResources(entry.getKey(), entry.getValue());
         }
-        dropBuilding(x, y, buildingsDetails);
+        dropBuilding(x, y, buildingsDetails, currentGovernment);
         return GameMessage.SUCCESS;
     }
 
@@ -140,11 +142,11 @@ public class GameController {
         }
     }
 
-    public void dropBuilding(int x, int y, BuildingsDetails buildingsDetails) {
+    public void dropBuilding(int x, int y, BuildingsDetails buildingsDetails, Government govern) {
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         ArrayList<Person> persons = new ArrayList<>();
         int number = buildingsDetails.getWorkersCount();
-        for (Person person : currentGovernment.getPeople()) {
+        for (Person person : govern.getPeople()) {
             if (!(person instanceof Worker) && person.getWorkPlace() == null) {
                 if (number-- == 0) break;
                 persons.add(person);
@@ -152,34 +154,34 @@ public class GameController {
         }
         if (buildingsDetails.equals(BuildingsDetails.CATHEDRAL) || buildingsDetails.equals(BuildingsDetails.CHURCH) ||
                 buildingsDetails.equals(BuildingsDetails.INN))
-            currentGovernment.setReligionRate(true);
+            govern.setReligionRate(true);
         if (buildingType == null) {
-            currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x ][y ], persons));
+            govern.addBuilding(new Building(govern, buildingsDetails, map[x ][y ], persons));
             return;
         }
         switch (buildingType) {
-            case PRODUCT_MAKER -> currentGovernment.addBuilding(new ProductMaker(currentGovernment, map[x ][y ],
+            case PRODUCT_MAKER -> govern.addBuilding(new ProductMaker(govern, map[x ][y ],
                     Objects.requireNonNull(ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails)), persons));
-            case STORAGE -> currentGovernment.addBuilding(new Storage(currentGovernment, map[x ][y ],
+            case STORAGE -> govern.addBuilding(new Storage(govern, map[x ][y ],
                     Objects.requireNonNull(ContainerDetails.getContainerByBuilding(buildingsDetails)), persons));
-            case GATE -> currentGovernment.addBuilding(new Gate(currentGovernment, map[x ][y ],
+            case GATE -> govern.addBuilding(new Gate(govern, map[x ][y ],
                     ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails), persons, true, false));
-            case RESIDENCY -> currentGovernment.addBuilding(new Residency(currentGovernment, map[x ][y ],
+            case RESIDENCY -> govern.addBuilding(new Residency(govern, map[x ][y ],
                     Objects.requireNonNull(ResidencyDetails.getResidencyDetailsByBuildingDetails(buildingsDetails)), persons));
             case WEAPON_PRODUCTION ->
-                    currentGovernment.addBuilding(new WeaponProduction(currentGovernment, map[x ][y ],
+                    govern.addBuilding(new WeaponProduction(govern, map[x ][y ],
                             ProductMakerDetails.getProductMakerDetailsByBuildingDetails(buildingsDetails), persons));
             case STABLE ->
-                    currentGovernment.addBuilding(new Stable(currentGovernment, BuildingsDetails.STABLE, map[x ][y ], persons));
+                    govern.addBuilding(new Stable(govern, BuildingsDetails.STABLE, map[x ][y ], persons));
             case TRAP ->
-                    currentGovernment.addBuilding(new Trap(currentGovernment, buildingsDetails, map[x ][y ], persons));
-            case QUARRY -> currentGovernment.addBuilding(new Quarry(currentGovernment, map[x ][y ], persons));
-            case TOWER -> currentGovernment.addBuilding(new Tower(currentGovernment, map[x ][y ],
+                    govern.addBuilding(new Trap(govern, buildingsDetails, map[x ][y ], persons));
+            case QUARRY -> govern.addBuilding(new Quarry(govern, map[x ][y ], persons));
+            case TOWER -> govern.addBuilding(new Tower(govern, map[x ][y ],
                     Objects.requireNonNull(TowerDetails.getTowerDetailsByBuildingDetails(buildingsDetails)), persons));
             case OX_TETHER ->
-                    currentGovernment.addBuilding(new OxTether(currentGovernment, buildingsDetails, map[x ][y ], persons));
+                    govern.addBuilding(new OxTether(govern, buildingsDetails, map[x ][y ], persons));
             default ->
-                    currentGovernment.addBuilding(new Building(currentGovernment, buildingsDetails, map[x ][y ], persons));
+                    govern.addBuilding(new Building(govern, buildingsDetails, map[x ][y ], persons));
         }
 
     }
@@ -624,8 +626,31 @@ public class GameController {
             currentGovernment.killAllPeople();
             governments.remove(currentGovernment);
             currentGovernment = governments.get(index % governments.size());
-        } else currentGovernment = governments.get((index + 1) % governments.size());
+        } else {
+            System.out.println("Changing Government");
+            System.out.println("Current Government: " + index + ". " + currentGovernment.getLord().getUserName());
+            changeGovernment();
+//            int newIndex = (index + 1) % governments.size();
+//            System.out.println("New index: " + newIndex);
+//            currentGovernment = governments.get((index + 1) % governments.size());
+            System.out.println("New Government: " + currentGovernment.getLord().getUserName());
+        }
         currentGovernment.doActionInTurnFirst();
+    }
+
+    private void changeGovernment() {
+        System.out.println("=====");
+        for (Government government: governments) System.out.println(government.getLord().getUserName());
+        System.out.println("=====");
+        for (int i = 0; i < governments.size(); i++) {
+            System.out.println(governments.get(i).getLord().getUserName());
+            if (governments.get(i).getLord().getUserName().equals(currentGovernment.getLord().getUserName())) {
+                if (i == governments.size()-1) currentGovernment = governments.get(0);
+                else currentGovernment = governments.get(i+1);
+                System.out.println("Government Changed");
+                return;
+            }
+        }
     }
 
     private void removeHealedCells() {
@@ -1213,5 +1238,21 @@ public class GameController {
             vBox.getChildren().add(new Text(entry.getKey().getName() + ": " + entry.getValue()));
         }
         return vBox;
+    }
+
+    public void dropOpponentBuilding(DropBuilding dropBuilding) {
+        dropBuilding(dropBuilding.getXPosition(), dropBuilding.getYPosition(),
+                dropBuilding.getBuildingsDetails(), getGovernmentByUsername(dropBuilding.getUsername()));
+    }
+
+    public void makeOpponentTroop(MakeTroop makeTroop) {
+        getGovernmentByUsername(makeTroop.getUsername()).addTrainedPeople(makeTroop.getWorkerDetails(),
+                map[makeTroop.getXPosition()][makeTroop.getYPosition()]);
+    }
+
+    private Government getGovernmentByUsername(String username) {
+        for (Government government: governments)
+            if (government.getLord().getUserName().equals(username)) return government;
+        return null;
     }
 }

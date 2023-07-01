@@ -1,5 +1,6 @@
 package view;
 
+import ServerConnection.UserDetails;
 import controller.FileController;
 import controller.OtherController;
 import controller.SignUpController;
@@ -18,6 +19,7 @@ import view.commands.CheckValidion;
 import view.message.SignUpMessages;
 
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -230,13 +232,17 @@ public class SigningMenu extends Application {
         usernameTextField.textProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                if (!CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) || FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
-                    if (!mainPane.getChildren().contains(userNameError)) {
-                        updateUsernameError(userNameError, usernameTextField.getText());
-                        mainPane.getChildren().add(userNameError);
+                try {
+                    if (!CheckValidion.check(usernameTextField.getText(), CheckValidion.CHECK_USERNAME) || FileController.checkExistenceOfUserOrEmail(usernameTextField.getText(), true)) {
+                        if (!mainPane.getChildren().contains(userNameError)) {
+                            updateUsernameError(userNameError, usernameTextField.getText());
+                            mainPane.getChildren().add(userNameError);
+                        }
+                    } else if (mainPane.getChildren().contains(userNameError)) {
+                        mainPane.getChildren().remove(userNameError);
                     }
-                } else if (mainPane.getChildren().contains(userNameError)) {
-                    mainPane.getChildren().remove(userNameError);
+                } catch (IOException | InterruptedException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -291,10 +297,16 @@ public class SigningMenu extends Application {
                     }
                     if (mainPane.getChildren().contains(sloganTextField) && sloganTextField.getText().isEmpty())
                         saveError.setText("slogan is empty");
-                    else if(FileController.checkExistenceOfUserOrEmail(emailTextField.getText(),false))
-                        saveError.setText("existed email");
-                    else
-                        createQuestionScene();
+                    else {
+                        try {
+                            if(FileController.checkExistenceOfUserOrEmail(emailTextField.getText(),false))
+                                saveError.setText("existed email");
+                            else
+                                createQuestionScene();
+                        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 }
             }
             if (!mainPane.getChildren().contains(saveError))
@@ -355,7 +367,32 @@ public class SigningMenu extends Application {
                     if (pane.getChildren().contains(error))
                         pane.getChildren().remove(error);
 
-                    captchaScene(stage, selectedQuestionNumber[0], answerTextField.getText());
+//                    captchaScene(stage, selectedQuestionNumber[0], answerTextField.getText());
+//                    FileController.addUserToFile(usernameTextField.getText(), passwordTextField.getText(),
+//                            emailTextField.getText(), nicknameTextField.getText(), sloganTextField.getText(),
+//                            selectedQuestionNumber[0], answerTextField.getText());
+                    try {
+                        StartingMenu.getDOut().writeObject(new UserDetails(
+                                usernameTextField.getText(),
+                                passwordTextField.getText(),
+                                emailTextField.getText(),
+                                nicknameTextField.getText(),
+                                sloganTextField.getText(),
+                                selectedQuestionNumber[0],
+                                answerTextField.getText()
+                        ));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (startingMenu == null) {
+                        startingMenu = new StartingMenu();
+                    }
+                    try {
+                        stage.close();
+                        startingMenu.start(StartingMenu.mainStage);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 } else {
                     if (!pane.getChildren().contains(error))
                         pane.getChildren().add(error);
@@ -412,7 +449,7 @@ public class SigningMenu extends Application {
     }
 
 
-    private void updateUsernameError(Label label, String username) {
+    private void updateUsernameError(Label label, String username) throws IOException, InterruptedException, ClassNotFoundException {
         if (FileController.checkExistenceOfUserOrEmail(username, true))
             label.setText("The username exists");
         else

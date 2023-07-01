@@ -2,11 +2,12 @@ package view;
 
 import view.commands.StartMenuCommand;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
 public class StartMenu {
-    public void run(Scanner scanner){
+    public void run(Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String input ;
         Matcher matcher;
         while (true){
@@ -28,7 +29,7 @@ public class StartMenu {
         System.out.println("You are in the start menu:\n You can enter signup menu or login menu");
     }
 
-    public void checkWhichMenu(Matcher matcher,Scanner scanner,boolean isLogin){
+    public void checkWhichMenu(Matcher matcher,Scanner scanner,boolean isLogin) throws IOException, InterruptedException, ClassNotFoundException {
         if(!isLogin){
             System.out.println("you are in sign up menu");
             SignUpMenu signUpMenu=new SignUpMenu();

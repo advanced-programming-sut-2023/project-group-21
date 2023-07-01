@@ -3,14 +3,16 @@ package controller;
 
 
 import model.Game;
-import model.User;
+import ServerConnection.User;
 import view.message.LoginMessages;
+
+import java.io.IOException;
 
 
 public class LoginMenuController {
 
 
-    public LoginMessages CheckLogin(String username, String password) {
+    public LoginMessages CheckLogin(String username, String password) throws IOException, InterruptedException, ClassNotFoundException {
         password = FileController.encode(password);
         if (!FileController.checkExistenceOfUserOrEmail(username, true)) {
             OtherController.increaseSleepRate();

@@ -3,11 +3,12 @@ package view;
 import controller.OtherController;
 import controller.FileController;
 import controller.LoginMenuController;
-import model.User;
+import ServerConnection.User;
 import view.commands.CheckValidion;
 import view.commands.LoginCommands;
 import view.message.LoginMessages;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
@@ -15,7 +16,7 @@ public class LoginMenu {
     LoginMenuController loginMenuController = new LoginMenuController();
 
 
-    public void run(Scanner scanner) {
+    public void run(Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String line;
         Matcher matcher;
         while (true) {
@@ -40,7 +41,7 @@ public class LoginMenu {
         System.out.println("login menu!");
     }
 
-    public void checkLogin(Matcher matcher, Scanner scanner) {
+    public void checkLogin(Matcher matcher, Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         boolean state = matcher.group("last") != null;
         String username = OtherController.myTrim(matcher.group("username"));
         String password = OtherController.myTrim(matcher.group("password"));
@@ -76,7 +77,7 @@ public class LoginMenu {
 
 
 
-    public void checkForgotPassword(Matcher matcher, Scanner scanner) {
+    public void checkForgotPassword(Matcher matcher, Scanner scanner) throws IOException, InterruptedException, ClassNotFoundException {
         String username = OtherController.myTrim(matcher.group("username"));
         OtherController.sleepNormal();
         System.out.println("please enter the captcha!");

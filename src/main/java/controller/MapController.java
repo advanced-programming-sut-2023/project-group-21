@@ -1,15 +1,16 @@
 package controller;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Game;
-import model.User;
+import ServerConnection.User;
 import model.generalenums.Extras;
 import model.generalenums.GroundTexture;
 import view.message.MapMessages;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MapController {
+public class MapController implements Serializable {
     public MapController() {
         System.out.println("new object!");
     }

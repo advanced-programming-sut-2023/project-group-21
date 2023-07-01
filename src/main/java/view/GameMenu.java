@@ -3,9 +3,9 @@ package view;
 
 import controller.GameController;
 import controller.OtherController;
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
-import model.User;
+import ServerConnection.User;
 import view.commands.GameMenuCommand;
 import view.commands.MapCommand;
 import view.message.GameMessage;

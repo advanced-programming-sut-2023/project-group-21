@@ -13,13 +13,32 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import model.User;
 
+import java.io.*;
+import java.net.Socket;
 import java.net.URL;
 
 public class StartingMenu extends Application {
+    private static ObjectInputStream dIn;
+    private static ObjectOutputStream dOut;
+    private static OutputStream outputStream;
+    private static InputStream inputStream;
+    private static Socket socket;
+
+    static {
+        try {
+            socket = new Socket("localhost", 8080);
+            outputStream = socket.getOutputStream();
+            dOut = new ObjectOutputStream(outputStream);
+            inputStream = socket.getInputStream();
+            dIn = new ObjectInputStream(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Stage mainStage;
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         FileController.start();
         launch(args);
     }
@@ -29,7 +48,6 @@ public class StartingMenu extends Application {
         URL url = StartMenu.class.getResource("/FXML/StartingMenu.fxml");
         Pane mainPane = FXMLLoader.load(url);
         mainStage=stage;
-
         addButtons(mainPane);
         addOtherGraphics(mainPane);
 
@@ -111,5 +129,19 @@ public class StartingMenu extends Application {
                 upperLine2,rightLine2,leftLine2,downLine1,downLine2);
     }
 
+    public static ObjectInputStream getDIn() {
+        return dIn;
+    }
 
+    public static ObjectOutputStream getDOut() {
+        return dOut;
+    }
+
+    public static OutputStream getOutputStream() {
+        return outputStream;
+    }
+
+    public static InputStream getInputStream() {
+        return inputStream;
+    }
 }

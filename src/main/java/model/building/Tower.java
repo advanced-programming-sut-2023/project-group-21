@@ -1,6 +1,6 @@
 package model.building;
 
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
 import model.building.Enums.TowerDetails;

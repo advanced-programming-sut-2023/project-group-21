@@ -1,13 +1,14 @@
 package view;
 
+import ServerConnection.DropBuilding;
+import ServerConnection.MakeTroop;
 import controller.GameController;
 import controller.MapController;
 import controller.VboxCreator;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -16,6 +17,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -30,7 +34,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import model.Cell;
+import ServerConnection.Cell;
 import model.Government;
 import model.building.Enums.BuildingsDetails;
 import model.generalenums.Extras;
@@ -50,14 +54,15 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 
-public class MapViewGui extends Application implements Initializable {
+public class MapViewGui extends Application implements Initializable, Runnable {
     private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
             "/src/main/resources/CSS/Texture.css";
     private final static String MY_PATH = new File("").getAbsolutePath();
     private String[] textureItem;
     private final Label errorLabel = new Label("");
     private double startDragX = 0, startDragY = 0;
-    private int CELL_SIZE = 75, MINI_MAP_SIZE = 10;
+    private int CELL_SIZE = 75;
+    private final int MINI_MAP_SIZE = 10;
     @FXML
     private Pane cellPane, miniMap;
     @FXML
@@ -65,7 +70,7 @@ public class MapViewGui extends Application implements Initializable {
     private AnchorPane anchorPane;
     private ArrayList<Worker> guiWorker;
     private Cell[][] showingMap;
-    private int destinationX = 5, destinatioinY = 5;
+    private int destinationX = 5, destinationY = 5;
     private int currentX = 5, currentY = 5;
     public MapController mapController;
     public static MapController mapControllerStatic;
@@ -84,6 +89,7 @@ public class MapViewGui extends Application implements Initializable {
     private double XFullDrag = 0, YFullDrag = 0;
     private Stage mainStage;
     private MainMenu mainMenu;
+    private GetChanges getChanges;
 
 
     public static boolean isInGame = false;
@@ -133,62 +139,72 @@ public class MapViewGui extends Application implements Initializable {
                     BackgroundSize.DEFAULT);
             anchorPane.setBackground(new Background(myBI));
             Scene mapScene = new Scene(anchorPane);
-            stage.setScene(mapScene);
-            stage.show();
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    stage.setScene(mapScene);
+                    stage.show();
+                }
+            });
         } catch (IOException | NullPointerException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void showMap(Cell[][] myMap) {
-        showingMap = myMap;
-        if (cellPane.getChildren().size() > 1)
-            cellPane.getChildren().remove(0, cellPane.getChildren().size());
-        for (int i1 = 0; i1 < myMap.length && i1 < (600 / CELL_SIZE); i1++)
-            for (int i2 = 0; i2 < myMap.length && i2 < (600 / CELL_SIZE); i2++) {
-                Label label = myMap[i1][i2].toLabel(CELL_SIZE * i1, CELL_SIZE * i2, CELL_SIZE);
-                int finalI = i1;
-                if ((currentX + i1 - 1) >= selectedX1 && (currentX + i1 - 1) <= selectedX2 &&
-                        (currentY + i2 - 1) >= selectedY1 && (currentY + i2 - 1) <= selectedY2) {
-                    label.setOpacity(0.4);
-                }
-                int finalI1 = i2;
-                label.setOnMouseClicked(mouseEvent -> {
-                    if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                        System.out.println("click on sec");
-                        isDraggedExtra = false;
-                        if (!isInGame) {
-                            if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
-                                    (currentY + finalI1 - 1) <= selectedY2 && (currentY + finalI1 - 1) >= selectedY1)
-                                setTexture(selectedX1, selectedY1, selectedX2, selectedY2);
-                            else
-                                setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
-                                        currentX + finalI - 1, currentY + finalI1 - 1);
-                        } else {
-                            showMoveStage(finalI + currentX - 1, finalI1 + currentY - 1);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                showingMap = myMap;
+                if (cellPane.getChildren().size() > 1)
+                    cellPane.getChildren().remove(0, cellPane.getChildren().size());
+                for (int i1 = 0; i1 < myMap.length && i1 < (600 / CELL_SIZE); i1++)
+                    for (int i2 = 0; i2 < myMap.length && i2 < (600 / CELL_SIZE); i2++) {
+                        Label label = myMap[i1][i2].toLabel(CELL_SIZE * i1, CELL_SIZE * i2, CELL_SIZE);
+                        int finalI = i1;
+                        if ((currentX + i1 - 1) >= selectedX1 && (currentX + i1 - 1) <= selectedX2 &&
+                                (currentY + i2 - 1) >= selectedY1 && (currentY + i2 - 1) <= selectedY2) {
+                            label.setOpacity(0.4);
                         }
-                    }
-                });
-                label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1, currentY + i2)));
+                        int finalI1 = i2;
+                        label.setOnMouseClicked(mouseEvent -> {
+                            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                                System.out.println("click on sec");
+                                isDraggedExtra = false;
+                                if (!isInGame) {
+                                    if ((currentX + finalI - 1) <= selectedX2 && (currentX + finalI - 1) >= selectedX1 &&
+                                            (currentY + finalI1 - 1) <= selectedY2 && (currentY + finalI1 - 1) >= selectedY1)
+                                        setTexture(selectedX1, selectedY1, selectedX2, selectedY2);
+                                    else
+                                        setTexture(currentX + finalI - 1, currentY + finalI1 - 1,
+                                                currentX + finalI - 1, currentY + finalI1 - 1);
+                                } else {
+                                    showMoveStage(finalI + currentX - 1, finalI1 + currentY - 1);
+                                }
+                            }
+                        });
+                        label.setTooltip(new Tooltip(mapController.showDetails(currentX + i1, currentY + i2)));
 
-                cellPane.getChildren().add(label);
+                        cellPane.getChildren().add(label);
+                    }
+                if (600 % CELL_SIZE != 0) {
+                    int thing = 600 / CELL_SIZE;
+                    for (int i = 0; i < thing && i < myMap.length; i++) {
+                        Label label = myMap[thing][i].toLabel(thing * CELL_SIZE, i * CELL_SIZE,
+                                (600 - CELL_SIZE * (thing)), CELL_SIZE);
+                        cellPane.getChildren().add(label);
+                    }
+                    for (int i = 0; i < (600 / CELL_SIZE) && i < myMap.length; i++) {
+                        Label label = myMap[i][thing].toLabel(i * CELL_SIZE, thing * CELL_SIZE, CELL_SIZE,
+                                600 - CELL_SIZE * thing);
+                        cellPane.getChildren().add(label);
+                    }
+                    Label label = myMap[thing][thing].toLabel(CELL_SIZE * thing,
+                            CELL_SIZE * thing, 600 - CELL_SIZE * thing, 600 - CELL_SIZE * thing);
+                    cellPane.getChildren().add(label);
+                }
             }
-        if (600 % CELL_SIZE != 0) {
-            int thing = 600 / CELL_SIZE;
-            for (int i = 0; i < thing && i < myMap.length; i++) {
-                Label label = myMap[thing][i].toLabel(thing * CELL_SIZE, i * CELL_SIZE,
-                        (600 - CELL_SIZE * (thing)), CELL_SIZE);
-                cellPane.getChildren().add(label);
-            }
-            for (int i = 0; i < (600 / CELL_SIZE) && i < myMap.length; i++) {
-                Label label = myMap[i][thing].toLabel(i * CELL_SIZE, thing * CELL_SIZE, CELL_SIZE,
-                        600 - CELL_SIZE * thing);
-                cellPane.getChildren().add(label);
-            }
-            Label label = myMap[thing][thing].toLabel(CELL_SIZE * thing,
-                    CELL_SIZE * thing, 600 - CELL_SIZE * thing, 600 - CELL_SIZE * thing);
-            cellPane.getChildren().add(label);
-        }
+        });
     }
 
 
@@ -561,7 +577,8 @@ public class MapViewGui extends Application implements Initializable {
         spinnerX.setMaxWidth(60);
         spinnerY.setMaxWidth(60);
         spinnerY.relocate(300, 280);
-        spinnerX.setEditable(true);spinnerY.setEditable(true);
+        spinnerX.setEditable(true);
+        spinnerY.setEditable(true);
         HBox hBox = new HBox();
         scrollPane1.setContent(hBox);
         ArrayList<Worker> people;
@@ -607,7 +624,7 @@ public class MapViewGui extends Application implements Initializable {
         moveButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 destinationX = spinnerX.getValue();
-                destinatioinY = spinnerY.getValue();
+                destinationY = spinnerY.getValue();
                 move(finalPeople);
                 moveUnitStage.close();
             }
@@ -629,7 +646,7 @@ public class MapViewGui extends Application implements Initializable {
         guiWorker = workers;
         for (Worker worker : workers)
             if (worker.getIsGoingToMoveGui()) {
-                worker.setDestination(mapController.getCell(destinationX, destinatioinY));//
+                worker.setDestination(mapController.getCell(destinationX, destinationY));//
                 worker.setGoingToMoveGui(false);//ready for next turn!
             }
     }
@@ -639,10 +656,11 @@ public class MapViewGui extends Application implements Initializable {
             for (int i2 = selectedY1; i2 <= selectedY2; i2++)
                 mapController.removeBuilding(i1, i2);
         showMap(showingMap);
+        miniMap();
     }
 
 
-    private void nextTurn() {//called by pressing 'n'
+    private void nextTurn() throws IOException {//called by pressing 'n'
         if (!isInGame)
             return;
         System.out.println("next turn is called!");
@@ -652,16 +670,20 @@ public class MapViewGui extends Application implements Initializable {
         updateObjectBox(VboxCreator.CASTLE_BUILDINGS);//make it default
         showMap(showingMap);//update map
         miniMap();
-        if (guiWorker != null)
+        if (guiWorker != null) {
             for (Worker myWorker : guiWorker)
                 myWorker.setGoingToMoveGui(false);
+        }
+        StartingMenu.getDOut().writeObject("next " + gameController.getCurrentGovernment().getLord().getUserName());
+        getChanges.canMakeChanges = false;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         errorLabel.relocate(900, 200);
-        if (gameController == null)
+        if (gameController == null) {
             gameController = staticGameController;
+        }
         if (mapControllerStatic == null) {
             if (MainMenu.staticMapController != null) {
             } else {
@@ -669,29 +691,38 @@ public class MapViewGui extends Application implements Initializable {
             }
             mapController = MainMenu.staticMapController;
             mapControllerStatic = mapController;
-        } else
+        } else {
             mapController = mapControllerStatic;
+        }
+
+        getChanges = new GetChanges(this);
+        getChanges.setGameController(staticGameController);
+        getChanges.start();
+
         textureItem = new String[GroundTexture.values().length];
         for (int i = 0; i < textureItem.length; i++)
             textureItem[i] = GroundTexture.values()[i].getName();
         if (!isInGame) initExtra();
         else initGame();
-        miniMap();
         cellPane.setOnScroll(scrollEvent -> {
-            if (scrollEvent.getDeltaY() < 1 && scrollEvent.getDeltaY() > -1)
+            if (scrollEvent.getDeltaY() < 1 && scrollEvent.getDeltaY() > -1) {
                 return;
-            if (scrollEvent.getDeltaY() > 0)
+            }
+            if (scrollEvent.getDeltaY() > 0) {
                 zoomIn();
-            else
+            } else {
                 zoomOut();
+            }
         });
 
         mainPane.setOnMouseDragReleased(mouseDragEvent -> {
             double xPane = mouseDragEvent.getX() - X_CELL_PANE, yPane = mouseDragEvent.getY() - Y_CELL_PANE;
-            if (xPane >= 600 || xPane < 0 || yPane >= 600 || yPane < 0)
+            if (xPane >= 600 || xPane < 0 || yPane >= 600 || yPane < 0) {
                 return;
-            if (!(XFullDrag >= 600 || XFullDrag < 0 || YFullDrag >= 600 || YFullDrag < 0))
+            }
+            if (!(XFullDrag >= 600 || XFullDrag < 0 || YFullDrag >= 600 || YFullDrag < 0)) {
                 return;
+            }
             if (selectedExtra != null) {
                 if (isDraggedExtra) {
                     isDraggedExtra = false;
@@ -703,6 +734,7 @@ public class MapViewGui extends Application implements Initializable {
                         raiseError(MapMessages.NULL_MESSAGE);
                     }
                     showMap(showingMap);
+                    miniMap();
                     selectedExtra = null;
                     return;
                 }
@@ -712,26 +744,53 @@ public class MapViewGui extends Application implements Initializable {
                     raiseError(messages);
                 }
                 showMap(showingMap);
+                miniMap();
                 selectedExtra = null;
                 return;
             } else if (selectedBuildingDetails != null) {
-                GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (xPane / CELL_SIZE) - 1,
-                        currentY + (int) (yPane / CELL_SIZE) - 1, selectedBuildingDetails.getName());
-                alert(gameMessage);
-                showMap(showingMap);
-                updateDetailsBox();
-                updateResourcesBox();
-                selectedBuildingDetails = null;
+                if (getChanges.canMakeChanges) {
+                    GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (xPane / CELL_SIZE) - 1,
+                            currentY + (int) (yPane / CELL_SIZE) - 1, selectedBuildingDetails.getName());
+                    alert(gameMessage);
+                    showMap(showingMap);
+                    miniMap();
+                    updateDetailsBox();
+                    updateResourcesBox();
+                    try {
+                        if (gameMessage.equals(GameMessage.SUCCESS))
+                            StartingMenu.getDOut().writeObject(new DropBuilding(selectedBuildingDetails,
+                                    currentX + (int) (xPane / CELL_SIZE) - 1,
+                                    currentY + (int) (yPane / CELL_SIZE) - 1
+                            ));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    selectedBuildingDetails = null;
+                } else {
+                    System.out.println("Not your Turn");
+                }
             } else if (selectedWorkerDetails != null) {
-                GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(), 1,
-                        currentX + (int) (xPane / CELL_SIZE) - 1,
-                        currentY + (int) (yPane / CELL_SIZE) - 1);
-                alert(gameMessage);
-                System.out.println(gameMessage);
-                updateDetailsBox();
-                updateResourcesBox();
-                selectedWorkerDetails = null;
-                showMap(showingMap);
+                if (getChanges.canMakeChanges) {
+                    GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(), 1,
+                            currentX + (int) (xPane / CELL_SIZE) - 1,
+                            currentY + (int) (yPane / CELL_SIZE) - 1);
+                    alert(gameMessage);
+                    System.out.println(gameMessage);
+                    updateDetailsBox();
+                    updateResourcesBox();
+                    showMap(showingMap);
+                    miniMap();
+                    try {
+                        if (gameMessage.equals(GameMessage.SUCCESS))
+                            StartingMenu.getDOut().writeObject(new MakeTroop(selectedWorkerDetails,
+                                    currentX + (int) (xPane / CELL_SIZE) - 1,
+                                    currentY + (int) (yPane / CELL_SIZE) - 1
+                            ));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    selectedWorkerDetails = null;
+                } else System.out.println("Not Your Turn");
             } else {
                 Cell cell = mapController.getCell(currentX + (int) (xPane / CELL_SIZE) - 1,
                         currentY + (int) (yPane / CELL_SIZE) - 1);
@@ -747,38 +806,44 @@ public class MapViewGui extends Application implements Initializable {
 
         });
         mainPane.setOnKeyPressed(keyEvent -> {// for handling shortcuts!
-            if (keyEvent.getCode() == KeyCode.S)
+            if (keyEvent.getCode() == KeyCode.S) {
                 save();
-            else if (keyEvent.getCode() == KeyCode.Q)
+            } else if (keyEvent.getCode() == KeyCode.Q) {
                 back();
-            else if (keyEvent.getCode() == KeyCode.N)
-                nextTurn();//for going to next turn
-            else if (keyEvent.getCode() == KeyCode.G)
+            } else if (keyEvent.getCode() == KeyCode.N) {
+                try {
+                    nextTurn();//for going to next turn
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (keyEvent.getCode() == KeyCode.G) {
                 gotoXY();
-            else if (keyEvent.getCode() == KeyCode.L)
+            } else if (keyEvent.getCode() == KeyCode.L) {
                 goLeft();
-            else if (keyEvent.getCode() == KeyCode.R)
+            } else if (keyEvent.getCode() == KeyCode.R) {
                 goRight();
-            else if (keyEvent.getCode() == KeyCode.U)
+            } else if (keyEvent.getCode() == KeyCode.U) {
                 goUp();
-            else if (keyEvent.getCode() == KeyCode.D)
+            } else if (keyEvent.getCode() == KeyCode.D) {
                 goDown();
-            else if (keyEvent.getCode() == KeyCode.P)
+            } else if (keyEvent.getCode() == KeyCode.P) {
                 gameController.printAllGovernments();
-            else if (keyEvent.getCode() == KeyCode.E)
+            } else if (keyEvent.getCode() == KeyCode.E) {
                 removeObjects();
-            else if (keyEvent.getCode() == KeyCode.C)
+            } else if (keyEvent.getCode() == KeyCode.C) {
                 copyBuilding();
-            else if (keyEvent.getCode() == KeyCode.V)
+            } else if (keyEvent.getCode() == KeyCode.V) {
                 pasteBuilding();
-            else if (keyEvent.getCode() == KeyCode.T)
+            } else if (keyEvent.getCode() == KeyCode.T) {
                 showTaxStage();
+            }
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        if (!mapController.isInitState())
+        if (!mapController.isInitState()) {
             mapController.loadMapNormal();
+        }
         showMap(mapController.showMapGui(currentX, currentY));
-
+        miniMap();
         cellPane.setOnDragDetected(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
                 if (mouseEvent.getButton() == MouseButton.MIDDLE) {
@@ -824,26 +889,39 @@ public class MapViewGui extends Application implements Initializable {
                         raiseError(MapMessages.NULL_MESSAGE);
                     }
                     showMap(showingMap);
+                    miniMap();
                     selectedExtra = null;
                     return;
                 }
-                isDraggedExtra = false;
                 MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                         currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
                 if (messages != MapMessages.SUCCESS) {
                     raiseError(messages);
                 }
                 showMap(showingMap);
+                miniMap();
                 selectedExtra = null;
                 return;
             } else if (selectedBuildingDetails != null) {
-                GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
-                        currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails.getName());
-                alert(gameMessage);
-                showMap(showingMap);
-                updateDetailsBox();
-                updateResourcesBox();
-                selectedBuildingDetails = null;
+                if (getChanges.canMakeChanges) {
+                    GameMessage gameMessage = gameController.checkDropBuilding(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                            currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedBuildingDetails.getName());
+                    alert(gameMessage);
+                    showMap(showingMap);
+                    miniMap();
+                    updateDetailsBox();
+                    updateResourcesBox();
+                    try {
+                        if (gameMessage.equals(GameMessage.SUCCESS))
+                            StartingMenu.getDOut().writeObject(new DropBuilding(selectedBuildingDetails,
+                                    currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                                    currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1
+                            ));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    selectedBuildingDetails = null;
+                } else System.out.println("Not your Turn");
             } else if (selectedWorkerDetails != null) {
                 GameMessage gameMessage = gameController.checkMakeTroop(selectedWorkerDetails.getName(), 1,
                         currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
@@ -852,8 +930,18 @@ public class MapViewGui extends Application implements Initializable {
                 System.out.println(gameMessage);
                 updateDetailsBox();
                 updateResourcesBox();
-                selectedWorkerDetails = null;
                 showMap(showingMap);
+                miniMap();
+                try {
+                    if (gameMessage.equals(GameMessage.SUCCESS))
+                        StartingMenu.getDOut().writeObject(new MakeTroop(selectedWorkerDetails,
+                                currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
+                                currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1
+                        ));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                selectedWorkerDetails = null;
             } else {
                 Cell cell = mapController.getCell(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                         currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1);
@@ -887,6 +975,7 @@ public class MapViewGui extends Application implements Initializable {
             String name = gameController.getCopyBuildingDetail().getName();
             alert(gameController.checkDropBuilding(selectedX1, selectedY1, name));
             showMap(showingMap);
+            miniMap();
         }
     }
 
@@ -897,11 +986,11 @@ public class MapViewGui extends Application implements Initializable {
         Slider fearRateSlide = new Slider();
         Government currentGovernment = gameController.getCurrentGovernment();
 
-        StackPane stackPaneTax = getStackPane("tax",currentGovernment,20,"file:" + MY_PATH +
+        StackPane stackPaneTax = getStackPane("tax", currentGovernment, 20, "file:" + MY_PATH +
                 "/src/main/resources/images/tax_stage/tax.png");
-        StackPane stackPaneFear = getStackPane("fear",currentGovernment,60,"file:" + MY_PATH +
+        StackPane stackPaneFear = getStackPane("fear", currentGovernment, 60, "file:" + MY_PATH +
                 "/src/main/resources/images/tax_stage/fear.png");
-        StackPane stackPaneFood = getStackPane("food",currentGovernment,100,"file:" + MY_PATH +
+        StackPane stackPaneFood = getStackPane("food", currentGovernment, 100, "file:" + MY_PATH +
                 "/src/main/resources/images/tax_stage/tax.png");
 
         Button closeButton = new Button("save");
@@ -920,7 +1009,7 @@ public class MapViewGui extends Application implements Initializable {
         taxStage.show();
     }
 
-    private StackPane getStackPane(String type, Government currentGovernment,int Y , String fullPath) {
+    private StackPane getStackPane(String type, Government currentGovernment, int Y, String fullPath) {
         Label label = switch (type) {
             case ("tax") -> new Label("tax rate:" + currentGovernment.getTaxRate());
             case ("fear") -> new Label("fear rate: " + currentGovernment.getFearRate());
@@ -929,14 +1018,14 @@ public class MapViewGui extends Application implements Initializable {
         ImageView iv = new ImageView(fullPath);
         iv.setFitWidth(20);
         iv.setFitHeight(20);
-        iv.relocate(label.getWidth(),0);
-        StackPane stackPane = new StackPane(label,iv);
+        iv.relocate(label.getWidth(), 0);
+        StackPane stackPane = new StackPane(label, iv);
         if (type.equals("food")) {
             stackPane.setStyle("-fx-background-color: green");
-        }else
+        } else
             stackPane.setStyle("-fx-background-color: red");
 
-        stackPane.relocate(20,Y);
+        stackPane.relocate(20, Y);
         return stackPane;
     }
 
@@ -961,7 +1050,8 @@ public class MapViewGui extends Application implements Initializable {
         Spinner<Integer> ySpinner = new Spinner<>();
         xSpinner.setMaxWidth(86);
         ySpinner.setMaxWidth(86);
-        xSpinner.setEditable(true);ySpinner.setEditable(true);
+        xSpinner.setEditable(true);
+        ySpinner.setEditable(true);
         SpinnerValueFactory<Integer> XFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
                 mapController.getMap().length, mapController.getMap().length / 2);
         SpinnerValueFactory<Integer> YFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,
@@ -976,6 +1066,7 @@ public class MapViewGui extends Application implements Initializable {
             currentX = xSpinner.getValue() - 1;
             currentY = ySpinner.getValue() - 1;
             showMap(mapController.showMapGui(xSpinner.getValue() - 1, ySpinner.getValue() - 1));
+            miniMap();
             goStage.close();
         });
         thisPane.getChildren().addAll(go, xSpinner, ySpinner);
@@ -1058,27 +1149,54 @@ public class MapViewGui extends Application implements Initializable {
     }
 
     public void miniMap() {
-        if (miniMap != null && miniMap.getChildren() != null) miniMap.getChildren().remove(0, miniMap.getChildren().size());
-        else miniMap = new Pane();
-        int startX = 0, startY = 0, centerX = currentX + 3, centerY = currentY + 3;
-        if (centerX < 10 && centerY < 10);
-        else if (centerX < 10) startY = centerY - 10;
-        else if (centerY < 10) startX = centerX - 10;
-        else if (centerX > 190 && centerY > 190) startY = startX = 180;
-        else if (centerX > 190) {
-            startX = 180;
-            startY = centerY - 10;
-        } else if (centerY > 190) {
-            startX = centerX - 10;
-            startY = 180;
-        } else {
-            startX = centerX - 10;
-            startY = centerY - 10;
-        }
-        for (int i1 = startX, x = 0; i1 < startX + 20; i1++, x++)
-            for (int i2 = startY, y = 0; i2 < startY + 20; i2++, y++) {
-                Label label = mapController.getCell(i1, i2).toLabel(MINI_MAP_SIZE * x, MINI_MAP_SIZE * y, MINI_MAP_SIZE);
-                miniMap.getChildren().add(label);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (miniMap != null && miniMap.getChildren() != null)
+                    miniMap.getChildren().remove(0, miniMap.getChildren().size());
+                else miniMap = new Pane();
+                int startX = 0, startY = 0, centerX = currentX + 3, centerY = currentY + 3;
+                if (centerX < 10 && centerY < 10) ;
+                else if (centerX < 10) startY = centerY - 10;
+                else if (centerY < 10) startX = centerX - 10;
+                else if (centerX > 190 && centerY > 190) startY = startX = 180;
+                else if (centerX > 190) {
+                    startX = 180;
+                    startY = centerY - 10;
+                } else if (centerY > 190) {
+                    startX = centerX - 10;
+                    startY = 180;
+                } else {
+                    startX = centerX - 10;
+                    startY = centerY - 10;
+                }
+                for (int i1 = startX, x = 0; i1 < startX + 20; i1++, x++)
+                    for (int i2 = startY, y = 0; i2 < startY + 20; i2++, y++) {
+                        Label label = mapController.getCell(i1, i2).toLabel(MINI_MAP_SIZE * x, MINI_MAP_SIZE * y, MINI_MAP_SIZE);
+                        miniMap.getChildren().add(label);
+                    }
             }
+        });
+
+    }
+
+    @Override
+    public void run() {
+    }
+
+    public void showOriginalMap() {
+        showMap(showingMap);
+    }
+
+    public void dropBuilding(DropBuilding dropBuilding) {
+        gameController.dropOpponentBuilding(dropBuilding);
+        showMap(showingMap);
+        miniMap();
+    }
+
+    public void makeTroop(MakeTroop makeTroop) {
+        gameController.makeOpponentTroop(makeTroop);
+        showMap(showingMap);
+        miniMap();
     }
 }
