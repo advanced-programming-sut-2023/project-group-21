@@ -160,6 +160,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
             return;
         ShoppingMenu shoppingMenu=new ShoppingMenu();
         shoppingMenu.setGovernment(gameController.getCurrentGovernment());
+        shoppingMenu.setGameController(gameController);
         try {
             Stage shoppingStage = new Stage();
             shoppingStage.setOnCloseRequest(windowEvent -> {

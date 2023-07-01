@@ -1,5 +1,6 @@
 package view;
 
+import controller.GameController;
 import controller.ShopController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -18,6 +19,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ServerConnection.Cell;
+import model.Game;
 import model.Government;
 import ServerConnection.User;
 import model.generalenums.Resource;
@@ -38,6 +40,7 @@ public class ShoppingMenu extends Application {
     private Label message;
     private int selectedAmount=1;
     private Stage shopStage;
+    private GameController gameController;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -95,8 +98,10 @@ public class ShoppingMenu extends Application {
             TradingMenu tradingMenu=new TradingMenu();
             Government government=new Government(new User("s","s","s","s","s",0),new Cell(20,20));
             tradingMenu.setGovernment(government);
-            tradingMenu.addGovernments(new Government(new User("a","a","a","a","a",0),new Cell(10,10)));
-            tradingMenu.addGovernments(new Government(new User("d","d","d","d","d",0),new Cell(18,18)));
+            tradingMenu.setGovernment(this.government);
+            for (Government gameControllerGovernment : gameController.getGovernments()) {
+                tradingMenu.addGovernments(gameControllerGovernment);
+            }
             try {
                 tradingMenu.start(shopStage);
             } catch (Exception e) {
@@ -211,4 +216,7 @@ public class ShoppingMenu extends Application {
             selected.setText(String.valueOf(selectedAmount));
     }
 
+    public void setGameController(GameController gameController) {
+        this.gameController=gameController;
+    }
 }
