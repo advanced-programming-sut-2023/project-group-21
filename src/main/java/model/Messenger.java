@@ -1,5 +1,6 @@
 package model;
 
+import ServerConnection.User;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -13,9 +14,10 @@ import javafx.stage.Stage;
 import model.generalenums.MessageEnum;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Messenger {
+public class Messenger implements Serializable {
     private final static  String PROJECT_ADDRESS = (new File("")).getAbsolutePath();
     private final ScrollPane scrollPane = new ScrollPane();
     private final ArrayList<Chat> allChat;

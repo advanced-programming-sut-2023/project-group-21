@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -104,7 +105,7 @@ public class FileController {
             if (tempObject.get("username").equals(username)) {
                 return (new User((String) tempObject.get("username"), (String) tempObject.get("password"),
                         (String) tempObject.get("nickname"), (String) tempObject.get("email"),
-                        (String) tempObject.get("slogan")));
+                        (String) tempObject.get("slogan"), ((Long)tempObject.get("score")).intValue()));
             }
         }
         return null;
@@ -243,6 +244,28 @@ public class FileController {
             if (temp.get("username").equals(username))
                 temp.replace("score", ((Long)temp.get("score"))+ change);
         }
+    }
+
+    public static ArrayList<User> getAllUsers() {
+        ArrayList<User> result=new ArrayList<>();
+        try {
+            StartingMenu.getDOut().writeObject("get all users");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            Thread.sleep(Duration.ofMillis(50));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            result= (ArrayList<User>) StartingMenu.getDIn().readObject();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
 

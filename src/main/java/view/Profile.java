@@ -24,7 +24,6 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ServerConnection.User;
-import model.User;
 import model.*;
 import view.commands.CheckValidion;
 
@@ -81,7 +80,7 @@ public class Profile extends Application {
             table.getColumns().addAll(nameColumn, scoreColumn, timeColumn);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-            FileController.getAllUsers().sort(User::compareTo);
+//            FileController.getAllUsers().sort(User::compareTo);
             ObservableList<User> users= FXCollections.observableArrayList(FileController.getAllUsers());
 
             table.setItems(users);

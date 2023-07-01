@@ -1,5 +1,6 @@
 package model;
 
+import ServerConnection.User;
 import controller.TradingController;
 import model.generalenums.Resource;
 import view.message.TradeMenuMessage;

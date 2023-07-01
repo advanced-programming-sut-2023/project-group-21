@@ -160,6 +160,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
             return;
         ShoppingMenu shoppingMenu=new ShoppingMenu();
         shoppingMenu.setGovernment(gameController.getCurrentGovernment());
+        shoppingMenu.setGameController(gameController);
         try {
             Stage shoppingStage = new Stage();
             shoppingStage.setOnCloseRequest(windowEvent -> {
@@ -857,8 +858,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
                 pasteBuilding();
             } else if (keyEvent.getCode() == KeyCode.T) {
                 showTaxStage();
-            }
-            else if (keyEvent.getCode() == KeyCode.Y)
+            } else if (keyEvent.getCode() == KeyCode.Y)
                 startShop();
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);

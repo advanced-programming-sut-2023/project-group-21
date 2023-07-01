@@ -29,10 +29,13 @@ public class JoinGameMenu extends Application {
         gridPane.setVgap(40);
         gridPane.setGridLinesVisible(true);
         gridPane.setBorder(new Border(new BorderStroke(Color.YELLOW, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-        Button button = new Button("Refresh");
-        button.relocate(520, 5);
-        borderPane.setBottom(button);
-        button.setOnMouseClicked(mouseEvent -> {
+
+        HBox hBox = new HBox();
+
+        Button refresh = new Button("Refresh");
+        refresh.relocate(520, 5);
+        refresh.setMaxWidth(150);
+        refresh.setOnMouseClicked(mouseEvent -> {
             try {
                 StartingMenu.getDOut().writeObject("refresh");
                 Thread.sleep(50);
@@ -41,6 +44,20 @@ public class JoinGameMenu extends Application {
                 throw new RuntimeException(e);
             }
         });
+
+        Button exitGroupGame = new Button("Exit Group Game");
+        exitGroupGame.setMaxWidth(150);
+        exitGroupGame.setOnMouseClicked(mouseEvent -> {
+            try {
+                StartingMenu.getDOut().writeObject("cancel");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        hBox.setSpacing(50);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(refresh, exitGroupGame);
+        borderPane.setBottom(hBox);
         createGridPane();
 
         WaitForMap waitForMap = new WaitForMap(this, mainMenu);
@@ -60,7 +77,9 @@ public class JoinGameMenu extends Application {
                 outer:
                 for (int i = 0; i < 5; i++) {
                     for (int j = 0; j < 3; j++) {
-                        gridPane.add(createGameDetails(games.get(count++)), i, j, 1, 1);
+                        GroupGame group = games.get(count++);
+                        if ((!group.isPrivate) || group.getChosenUsers().contains(mainMenu.getUser().getUserName()))
+                            gridPane.add(createGameDetails(group), i, j, 1, 1);
                         if (count == games.size()) break outer;
                     }
                 }

@@ -33,6 +33,11 @@ public class GameController {
     private TreeMap<Integer, TreeMap<Integer, ArrayList<Cell>>> opens = new TreeMap<>();
     private final HashSet<Cell> openSet = new HashSet<>();
     private final Cell[][] map;
+
+    public ArrayList<Government> getGovernments() {
+        return governments;
+    }
+
     private final ArrayList<Government> governments;
     private Building selectedBuilding;
     private Worker selectedWorker;

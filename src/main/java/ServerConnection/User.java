@@ -2,13 +2,11 @@ package ServerConnection;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
-    String userName, password, nickName, email, slogan, passwordRecoveryAnswer,pictureName;
+import model.Chat;
 import model.generalenums.MessageEnum;
 
 import java.util.ArrayList;
-
-public class User implements Comparable<User>{
+public class User implements Serializable, Comparable<User> {
     private String userName, password, nickName, email, slogan, passwordRecoveryAnswer,pictureName;
     private Integer score;
     private Boolean isOnline;
@@ -32,8 +30,8 @@ public class User implements Comparable<User>{
         this.score=score;
         this.isOnline=false;
         pictureName="pic1.jpg";
-        Chat chat = new Chat(this, MessageEnum.PRIVATE_CHAT);
-        chats.add(chat);
+//        Chat chat = new Chat(this, MessageEnum.PRIVATE_CHAT);
+//        chats.add(chat);
     }
 
     public String getPasswordRecoveryAnswer() {

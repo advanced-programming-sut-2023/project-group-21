@@ -1,5 +1,6 @@
 package model;
 
+import ServerConnection.User;
 import controller.OtherController;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -13,9 +14,10 @@ import javafx.scene.shape.Circle;
 import model.generalenums.MessageEnum;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Chat {
+public class Chat implements Serializable {
     private final User admin;
     private final ArrayList<User> allUsers = new ArrayList<>();
     private final ArrayList<Message> allMessages = new ArrayList<>();
@@ -27,7 +29,7 @@ public class Chat {
     private final MessageEnum messageEnum;
     VBox mainPane = new VBox();
 
-    public Chat(User admin,MessageEnum messageEnum) {
+    public Chat(User admin, MessageEnum messageEnum) {
         this.admin = admin;
         allUsers.add(admin);
         this.messageEnum = messageEnum;
