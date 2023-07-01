@@ -1,12 +1,12 @@
 package view;
 
+import ServerConnection.User;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Chat;
 import model.Message;
 import model.Messenger;
-import model.User;
 import model.generalenums.MessageEnum;
 
 public class TestMessage extends Application {
@@ -33,7 +33,7 @@ public class TestMessage extends Application {
 //        mainPane.getChildren().add(messageGui.getPane());
 //        mainPane.getChildren().add(messageGui2.getPane());
         primaryStage.setResizable(false);
-        Messenger messenger = new Messenger(new User("a","a","a","as","slogan"));
+        Messenger messenger = new Messenger(new User("a","a","a","as","slogan",0));
         Scene scene = new Scene(messenger.getPanepane());
         primaryStage.setScene(scene);
 

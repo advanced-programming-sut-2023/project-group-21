@@ -1,5 +1,6 @@
 package model;
 
+import ServerConnection.User;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
