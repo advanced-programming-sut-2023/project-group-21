@@ -30,8 +30,8 @@ public class User implements Serializable, Comparable<User> {
         this.score=score;
         this.isOnline=false;
         pictureName="pic1.jpg";
-        Chat chat = new Chat(this, MessageEnum.PRIVATE_CHAT);
-        chats.add(chat);
+//        Chat chat = new Chat(this, MessageEnum.PRIVATE_CHAT);
+//        chats.add(chat);
     }
 
     public String getPasswordRecoveryAnswer() {

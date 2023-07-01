@@ -11,11 +11,23 @@ public class GroupGame implements Serializable {
     private User owner;
     private final ArrayList<User> players = new ArrayList<>();
     public final MapController mapController;
+    public final boolean isPrivate;
+    private ArrayList<String> chosenUsers = new ArrayList<>();
     public GroupGame(User owner, int size, MapController mapController) {
         this.owner = owner;
         this.size = size;
         addUser(owner);
         this.mapController = mapController;
+        this.isPrivate = false;
+    }
+
+    public GroupGame(User owner, int size, MapController mapController, ArrayList<String> chosenUsers) {
+        this.size = size;
+        this.owner = owner;
+        addUser(owner);
+        this.mapController = mapController;
+        this.chosenUsers = chosenUsers;
+        isPrivate = true;
     }
 
     public synchronized void addUser(User user) {
@@ -50,8 +62,15 @@ public class GroupGame implements Serializable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Users:\n");
-        for (int i = 0; i < players.size(); i++) {
-            stringBuilder.append((i+1)).append(". ").append(players.get(i).getUserName()).append("\n");
+        if (isPrivate) {
+            stringBuilder.append("(Specified)\n");
+            for (int i = 0; i < chosenUsers.size(); i++) {
+                stringBuilder.append((i+1)).append(". ").append(chosenUsers.get(i)).append("\n");
+            }
+        } else {
+            for (int i = 0; i < players.size(); i++) {
+                stringBuilder.append((i + 1)).append(". ").append(players.get(i).getUserName()).append("\n");
+            }
         }
         return stringBuilder.toString();
     }
@@ -61,12 +80,19 @@ public class GroupGame implements Serializable {
         for (User player: players)
             if (player.getUserName().equals(username)) desiredUser = player;
         if (desiredUser != null && desiredUser.equals(owner) && players.size() > 1) owner = players.get(1);
-        size--;
         players.remove(desiredUser);
     }
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public void setChosenUsers(ArrayList<String> chosenUsers) {
+        this.chosenUsers = chosenUsers;
+    }
+
+    public ArrayList<String> getChosenUsers() {
+        return chosenUsers;
     }
 }
 

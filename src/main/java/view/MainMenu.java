@@ -5,21 +5,21 @@ import ServerConnection.GroupGame;
 import controller.FileController;
 import controller.GameController;
 import controller.MapController;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import javafx.scene.shape.Line;
 import ServerConnection.Cell;
+import javafx.util.Duration;
 import model.Government;
 import ServerConnection.User;
 
@@ -211,22 +212,30 @@ public class MainMenu extends Application {
         stage.setMinHeight(400);
         Pane pane = new Pane();
         pane.setBackground(new Background(new BackgroundFill(Color.GOLD, CornerRadii.EMPTY, Insets.EMPTY)));
-        Scene scene = new Scene(pane, 400, 200);
+        Scene scene = new Scene(pane, 500, 600);
         scene.getStylesheets().add(pathCssFile);
         stage.setScene(scene);
         TextField numberOfPlayers = new TextField();
         numberOfPlayers.setPromptText("Number of Players");
-        numberOfPlayers.setMaxWidth(50);
-        numberOfPlayers.relocate(30, 30);
+        numberOfPlayers.setMaxWidth(40);
+        numberOfPlayers.relocate(100, 30);
+
         Button joinGame = new Button("Join a Game");
-        joinGame.relocate(220, 120);
+        joinGame.relocate(200, 120);
         joinGame.setPrefWidth(150);
+
         Button createGame = new Button("New Game");
         createGame.setPrefWidth(150);
-        createGame.relocate(30, 120);
+        createGame.relocate(100, 120);
+
+        Button privateGame = new Button("Private");
+        privateGame.setPrefWidth(150);
+        privateGame.relocate(300, 120);
+
         stage.show();
         pane.setStyle("-fx-max-height: 200;" + "-fx-min-height: 200;");
-        pane.getChildren().addAll(createGame, joinGame, numberOfPlayers);
+        pane.getChildren().addAll(createGame, joinGame, numberOfPlayers, privateGame);
+
         createGame.setOnMouseClicked(mouseEvent -> {
             ArrayList<Cell> myHolds = mapController.getMyHolds();
             System.out.println(myHolds);
@@ -286,6 +295,83 @@ public class MainMenu extends Application {
                     menu.start(StartingMenu.mainStage);
                 }
 
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        privateGame.setOnMouseClicked(mouseEvent -> {
+            try {
+                String count = numberOfPlayers.getText();
+                if (count.trim().isEmpty() || !count.matches("\\d+")) {
+                    //TODO: add proper message
+                    System.out.println("not a number");
+                    return;
+                }
+                int playerCount = Integer.parseInt(count);
+                pane.getChildren().remove(0, pane.getChildren().size());
+                ArrayList<TextField> playersUsernames = new ArrayList<>();
+                for (int i = 1; i < playerCount; i++) {
+                    TextField textField = new TextField();
+                    textField.setMaxWidth(50);
+                    textField.setPromptText("User no." + (i+1));
+                    playersUsernames.add(textField);
+                }
+                VBox vBox = new VBox();
+                vBox.setAlignment(Pos.CENTER);
+                vBox.setSpacing(15);
+                vBox.getChildren().addAll(playersUsernames);
+
+                Button startGame = new Button("Start Game");
+                startGame.setPrefWidth(100);
+                startGame.setTextFill(Color.DARKORANGE);
+                startGame.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+                startGame.setOnMouseClicked(mouseEvent1 -> {
+                    for (TextField textField: playersUsernames) {
+                        if (textField.getText().trim().isEmpty()) {
+                            Text text = new Text("You Have Not Specified\nAll Users.");
+                            text.setFill(Color.GREEN);
+                            text.setStroke(Color.BLACK);
+                            text.relocate(120, 500);
+                            pane.getChildren().add(text);
+                            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2), actionEvent ->
+                                    pane.getChildren().remove(text)));
+                            timeline.play();
+                            return;
+                        }
+                    }
+                    try {
+                        ArrayList<String> usernames = new ArrayList<>();
+                        usernames.add(user.getUserName());
+                        for (TextField textField: playersUsernames) usernames.add(textField.getText());
+                        System.out.println(usernames);
+                        GroupGame game = new GroupGame(user, playerCount, mapController, usernames);
+                        StartingMenu.getDOut().writeObject(game);
+                        Thread.sleep(50);
+                        Object object = StartingMenu.getDIn().readObject();
+                        if (object instanceof Integer number) {
+                            game.setId(number);
+                            pane.getChildren().remove(0, pane.getChildren().size());
+                            Text text = new Text("Waiting for other users\nto join...");
+                            text.relocate(100, 60);
+                            text.setTextAlignment(TextAlignment.CENTER);
+                            pane.getChildren().add(text);
+                            stage.close();
+                            WaitScene();
+                        } else if (object instanceof String message && message.equals("duplicate")) {
+                            Text text = new Text("You have already created\na game.");
+                            text.relocate(100, 60);
+                            text.setTextAlignment(TextAlignment.CENTER);
+                            pane.getChildren().add(text);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                vBox.getChildren().add(startGame);
+                vBox.relocate(90, 10);
+                pane.getChildren().add(vBox);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
