@@ -9,6 +9,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.MapChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,6 +36,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import ServerConnection.Cell;
 import model.Government;
@@ -147,6 +151,23 @@ public class MapViewGui extends Application implements Initializable, Runnable {
                 }
             });
         } catch (IOException | NullPointerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void startShop(){
+        if (!isInGame)
+            return;
+        ShoppingMenu shoppingMenu=new ShoppingMenu();
+        shoppingMenu.setGovernment(gameController.getCurrentGovernment());
+        try {
+            Stage shoppingStage = new Stage();
+            shoppingStage.setOnCloseRequest(windowEvent -> {
+                updateDetailsBox();
+                updateResourcesBox();
+            });
+            shoppingMenu.start(shoppingStage);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -837,6 +858,8 @@ public class MapViewGui extends Application implements Initializable, Runnable {
             } else if (keyEvent.getCode() == KeyCode.T) {
                 showTaxStage();
             }
+            else if (keyEvent.getCode() == KeyCode.Y)
+                startShop();
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         if (!mapController.isInitState()) {
@@ -893,6 +916,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
                     selectedExtra = null;
                     return;
                 }
+                isDraggedExtra = false;
                 MapMessages messages = mapController.setExtra(currentX + (int) (mouseEvent.getX() / CELL_SIZE) - 1,
                         currentY + (int) (mouseEvent.getY() / CELL_SIZE) - 1, selectedExtra);
                 if (messages != MapMessages.SUCCESS) {
@@ -980,53 +1004,83 @@ public class MapViewGui extends Application implements Initializable, Runnable {
     }
 
     private void showTaxStage() {
+        if (!isInGame)
+            return;
         Stage taxStage = new Stage();
         taxStage.setTitle("tax");
         taxStage.setResizable(false);
         Slider fearRateSlide = new Slider();
+        SpinnerValueFactory<Integer> taxFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(-3,8,
+                gameController.getCurrentGovernment().getTaxRate());
+        Spinner<Integer> taxSpinner = new Spinner<>(taxFactory);
+        SpinnerValueFactory<Integer> foodFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(-2,2,
+                gameController.getCurrentGovernment().getFoodRate());
+        Spinner<Integer> foodSpinner = new Spinner<>(foodFactory);
+
+        taxSpinner.setEditable(true);
+        taxSpinner.setMaxWidth(60);
+        taxSpinner.relocate(130,0);
+        foodSpinner.setMaxWidth(60);
+        foodSpinner.relocate(130,0);
+        fearRateSlide.setMax(2.1);
+        fearRateSlide.setMin(-2);
+        fearRateSlide.setValue(gameController.getCurrentGovernment().getFearRate() + 0.001);
+        fearRateSlide.relocate(115,0);
         Government currentGovernment = gameController.getCurrentGovernment();
 
-        StackPane stackPaneTax = getStackPane("tax", currentGovernment, 20, "file:" + MY_PATH +
+        Pane paneTax = getPane("tax",currentGovernment,20,"file:" + MY_PATH +
                 "/src/main/resources/images/tax_stage/tax.png");
-        StackPane stackPaneFear = getStackPane("fear", currentGovernment, 60, "file:" + MY_PATH +
+        Pane paneFear = getPane("fear",currentGovernment,60,"file:" + MY_PATH +
                 "/src/main/resources/images/tax_stage/fear.png");
-        StackPane stackPaneFood = getStackPane("food", currentGovernment, 100, "file:" + MY_PATH +
+        Pane paneFood = getPane("food",currentGovernment,100,"file:" + MY_PATH +
                 "/src/main/resources/images/tax_stage/tax.png");
+
+        paneFear.getChildren().add(fearRateSlide);
+        paneTax.getChildren().add(taxSpinner);
+
+        fearRateSlide.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) observable ->
+                ((Label)paneFear.getChildren().get(0)).setText("fear rate: "+(int)fearRateSlide.getValue()));
+        taxSpinner.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) observable ->
+                ((Label)paneTax.getChildren().get(0)).setText("tax rate : " + taxSpinner.getValue()));
+        foodSpinner.getProperties().addListener((MapChangeListener<? super Object, ? super Object>) observable ->
+                ((Label)paneFood.getChildren().get(0)).setText("food rate : " + foodSpinner.getValue()));
 
         Button closeButton = new Button("save");
         closeButton.relocate(130, 160);
         closeButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                currentGovernment.setTaxRate(0);//repair
-                currentGovernment.setFearRate(0);//repair
+                currentGovernment.setTaxRate(taxSpinner.getValue());
+                currentGovernment.setFearRate((int)Math.floor(fearRateSlide.getValue()));
                 currentGovernment.setFoodRate(0);//repair
                 taxStage.close();
             }
         });
-        Pane pane = new Pane(stackPaneFood, stackPaneTax, stackPaneFear, closeButton);
+
+        Pane pane = new Pane(paneFood, paneTax, paneFear, closeButton);
         Scene tempScene = new Scene(pane, 300, 200);
         taxStage.setScene(tempScene);
         taxStage.show();
     }
 
-    private StackPane getStackPane(String type, Government currentGovernment, int Y, String fullPath) {
+    private Pane getPane(String type, Government currentGovernment, int Y , String fullPath) {
         Label label = switch (type) {
             case ("tax") -> new Label("tax rate:" + currentGovernment.getTaxRate());
             case ("fear") -> new Label("fear rate: " + currentGovernment.getFearRate());
             default -> new Label("food rate: " + currentGovernment.getFoodRate());
         };
+        label.relocate(30,0);
         ImageView iv = new ImageView(fullPath);
         iv.setFitWidth(20);
         iv.setFitHeight(20);
-        iv.relocate(label.getWidth(), 0);
-        StackPane stackPane = new StackPane(label, iv);
-        if (type.equals("food")) {
-            stackPane.setStyle("-fx-background-color: green");
-        } else
-            stackPane.setStyle("-fx-background-color: red");
+        Pane pane = new Pane(label,iv);
+        if (type.equals("food"))
+            pane.setStyle("-fx-background-color: green;");
+        else
+            pane.setStyle("-fx-background-color: red;");
 
-        stackPane.relocate(20, Y);
-        return stackPane;
+        pane.relocate(20,Y);
+        pane.setMinWidth(260);
+        return pane;
     }
 
     private void alert(GameMessage gameMessage) {
@@ -1035,7 +1089,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
         text.setFill(Color.RED);
         text.setFont(Font.font(20));
         mainPane.getChildren().add(text);
-        new Timeline(new KeyFrame(Duration.millis(1000),
+        new Timeline(new KeyFrame(Duration.millis(2000),
                 actionEvent -> mainPane.getChildren().remove(text))).play();
     }
 

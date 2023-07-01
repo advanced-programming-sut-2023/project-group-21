@@ -417,10 +417,10 @@ public class SigningMenu extends Application {
         answerLabel.relocate(40, 210);
         textField.relocate(40, 240);
         saveButton.relocate(40, 270);
-        changeButton.relocate(300, 50);
+        changeButton.relocate(340, 50);
         changeButton.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
-                area.setText(OtherController.generateCaptchaString());
+                area.setText(OtherController.generateCaptcha());
             }
         });
 
