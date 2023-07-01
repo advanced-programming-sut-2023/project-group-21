@@ -460,8 +460,8 @@ public class Profile extends Application {
 
     private void addAvatar(String picture) {
         Circle circle = new Circle(70);
-        Image image = new Image((new File("").getAbsolutePath()) +
-                "/src/main/resources/images/avatar/" + picture);
+        String path = "/images/avatar/" + picture;
+        Image image = new Image(Profile.class.getResource(path).toExternalForm());
         circle.setStroke(Color.BLACK);
         circle.setFill(new ImagePattern(image));
         circle.relocate(900, 80);
