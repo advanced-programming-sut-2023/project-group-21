@@ -860,6 +860,15 @@ public class MapViewGui extends Application implements Initializable, Runnable {
                 showTaxStage();
             } else if (keyEvent.getCode() == KeyCode.Y)
                 startShop();
+            else if (keyEvent.getCode() == KeyCode.Z) {
+                try {
+                    gameController.undo(null);
+                    showMap(showingMap);
+                    miniMap();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         });
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         if (!mapController.isInitState()) {
@@ -1242,13 +1251,13 @@ public class MapViewGui extends Application implements Initializable, Runnable {
         showMap(showingMap);
     }
 
-    public void dropBuilding(DropBuilding dropBuilding) {
+    public void dropBuilding(DropBuilding dropBuilding) throws IOException {
         gameController.dropOpponentBuilding(dropBuilding);
         showMap(showingMap);
         miniMap();
     }
 
-    public void makeTroop(MakeTroop makeTroop) {
+    public void makeTroop(MakeTroop makeTroop) throws IOException {
         gameController.makeOpponentTroop(makeTroop);
         showMap(showingMap);
         miniMap();
