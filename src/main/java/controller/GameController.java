@@ -20,8 +20,10 @@ import model.human.Person;
 import model.human.Worker;
 import model.machine.Machine;
 import model.machine.MachineDetails;
+import view.StartingMenu;
 import view.message.GameMessage;
 
+import java.io.IOException;
 import java.util.*;
 
 import static java.lang.Math.abs;
@@ -48,6 +50,8 @@ public class GameController {
     private final Map<Engineer, String> pouringOils = new HashMap<>();
     private final ArrayList<Cell> freeDogs = new ArrayList<>();
     private final Map<Cell, String> tunnels = new HashMap<>();
+    private int lastX = -1, lastY = -1;
+    private boolean wasBuilding;
 
     public GameController(ArrayList<Government> governments, Cell[][] map) {
         this.governments = governments;
@@ -148,6 +152,9 @@ public class GameController {
     }
 
     public void dropBuilding(int x, int y, BuildingsDetails buildingsDetails, Government govern) {
+        lastX = x;
+        lastY = y;
+        wasBuilding = true;
         BuildingsDetails.BuildingType buildingType = buildingsDetails.getBuildingType();
         ArrayList<Person> persons = new ArrayList<>();
         int number = buildingsDetails.getWorkersCount();
@@ -218,6 +225,9 @@ public class GameController {
         EuropeanSoldiersDetails europeanSoldiers = EuropeanSoldiersDetails.getDetailsByWorkerDetails(worker);
 //        if (!worker.getTrainerBuilding().equals(selectedBuilding.getBuildingsDetails()))
 //            return GameMessage.NO_SUITABLE_BUILDING;
+        lastX = x;
+        lastY = y;
+        wasBuilding = false;
         try {
             if (!worker.getTrainerBuilding().equals(BuildingsDetails.MERCENARY_POST) && getNumberOfPeasants() < count)
                 return GameMessage.NOT_ENOUGH_PEOPLE;
@@ -773,7 +783,7 @@ public class GameController {
             toRemove.add(cell.getBuilding());
         }
         freeDogs.clear();
-        for (Building building : toRemove) removeBuilding(building);
+        for (Building building : toRemove) removeBuilding(building, currentGovernment);
     }
 
 
@@ -1001,7 +1011,7 @@ public class GameController {
                 toRemove.add(building);
             }
         }
-        for (Building building : toRemove) removeBuilding(building);
+        for (Building building : toRemove) removeBuilding(building, currentGovernment);
     }
 
     public void pourOil(String direction, Engineer engineer) {
@@ -1037,7 +1047,7 @@ public class GameController {
         engineer.setDestination(currentGovernment.getBuildingByName("oil smelter").getCell());
     }
 
-    private void removeBuilding(Building building) {
+    private void removeBuilding(Building building, Government govern) {
         building.getGovernment().getBuildings().remove(building);
         building.getCell().setBuilding(null);
         if (building.getWorkers() != null) {
@@ -1047,7 +1057,7 @@ public class GameController {
         if (building.getBuildingsDetails().equals(BuildingsDetails.CHURCH) ||
                 building.getBuildingsDetails().equals(BuildingsDetails.CATHEDRAL) ||
                 building.getBuildingsDetails().equals(BuildingsDetails.INN))
-            currentGovernment.setReligionRate(false);
+            govern.setReligionRate(false);
     }
 
     public ArrayList<Cell> getNeighbours(Cell cell) {
@@ -1261,19 +1271,47 @@ public class GameController {
         return vBox;
     }
 
-    public void dropOpponentBuilding(DropBuilding dropBuilding) {
-        dropBuilding(dropBuilding.getXPosition(), dropBuilding.getYPosition(),
-                dropBuilding.getBuildingsDetails(), getGovernmentByUsername(dropBuilding.getUsername()));
+    public void dropOpponentBuilding(DropBuilding dropBuilding) throws IOException {
+        if (dropBuilding.getBuildingsDetails() == null) {
+            lastX = dropBuilding.getXPosition();
+            lastY = dropBuilding.getYPosition();
+            wasBuilding = true;
+            undo(getGovernmentByUsername(dropBuilding.getUsername()));
+        } else {
+            dropBuilding(dropBuilding.getXPosition(), dropBuilding.getYPosition(),
+                    dropBuilding.getBuildingsDetails(), getGovernmentByUsername(dropBuilding.getUsername()));
+        }
     }
 
-    public void makeOpponentTroop(MakeTroop makeTroop) {
-        getGovernmentByUsername(makeTroop.getUsername()).addTrainedPeople(makeTroop.getWorkerDetails(),
-                map[makeTroop.getXPosition()][makeTroop.getYPosition()]);
+    public void makeOpponentTroop(MakeTroop makeTroop) throws IOException {
+        if (makeTroop.getWorkerDetails() == null) {
+            lastX = makeTroop.getXPosition();
+            lastY = makeTroop.getYPosition();
+            wasBuilding = false;
+            undo(getGovernmentByUsername(makeTroop.getUsername()));
+        } else {
+            getGovernmentByUsername(makeTroop.getUsername()).addTrainedPeople(makeTroop.getWorkerDetails(),
+                    map[makeTroop.getXPosition()][makeTroop.getYPosition()]);
+        }
     }
 
     private Government getGovernmentByUsername(String username) {
         for (Government government: governments)
             if (government.getLord().getUserName().equals(username)) return government;
         return null;
+    }
+
+    public void undo(Government govern) throws IOException {
+        if (lastX == -1) return;
+        Cell cell = map[lastX][lastY];
+        if (wasBuilding) {
+            if (govern == null) govern = currentGovernment;
+            removeBuilding(cell.getBuilding(),govern);
+            StartingMenu.getDOut().writeObject(new DropBuilding(null, lastX, lastY));
+        } else {
+            cell.getPeople().remove(cell.getPeople().size() - 1);
+            StartingMenu.getDOut().writeObject(new MakeTroop(null, lastX, lastY));
+        }
+        lastX = lastY = -1;
     }
 }

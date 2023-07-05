@@ -9,7 +9,7 @@ public class GroupGame implements Serializable {
     private int id;
     private int size;
     private User owner;
-    private final ArrayList<User> players = new ArrayList<>();
+    private final ArrayList<User> players = new ArrayList<>(), spectators = new ArrayList<>();
     public final MapController mapController;
     public final boolean isPrivate;
     private ArrayList<String> chosenUsers = new ArrayList<>();
@@ -93,6 +93,14 @@ public class GroupGame implements Serializable {
 
     public ArrayList<String> getChosenUsers() {
         return chosenUsers;
+    }
+
+    public void addSpectator(User user) {
+        spectators.add(user);
+    }
+
+    public ArrayList<User> getSpectators() {
+        return spectators;
     }
 }
 

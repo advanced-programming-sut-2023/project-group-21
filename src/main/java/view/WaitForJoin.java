@@ -46,6 +46,7 @@ public class WaitForJoin extends Thread {
         GameController gameController = new GameController(governments, groupGame.getMapController().getMap());
         MapViewGui.setStaticGameController(gameController);
         MapViewGui.isInGame = true;
+        MapViewGui.user = mainMenu.getUser();
         MapViewGui mapViewGui = new MapViewGui();
 //        GetChanges getChanges = new GetChanges(mapViewGui);
 //        getChanges.setGameController(gameController);

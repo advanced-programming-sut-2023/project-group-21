@@ -35,6 +35,7 @@ import ServerConnection.User;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MainMenu extends Application {
     private final static String pathCssFile = MainMenu.class.getResource("/CSS/Texture.css").toString();
@@ -232,9 +233,13 @@ public class MainMenu extends Application {
         privateGame.setPrefWidth(150);
         privateGame.relocate(300, 120);
 
+        Button watchGame = new Button("Watch");
+        watchGame.setPrefWidth(150);
+        watchGame.relocate(200, 150);
+
         stage.show();
         pane.setStyle("-fx-max-height: 200;" + "-fx-min-height: 200;");
-        pane.getChildren().addAll(createGame, joinGame, numberOfPlayers, privateGame);
+        pane.getChildren().addAll(createGame, joinGame, numberOfPlayers, privateGame, watchGame);
 
         createGame.setOnMouseClicked(mouseEvent -> {
             ArrayList<Cell> myHolds = mapController.getMyHolds();
@@ -373,6 +378,34 @@ public class MainMenu extends Application {
                 vBox.relocate(90, 10);
                 pane.getChildren().add(vBox);
             } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        watchGame.setOnMouseClicked(mouseEvent -> {
+            try {
+                StartingMenu.getDOut().writeObject("watch");
+                Thread.sleep(50);
+                Object obj = StartingMenu.getDIn().readObject();
+                if (obj == null) {
+                    System.out.println("No Game Available.");
+                    return;
+                }
+                GroupGame game = (GroupGame) obj;
+                ArrayList<Government> governments = new ArrayList<>();
+                for (int i = 0; i < game.getPlayers().size(); i++)
+                    governments.add(new Government(game.getPlayers().get(i), game.getMapController().getMyHolds().get(i)));
+                GameController gameController = new GameController(governments, game.getMapController().getMap());
+                MapViewGui.setStaticGameController(gameController);
+                MapViewGui.isInGame = true;
+                MapViewGui.watch = true;
+                MapViewGui mapViewGui = new MapViewGui();
+                mapViewGui.setMainMenu(this);
+                mapViewGui.setMapController(game.getMapController());
+                mapViewGui.setGameController(gameController);
+                mapViewGui.start(StartingMenu.mainStage);
+                stage.close();
+            } catch (IOException | InterruptedException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         });

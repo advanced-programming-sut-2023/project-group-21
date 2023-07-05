@@ -1,7 +1,6 @@
 package view;
 
 import ServerConnection.GroupGame;
-import ServerConnection.User;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -77,6 +76,7 @@ public class JoinGameMenu extends Application {
                 outer:
                 for (int i = 0; i < 5; i++) {
                     for (int j = 0; j < 3; j++) {
+                        if (games.size() == 0) break outer;
                         GroupGame group = games.get(count++);
                         if ((!group.isPrivate) || group.getChosenUsers().contains(mainMenu.getUser().getUserName()))
                             gridPane.add(createGameDetails(group), i, j, 1, 1);
