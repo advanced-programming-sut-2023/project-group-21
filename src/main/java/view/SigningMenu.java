@@ -379,7 +379,8 @@ public class SigningMenu extends Application {
                                 nicknameTextField.getText(),
                                 sloganTextField.getText(),
                                 selectedQuestionNumber[0],
-                                answerTextField.getText()
+                                answerTextField.getText(),
+                                "pic1.jpg"
                         ));
                     } catch (IOException e) {
                         throw new RuntimeException(e);

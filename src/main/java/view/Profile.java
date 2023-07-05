@@ -1,7 +1,10 @@
 package view;
 
+import ServerConnection.LoginMessage;
 import controller.FileController;
 import controller.OtherController;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -11,12 +14,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -24,7 +24,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ServerConnection.User;
-import model.*;
+import javafx.util.Duration;
 import view.commands.CheckValidion;
 
 import java.io.File;
@@ -65,6 +65,7 @@ public class Profile extends Application {
         leaderboardButton.setOnMouseClicked(mouseEvent -> {
             Stage boardStage=new Stage();
 
+
             TableView table = new TableView<User>();
 
 
@@ -79,7 +80,6 @@ public class Profile extends Application {
             timeColumn.setCellValueFactory(new PropertyValueFactory<User, Boolean>("isOnline"));
             table.getColumns().addAll(nameColumn, scoreColumn, timeColumn);
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
 //            FileController.getAllUsers().sort(User::compareTo);
             ObservableList<User> users= FXCollections.observableArrayList(FileController.getAllUsers());
 
@@ -88,6 +88,42 @@ public class Profile extends Application {
             table.getSortOrder().add(scoreColumn);
             table.prefHeightProperty().bind(boardStage.heightProperty());
             table.prefWidthProperty().bind(boardStage.widthProperty());
+
+            table.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    Stage newStage = new Stage();
+                    newStage.setWidth(200);
+                    newStage.setHeight(200);
+                    User selectedItem = (User) newSelection;
+//                    try {
+//                        StartingMenu.getDOut().writeObject(new LoginMessage(((User) newSelection).getUserName(), "s")););
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+                    Circle circle = new Circle(70);
+                    String path = "/images/avatar/" + selectedItem.getPictureName();
+                    Image image = new Image(Profile.class.getResource(path).toExternalForm());
+                    circle.setStroke(Color.BLACK);
+                    circle.setFill(new ImagePattern(image));
+                    circle.relocate(0,0);
+                    Pane pane=new Pane(circle);
+                    pane.setPrefWidth(200);
+                    pane.setPrefHeight(200);
+                    Scene newScene = new Scene(pane);
+                    newStage.setScene(newScene);
+
+                    // Show the new stage
+                    newStage.show();
+                }
+            });
+
+
+
+            Timeline timeline=new Timeline(new KeyFrame(Duration.seconds(10), actionEvent -> {
+                update(table,scoreColumn);
+            }));
+            timeline.setCycleCount(-1);
+            timeline.play();
 
             Pane boardPane=new Pane(table);
             Scene boardScene=new Scene(boardPane);
@@ -101,6 +137,13 @@ public class Profile extends Application {
 
         leaderboardButton.relocate(380, 400);
         mainPane.getChildren().add(leaderboardButton);
+    }
+
+    private void update(TableView table, TableColumn scoreColumn) {
+        table.getItems().clear();
+        ObservableList<User> users= FXCollections.observableArrayList(FileController.getAllUsers());
+        table.getItems().addAll(users);
+        table.sort();
     }
 
     private void addSlogan() {
