@@ -2,6 +2,7 @@ package view;
 
 import ServerConnection.DropBuilding;
 import ServerConnection.MakeTroop;
+import ServerConnection.User;
 import controller.GameController;
 import controller.MapController;
 import controller.VboxCreator;
@@ -62,6 +63,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
     private final static String pathCssFile = "file:" + (new File("").getAbsolutePath()) +
             "/src/main/resources/CSS/Texture.css";
     private final static String MY_PATH = new File("").getAbsolutePath();
+    public static User user;
     private String[] textureItem;
     private final Label errorLabel = new Label("");
     private double startDragX = 0, startDragY = 0;
@@ -96,7 +98,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
     private GetChanges getChanges;
 
 
-    public static boolean isInGame = false;
+    public static boolean isInGame = false, watch = false;
     private GameController gameController;
     private static GameController staticGameController;
     private BuildingsDetails selectedBuildingDetails;
@@ -231,24 +233,27 @@ public class MapViewGui extends Application implements Initializable, Runnable {
 
 
     public void initGame() {
-        initializeDetailsBox();
-        initializeResourcesBox();
-        createCategoryBox();
+        if (!watch) {
+            initializeDetailsBox();
+            initializeResourcesBox();
+            createCategoryBox();
+        }
         objectBox.getChildren().remove(0, objectBox.getChildren().size());
         ImageView imageView;
         Image image;
         Label label;
-        for (Map.Entry<String, BuildingsDetails> entry : VboxCreator.CASTLE_BUILDINGS.entrySet()) {
-            image = new Image(entry.getKey());
-            imageView = new ImageView(image);
-            imageView.setFitWidth(90);
-            imageView.setFitHeight(70);
-            label = new Label(null, imageView);
-            label.setTooltip(new Tooltip(entry.getValue().getName()));
-            label.setStyle("-fx-border-color: black;");
-            label.setOnMousePressed(mouseEvent -> selectedBuildingDetails = entry.getValue());
-            objectBox.getChildren().add(label);
-        }
+        if (!watch)
+            for (Map.Entry<String, BuildingsDetails> entry : VboxCreator.CASTLE_BUILDINGS.entrySet()) {
+                image = new Image(entry.getKey());
+                imageView = new ImageView(image);
+                imageView.setFitWidth(90);
+                imageView.setFitHeight(70);
+                label = new Label(null, imageView);
+                label.setTooltip(new Tooltip(entry.getValue().getName()));
+                label.setStyle("-fx-border-color: black;");
+                label.setOnMousePressed(mouseEvent -> selectedBuildingDetails = entry.getValue());
+                objectBox.getChildren().add(label);
+            }
     }
 
     private void createCategoryBox() {
@@ -682,22 +687,38 @@ public class MapViewGui extends Application implements Initializable, Runnable {
     }
 
 
-    private void nextTurn() throws IOException {//called by pressing 'n'
-        if (!isInGame)
-            return;
-        System.out.println("next turn is called!");
-        gameController.nextTurn();//go to next turn
-        updateDetailsBox();
-        updateResourcesBox();
-        updateObjectBox(VboxCreator.CASTLE_BUILDINGS);//make it default
-        showMap(showingMap);//update map
-        miniMap();
-        if (guiWorker != null) {
-            for (Worker myWorker : guiWorker)
-                myWorker.setGoingToMoveGui(false);
-        }
-        StartingMenu.getDOut().writeObject("next " + gameController.getCurrentGovernment().getLord().getUserName());
-        getChanges.canMakeChanges = false;
+    public void nextTurn() throws IOException {//called by pressing 'n'
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (!isInGame)
+                    return;
+                System.out.println("next turn is called!");
+                gameController.nextTurn();//go to next turn
+                updateDetailsBox();
+                updateResourcesBox();
+                updateObjectBox(VboxCreator.CASTLE_BUILDINGS);//make it default
+                showMap(showingMap);//update map
+                miniMap();
+                if (guiWorker != null) {
+                    for (Worker myWorker : guiWorker)
+                        myWorker.setGoingToMoveGui(false);
+                }
+                if (getChanges.canMakeChanges) {
+                    try {
+                        System.out.println("I Sent.");
+                        StartingMenu.getDOut().writeObject("next " + gameController.getCurrentGovernment().getLord().getUserName());
+                        getChanges.canMakeChanges = false;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (gameController.getCurrentGovernment().getLord().getUserName().equals(user.getUserName())) {
+                    System.out.println("SHOT");
+                    getChanges.canMakeChanges = true;
+                }
+            }
+        });
     }
 
     @Override
@@ -738,6 +759,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
         });
 
         mainPane.setOnMouseDragReleased(mouseDragEvent -> {
+            if (watch) return;
             double xPane = mouseDragEvent.getX() - X_CELL_PANE, yPane = mouseDragEvent.getY() - Y_CELL_PANE;
             if (xPane >= 600 || xPane < 0 || yPane >= 600 || yPane < 0) {
                 return;
@@ -828,6 +850,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
 
         });
         mainPane.setOnKeyPressed(keyEvent -> {// for handling shortcuts!
+            if (watch) return;
             if (keyEvent.getCode() == KeyCode.S) {
                 save();
             } else if (keyEvent.getCode() == KeyCode.Q) {
@@ -895,6 +918,7 @@ public class MapViewGui extends Application implements Initializable, Runnable {
             mainPane.startFullDrag();
         });
         cellPane.setOnMouseReleased(mouseEvent -> {
+            if (watch) return;
             if (mouseEvent.getButton() == MouseButton.MIDDLE || mouseEvent.getButton() == MouseButton.SECONDARY) {
                 if (mouseEvent.getButton() == MouseButton.MIDDLE) {
                     double deltaX = mouseEvent.getX() - startMoveX;
@@ -1261,5 +1285,9 @@ public class MapViewGui extends Application implements Initializable, Runnable {
         gameController.makeOpponentTroop(makeTroop);
         showMap(showingMap);
         miniMap();
+    }
+
+    public GameController getGameController() {
+        return gameController;
     }
 }

@@ -2,6 +2,7 @@ package view;
 
 import ServerConnection.GameEssentials;
 import ServerConnection.GroupGame;
+import ServerConnection.User;
 import controller.GameController;
 import controller.MapController;
 import model.Government;
@@ -51,6 +52,7 @@ public class WaitForMap extends Thread {
         GameController gameController = new GameController(governments, groupGame.getMapController().getMap());
         MapViewGui.setStaticGameController(gameController);
         MapViewGui.isInGame = true;
+        MapViewGui.user = mainMenu.getUser();
         MapViewGui mapViewGui = new MapViewGui();
 //        GetChanges getChanges = new GetChanges(mapViewGui);
 //        getChanges.setGameController(gameController);

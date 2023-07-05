@@ -31,13 +31,14 @@ public class GetChanges extends Thread {
                     switch (message) {
                         case "yes", "no" -> {
                             canMakeChanges = message.equals("yes");
-                            System.out.println(canMakeChanges);
                         }
                         case "show map" -> mapViewGui.showOriginalMap();
                         case "your turn" -> {
                             System.out.println("My turn now");
                             canMakeChanges = true;
                         }
+                        case "game" -> StartingMenu.getDOut().writeObject(mapViewGui.getGameController());
+                        case "next turn" -> mapViewGui.nextTurn();
                     }
                 } else if (object instanceof DropBuilding building) {
                     mapViewGui.dropBuilding(building);
